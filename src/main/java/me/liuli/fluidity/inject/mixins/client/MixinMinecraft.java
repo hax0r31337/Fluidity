@@ -92,6 +92,11 @@ public abstract class MixinMinecraft {
         Fluidity.eventManager.callEvent(new ScreenEvent(currentScreen));
     }
 
+    @Inject(method = "clickMouse", at = @At("HEAD"))
+    private void clickMouse(CallbackInfo callbackInfo) {
+        leftClickCounter = 0;
+    }
+
     @Overwrite
     private void sendClickBlockToController(boolean leftClick) {
         if(!leftClick)

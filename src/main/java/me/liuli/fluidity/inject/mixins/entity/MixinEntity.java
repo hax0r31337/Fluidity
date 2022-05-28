@@ -2,6 +2,8 @@ package me.liuli.fluidity.inject.mixins.entity;
 
 import me.liuli.fluidity.Fluidity;
 import me.liuli.fluidity.event.StrafeEvent;
+import me.liuli.fluidity.module.modules.client.Targets;
+import me.liuli.fluidity.module.modules.combat.HitBox;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Random;
 import java.util.UUID;
@@ -173,7 +176,7 @@ public abstract class MixinEntity {
 
     @Inject(method = "moveFlying", at = @At("HEAD"), cancellable = true)
     private void handleRotations(float strafe, float forward, float friction, final CallbackInfo callbackInfo) {
-        if ((Entity) (Object) this != Minecraft.getMinecraft().thePlayer)
+        if ((Object) this != Minecraft.getMinecraft().thePlayer)
             return;
 
         final StrafeEvent strafeEvent = new StrafeEvent(strafe, forward, friction);
@@ -181,5 +184,11 @@ public abstract class MixinEntity {
 
         if (strafeEvent.getCancelled())
             callbackInfo.cancel();
+    }
+
+    @Inject(method = "getCollisionBorderSize", at = @At("HEAD"), cancellable = true)
+    private void getCollisionBorderSize(final CallbackInfoReturnable<Float> callbackInfoReturnable) {
+        if (HitBox.INSTANCE.getState() && Targets.INSTANCE.isTarget(((Entity)((Object)this)),true))
+            callbackInfoReturnable.setReturnValue(0.1F + HitBox.INSTANCE.getSizeValue().get());
     }
 }

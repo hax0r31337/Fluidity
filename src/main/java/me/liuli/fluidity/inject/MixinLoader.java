@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class MixinLoader implements IFMLLoadingPlugin {
     public MixinLoader() {
-        System.out.println("[Mashiro] Injecting with IFMLLoadingPlugin.");
+        System.out.println("Injecting with IFMLLoadingPlugin.");
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.fluidity.json");
         MixinEnvironment.getDefaultEnvironment().setSide(MixinEnvironment.Side.CLIENT);

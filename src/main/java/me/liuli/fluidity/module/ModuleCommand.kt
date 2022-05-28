@@ -67,6 +67,7 @@ class ModuleCommand(private val module: Module, private val values: List<Value<*
                     when (args[1].lowercase()) {
                         "on", "true" -> value.set(true)
                         "off", "false" -> value.set(false)
+                        "!", "rev", "reverse" -> value.set(!value.get())
                         else -> value.set(!value.get())
                     }
                 }

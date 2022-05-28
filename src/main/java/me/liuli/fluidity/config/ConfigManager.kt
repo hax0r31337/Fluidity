@@ -3,19 +3,22 @@ package me.liuli.fluidity.config
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.EventMethod
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.event.UpdateEvent
+import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.other.getObjectInstance
+import me.liuli.fluidity.util.other.resolvePackage
 import me.liuli.fluidity.util.timing.TheTimer
-import org.reflections.Reflections
 import java.io.*
 import java.nio.charset.StandardCharsets
 
 class ConfigManager : Listener {
     val gson = GsonBuilder().setPrettyPrinting().create()
-    val rootPath = File(mc.mcDataDir, "Mashiro")
+    val rootPath = File(mc.mcDataDir, Fluidity.name)
     val configPath = File(rootPath, "configs")
     val configSetFile = File(rootPath, "config.json")
 
@@ -26,16 +29,18 @@ class ConfigManager : Listener {
     var configFile = File(configPath, "$nowConfig.json")
 
     init {
-        // 使用Reflections自动加载sections
-        val reflections = Reflections("${this.javaClass.`package`.name}.sections")
-        val subTypes: Set<Class<out ConfigSection>> = reflections.getSubTypesOf(ConfigSection::class.java)
-        for (theClass in subTypes) {
-            try {
-                sections.add(theClass.newInstance())
-            } catch (e: Exception) {
-                e.printStackTrace()
+        resolvePackage("${this.javaClass.`package`.name}.sections", ConfigSection::class.java)
+            .forEach {
+                try {
+                    sections.add(it.newInstance())
+                } catch (e: IllegalAccessException) {
+                    // this module is a kotlin object
+                    sections.add(getObjectInstance(it))
+                } catch (e: Throwable) {
+                    logError("Failed to load config section: ${it.name} (${e.javaClass.name}: ${e.message})")
+                }
             }
-        }
+
         // 初始化文件夹
         if (!rootPath.exists()) {
             rootPath.mkdirs()

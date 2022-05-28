@@ -1,7 +1,9 @@
 package me.liuli.fluidity.command
 
 import me.liuli.fluidity.util.client.displayAlert
-import org.reflections.Reflections
+import me.liuli.fluidity.util.client.logError
+import me.liuli.fluidity.util.other.getObjectInstance
+import me.liuli.fluidity.util.other.resolvePackage
 
 class CommandManager {
     val defaultPrefix = "."
@@ -11,15 +13,17 @@ class CommandManager {
     var latestAutoComplete: Array<String> = emptyArray()
 
     init {
-        val reflections = Reflections("${this.javaClass.`package`.name}.commands")
-        val subTypes: Set<Class<out Command>> = reflections.getSubTypesOf(Command::class.java)
-        for (theClass in subTypes) {
-            try {
-                registerCommand(theClass.newInstance())
-            } catch (e: Exception) {
-                e.printStackTrace()
+        resolvePackage("${this.javaClass.`package`.name}.commands", Command::class.java)
+            .forEach {
+                try {
+                    registerCommand(it.newInstance())
+                } catch (e: IllegalAccessException) {
+                    // this module is a kotlin object
+                    registerCommand(getObjectInstance(it))
+                } catch (e: Throwable) {
+                    logError("Failed to load command: ${it.name} (${e.javaClass.name}: ${e.message})")
+                }
             }
-        }
     }
 
     fun registerCommand(command: Command) {

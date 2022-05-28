@@ -3,11 +3,9 @@ package me.liuli.fluidity.util.client
 import com.google.gson.JsonObject
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.util.mc
-import net.minecraft.client.settings.GameSettings
 import net.minecraft.util.IChatComponent
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.Display
-import java.lang.reflect.Field
 
 private val logger = LogManager.getLogger(Fluidity.name)
 

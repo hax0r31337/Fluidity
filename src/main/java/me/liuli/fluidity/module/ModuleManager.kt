@@ -5,8 +5,10 @@ import me.liuli.fluidity.event.EventMethod
 import me.liuli.fluidity.event.KeyEvent
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.util.client.displayAlert
+import me.liuli.fluidity.util.client.logError
+import me.liuli.fluidity.util.other.getObjectInstance
+import me.liuli.fluidity.util.other.resolvePackage
 import org.lwjgl.input.Keyboard
-import org.reflections.Reflections
 
 class ModuleManager : Listener {
     val modules = mutableListOf<Module>()
@@ -14,15 +16,17 @@ class ModuleManager : Listener {
     private var pendingKeyBindModule: Module? = null
 
     init {
-        val reflections = Reflections("${this.javaClass.`package`.name}.modules")
-        val subTypes: Set<Class<out Module>> = reflections.getSubTypesOf(Module::class.java)
-        for (theClass in subTypes) {
-            try {
-                registerModule(theClass.newInstance())
-            } catch (e: Exception) {
-                e.printStackTrace()
+        resolvePackage("${this.javaClass.`package`.name}.modules", Module::class.java)
+            .forEach {
+                try {
+                    registerModule(it.newInstance())
+                } catch (e: IllegalAccessException) {
+                    // this module is a kotlin object
+                    registerModule(getObjectInstance(it))
+                } catch (e: Throwable) {
+                    logError("Failed to load module: ${it.name} (${e.javaClass.name}: ${e.message})")
+                }
             }
-        }
     }
 
     fun registerModule(module: Module) {

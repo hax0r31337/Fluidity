@@ -5,10 +5,9 @@ import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.util.mc
-
-import net.minecraft.client.settings.GameSettings
-import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.GuiIngameMenu
+import net.minecraft.client.settings.GameSettings
 
 // Not compiled, built by BRAIN-DEVELOPMENT-KIT XD
 class InventoryMove : Module("InventoryMove", "Allows you to walk while opening the inventory.", ModuleCategory.MOVEMENT) {

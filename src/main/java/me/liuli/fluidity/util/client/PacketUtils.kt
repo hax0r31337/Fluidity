@@ -1,10 +1,6 @@
 package me.liuli.fluidity.util.client
 
-import me.liuli.fluidity.util.mc
 import net.minecraft.network.Packet
-import net.minecraft.network.play.INetHandlerPlayClient
-import net.minecraft.network.play.INetHandlerPlayServer
-import net.minecraft.network.play.server.*
 
 object PacketUtils {
 

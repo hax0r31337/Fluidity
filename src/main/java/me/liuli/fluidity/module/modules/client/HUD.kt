@@ -6,7 +6,10 @@ import me.liuli.fluidity.event.Render2DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.util.mc
-import me.liuli.fluidity.util.render.*
+import me.liuli.fluidity.util.render.EaseUtils
+import me.liuli.fluidity.util.render.drawRect
+import me.liuli.fluidity.util.render.rainbow
+import me.liuli.fluidity.util.render.reAlpha
 import net.minecraft.client.gui.ScaledResolution
 import org.lwjgl.opengl.GL11
 import java.awt.Color
