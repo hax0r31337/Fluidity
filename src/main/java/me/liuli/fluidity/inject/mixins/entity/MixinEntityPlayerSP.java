@@ -630,4 +630,15 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
             this.worldObj.theProfiler.endSection();
         }
     }
+
+    @Override
+    public Vec3 getLook(float p_getLook_1_) {
+        float yaw = RotationUtilsKt.getLastReportedYaw(), pitch = RotationUtilsKt.getLastReportedPitch();
+
+        float f = MathHelper.cos(-yaw * 0.017453292F - 3.1415927F);
+        float f1 = MathHelper.sin(-yaw * 0.017453292F - 3.1415927F);
+        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
+        float f3 = MathHelper.sin(-pitch * 0.017453292F);
+        return new Vec3(f1 * f2, f3, f * f2);
+    }
 }

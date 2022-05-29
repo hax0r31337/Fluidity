@@ -38,8 +38,6 @@ class KeyEvent(val key: Int) : Event()
 
 class GuiKeyEvent(val typedChar: Char, val key: Int) : Event()
 
-class TextEvent(var text: String) : Event()
-
 class ClickBlockEvent(val clickedBlock: BlockPos?, val enumFacing: EnumFacing?) : Event()
 
 class WorldEvent(val worldClient: WorldClient?) : Event()

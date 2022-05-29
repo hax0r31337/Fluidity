@@ -37,7 +37,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         val destinationRotation = toRotation(getCenter(boundingBox), true)
 
         // Figure out the best turn speed suitable for the distance and configured turn speed
-        val rotationDiff = getRotationDifference(mc.thePlayer.serverRotationYaw, mc.thePlayer.serverRotationPitch, destinationRotation.first, destinationRotation.second)
+        val rotationDiff = getRotationDifference(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second)
 
         // is enemy visible to player on screen. Fov is about to be right with that you can actually see on the screen. Still not 100% accurate, but it is fast check.
         val supposedTurnSpeed = if (rotationDiff < mc.gameSettings.fovSetting) {
@@ -47,7 +47,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         }
         val gaussian = random.nextGaussian()
         val realisticTurnSpeed = rotationDiff * ((supposedTurnSpeed + (gaussian - 0.5)) / 180)
-        val targetRotation = limitAngleChange(mc.thePlayer.serverRotationYaw, mc.thePlayer.serverRotationPitch, destinationRotation.first, destinationRotation.second, realisticTurnSpeed.toFloat())
+        val targetRotation = limitAngleChange(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second, realisticTurnSpeed.toFloat())
 
         if (silentRotationValue.get()) {
             setServerRotation(targetRotation.first, targetRotation.second)

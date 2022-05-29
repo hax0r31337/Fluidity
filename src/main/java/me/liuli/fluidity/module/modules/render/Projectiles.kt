@@ -5,6 +5,10 @@ import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.lastReportedPitch
+import me.liuli.fluidity.util.move.lastReportedYaw
+import me.liuli.fluidity.util.move.serverRotationPitch
+import me.liuli.fluidity.util.move.serverRotationYaw
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.glColor
 import net.minecraft.block.material.Material
@@ -66,9 +70,9 @@ class Projectiles : Module("Projectiles", "Allows you to see where arrows will l
         }
 
         // Yaw and pitch of player
-        val yaw = mc.thePlayer.rotationYaw
+        val yaw = lastReportedYaw
 
-        val pitch = mc.thePlayer.rotationPitch
+        val pitch = lastReportedPitch
 
         // Positions
         var posX = renderManager.renderPosX - MathHelper.cos(yaw / 180F * 3.1415927F) * 0.16F

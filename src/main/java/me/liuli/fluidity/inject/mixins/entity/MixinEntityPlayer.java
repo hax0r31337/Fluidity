@@ -48,7 +48,6 @@ public abstract class MixinEntityPlayer extends MixinEntityLivingBase {
     @Inject(method = "attackTargetEntityWithCurrentItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;setSprinting(Z)V", shift = At.Shift.AFTER))
     public void onAttackTargetEntityWithCurrentItem(CallbackInfo callbackInfo) {
         if (KeepSprint.INSTANCE.getState()) {
-            System.out.println("setSprinting(false)");
             final float multiplier = 0.6f + 0.4f * KeepSprint.INSTANCE.getMultiplierValue().get();
             this.motionX = this.motionX / 0.6 * multiplier;
             this.motionZ = this.motionZ / 0.6 * multiplier;

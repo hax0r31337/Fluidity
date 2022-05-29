@@ -6,6 +6,7 @@ import me.liuli.fluidity.event.KeyEvent;
 import me.liuli.fluidity.event.ScreenEvent;
 import me.liuli.fluidity.event.WorldEvent;
 import me.liuli.fluidity.util.client.ClientUtilsKt;
+import me.liuli.fluidity.util.move.RotationUtilsKt;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.LoadingScreenRenderer;
 import net.minecraft.client.Minecraft;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Keyboard;
@@ -25,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -79,6 +82,15 @@ public abstract class MixinMinecraft {
     private void onClickBlock(CallbackInfo callbackInfo) {
         if (this.leftClickCounter == 0 && theWorld.getBlockState(objectMouseOver.getBlockPos()).getBlock().getMaterial() != Material.air) {
             Fluidity.eventManager.callEvent(new ClickBlockEvent(objectMouseOver.getBlockPos(), this.objectMouseOver.sideHit));
+        }
+    }
+
+
+    @Inject(method = "getRenderViewEntity", at = @At("HEAD"))
+    public void getRenderViewEntity(CallbackInfoReturnable<Entity> cir){
+        if (thePlayer != null) {
+            thePlayer.rotationYawHead = RotationUtilsKt.getLastReportedYaw();
+            thePlayer.renderYawOffset = RotationUtilsKt.getLastReportedYaw();
         }
     }
 

@@ -16,7 +16,6 @@
     "gui.MixinGuiScreen",
     "gui.MixinGuiSpectator",
     "other.MixinNetworkManager",
-    "render.MixinEntityRenderer",
-    "render.MixinFontRenderer"
+    "render.MixinEntityRenderer"
   ]
 }

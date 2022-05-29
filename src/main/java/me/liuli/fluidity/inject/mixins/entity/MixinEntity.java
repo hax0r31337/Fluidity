@@ -162,6 +162,9 @@ public abstract class MixinEntity {
     @Shadow
     public abstract boolean isInsideOfMaterial(Material materialIn);
 
+    @Shadow
+    public abstract Vec3 getLook(float partialTicks);
+
     public int getNextStepDistance() {
         return nextStepDistance;
     }
