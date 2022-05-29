@@ -2,6 +2,7 @@ package me.liuli.fluidity.inject.mixins.entity;
 
 import me.liuli.fluidity.Fluidity;
 import me.liuli.fluidity.event.*;
+import me.liuli.fluidity.util.move.RotationUtilsKt;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -16,6 +17,8 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.spongepowered.asm.mixin.Final;
@@ -106,14 +109,88 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
     @Shadow
     private float lastReportedPitch;
 
-    @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"))
-    public void onUpdateWalkingPlayerHEAD(CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new MotionEvent(EventState.PRE));
-    }
+    @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"), cancellable = true)
+    public void onUpdateWalkingPlayer(CallbackInfo ci) {
+        try {
+            Fluidity.eventManager.callEvent(new MotionEvent(EventState.PRE));
 
-    @Inject(method = "onUpdateWalkingPlayer", at = @At("RETURN"))
-    public void onUpdateWalkingPlayerRETURN(CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new MotionEvent(EventState.POST));
+            boolean flag = this.isSprinting();
+            if (flag != this.serverSprintState) {
+                if (flag) {
+                    this.sendQueue.addToSendQueue(new C0BPacketEntityAction((EntityPlayerSP) (Object) this, C0BPacketEntityAction.Action.START_SPRINTING));
+                } else {
+                    this.sendQueue.addToSendQueue(new C0BPacketEntityAction((EntityPlayerSP) (Object) this, C0BPacketEntityAction.Action.STOP_SPRINTING));
+                }
+
+                this.serverSprintState = flag;
+            }
+
+            boolean flag1 = this.isSneaking();
+            if (flag1 != this.serverSneakState) {
+                if (flag1) {
+                    this.sendQueue.addToSendQueue(new C0BPacketEntityAction((EntityPlayerSP) (Object) this, C0BPacketEntityAction.Action.START_SNEAKING));
+                } else {
+                    this.sendQueue.addToSendQueue(new C0BPacketEntityAction((EntityPlayerSP) (Object) this, C0BPacketEntityAction.Action.STOP_SNEAKING));
+                }
+
+                this.serverSneakState = flag1;
+            }
+
+            if (this.isCurrentViewEntity()) {
+                float yaw = RotationUtilsKt.getServerRotationYaw(mc.thePlayer);
+                float pitch = RotationUtilsKt.getServerRotationPitch(mc.thePlayer);
+                float lastReportedYaw = RotationUtilsKt.getLastReportedYaw();
+                float lastReportedPitch = RotationUtilsKt.getLastReportedPitch();
+
+                double xDiff = this.posX - this.lastReportedPosX;
+                double yDiff = this.getEntityBoundingBox().minY - this.lastReportedPosY;
+                double zDiff = this.posZ - this.lastReportedPosZ;
+                double yawDiff = yaw - lastReportedYaw;
+                double pitchDiff = pitch - lastReportedPitch;
+                boolean moved = xDiff * xDiff + yDiff * yDiff + zDiff * zDiff > 9.0E-4D || this.positionUpdateTicks >= 20;
+                boolean rotated = yawDiff != 0.0D || pitchDiff != 0.0D;
+
+                if (this.ridingEntity == null) {
+                    if (moved && rotated) {
+                        this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.posX, this.getEntityBoundingBox().minY, this.posZ, yaw, pitch, this.onGround));
+                    } else if (moved) {
+                        this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.onGround));
+                    } else if (rotated) {
+                        this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(yaw, pitch, this.onGround));
+                    } else {
+                        this.sendQueue.addToSendQueue(new C03PacketPlayer(this.onGround));
+                    }
+                } else {
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, yaw, pitch, this.onGround));
+                    moved = false;
+                }
+
+                RotationUtilsKt.setLastReportedYaw(yaw);
+                RotationUtilsKt.setLastReportedPitch(pitch);
+                RotationUtilsKt.setSilentRotationYaw(Float.NaN);
+                RotationUtilsKt.setSilentRotationPitch(Float.NaN);
+
+                ++this.positionUpdateTicks;
+
+                if (moved) {
+                    this.lastReportedPosX = this.posX;
+                    this.lastReportedPosY = this.getEntityBoundingBox().minY;
+                    this.lastReportedPosZ = this.posZ;
+                    this.positionUpdateTicks = 0;
+                }
+
+                if (rotated) {
+                    this.lastReportedYaw = this.rotationYaw;
+                    this.lastReportedPitch = this.rotationPitch;
+                }
+            }
+
+            Fluidity.eventManager.callEvent(new MotionEvent(EventState.POST));
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        ci.cancel();
     }
 
     @Overwrite

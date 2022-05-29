@@ -2,7 +2,7 @@ package me.liuli.fluidity.util.other
 
 import java.util.*
 
-private val random = Random()
+val random = Random()
 
 fun randomString(length: Int): String {
     return randomString(length, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
