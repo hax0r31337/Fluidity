@@ -17,6 +17,7 @@
     "gui.MixinGuiScreen",
     "gui.MixinGuiSpectator",
     "other.MixinNetworkManager",
+    "other.MixinNetHandlerPlayClient",
     "render.MixinEntityRenderer",
     "render.MixinLayerArmorBase",
     "render.MixinModelBiped",

@@ -30,7 +30,6 @@ fun setServerRotation(yaw: Float, pitch: Float) {
 
 fun EntityLivingBase.applyVisualYawUpdate() {
     if (!silentRotationYaw.isNaN()) {
-        println("YAW${this.rotationYaw}")
         this.rotationYawHead = silentRotationYaw
         this.renderYawOffset = silentRotationYaw
     }
