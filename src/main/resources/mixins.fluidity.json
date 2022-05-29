@@ -10,12 +10,16 @@
     "entity.MixinEntityPlayer",
     "entity.MixinEntityPlayerSP",
     "entity.MixinPlayerControllerMP",
+    "entity.MixinAbstractClientPlayer",
     "gui.MixinGuiChat",
     "gui.MixinGuiInGame",
     "gui.MixinGuiMainMenu",
     "gui.MixinGuiScreen",
     "gui.MixinGuiSpectator",
     "other.MixinNetworkManager",
-    "render.MixinEntityRenderer"
+    "render.MixinEntityRenderer",
+    "render.MixinLayerArmorBase",
+    "render.MixinModelBiped",
+    "render.MixinRenderItem"
   ]
 }
