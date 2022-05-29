@@ -27,6 +27,12 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
         lastBlocked = false
     }
 
+    override fun onDisable() {
+        if (lastBlocked) {
+            mc.gameSettings.keyBindUseItem.pressed = false
+        }
+    }
+
     @EventMethod
     fun onPreMotion(event: MotionEvent) {
         if (clickTimer.canClick() && mc.objectMouseOver?.entityHit != null && Targets.isTarget(mc.objectMouseOver.entityHit, true)) {

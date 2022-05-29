@@ -3,6 +3,7 @@ package me.liuli.fluidity.util.move
 import me.liuli.fluidity.util.mc
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
@@ -25,6 +26,14 @@ var lastReportedPitch = 0f
 fun setServerRotation(yaw: Float, pitch: Float) {
     silentRotationYaw = yaw
     silentRotationPitch = pitch
+}
+
+fun EntityLivingBase.applyVisualYawUpdate() {
+    if (!silentRotationYaw.isNaN()) {
+        println("YAW${this.rotationYaw}")
+        this.rotationYawHead = silentRotationYaw
+        this.renderYawOffset = silentRotationYaw
+    }
 }
 
 /**

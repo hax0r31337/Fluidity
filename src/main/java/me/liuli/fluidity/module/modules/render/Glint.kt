@@ -16,7 +16,7 @@ object Glint : Module("Glint", "Custom glint effect", ModuleCategory.RENDER) {
 
     fun getColor(): Int {
         return when (modeValue.get()) {
-            "rainbow" -> rainbow(1)
+            "Rainbow" -> rainbow(1)
             else -> Color(redValue.get(), greenValue.get(), blueValue.get())
         }.rgb
     }

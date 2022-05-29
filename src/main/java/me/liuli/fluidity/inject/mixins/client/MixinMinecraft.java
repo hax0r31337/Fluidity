@@ -88,9 +88,8 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "getRenderViewEntity", at = @At("HEAD"))
     public void getRenderViewEntity(CallbackInfoReturnable<Entity> cir){
-        if (thePlayer != null && RotationUtilsKt.getSilentRotationYaw() != Float.NaN) {
-            thePlayer.rotationYawHead = RotationUtilsKt.getLastReportedYaw();
-            thePlayer.renderYawOffset = RotationUtilsKt.getLastReportedYaw();
+        if (thePlayer != null) {
+            RotationUtilsKt.applyVisualYawUpdate(thePlayer);
         }
     }
 

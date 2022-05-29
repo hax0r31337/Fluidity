@@ -18,7 +18,7 @@ class ViewBobbing : Module("ViewBobbing", "Makes you custom view bobbing effect"
     fun onMotion(event: MotionEvent) {
         if (event.eventState == EventState.POST) return
 
-        if (!offgroundValue.get() || mc.thePlayer.onGround) {
+        if (offgroundValue.get() || mc.thePlayer.onGround) {
             mc.thePlayer.cameraYaw = value.get()
             mc.thePlayer.prevCameraYaw = value.get()
         }
