@@ -20,5 +20,8 @@ public abstract class MixinEntityLivingBase extends MixinEntity {
     public abstract PotionEffect getActivePotionEffect(Potion potionIn);
 
     @Shadow
+    public abstract void setSprinting(boolean sprinting);
+
+    @Shadow
     protected abstract void updateFallState(double y, boolean onGroundIn, Block blockIn, BlockPos pos);
 }

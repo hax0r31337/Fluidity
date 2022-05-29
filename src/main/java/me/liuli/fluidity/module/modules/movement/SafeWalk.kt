@@ -16,10 +16,7 @@ class SafeWalk : Module("SafeWalk", "Automatically make you walk safely", Module
 
     @EventMethod
     fun onUpdate(event: UpdateEvent) {
-        if (!mc.thePlayer.onGround)
-            return
-
         val underBlock = mc.theWorld.getBlockState(BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ)).block
-        mc.gameSettings.keyBindSneak.pressed = (underBlock == Blocks.air)
+        mc.gameSettings.keyBindSneak.pressed = (underBlock == Blocks.air) && mc.thePlayer.onGround
     }
 }

@@ -12,7 +12,7 @@ import me.liuli.fluidity.util.move.*
 import me.liuli.fluidity.util.other.random
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
 
-class AimBot : Module("AimBot", "Helps you aim another player", ModuleCategory.COMBAT) {
+class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
 
     private val rangeValue = FloatValue("Range", 4.5f, 1f, 10f)
     private val turnSpeedValue = FloatValue("TurnSpeed", 10f, 1F, 180F)
@@ -37,7 +37,6 @@ class AimBot : Module("AimBot", "Helps you aim another player", ModuleCategory.C
         val destinationRotation = toRotation(getCenter(boundingBox), true)
 
         // Figure out the best turn speed suitable for the distance and configured turn speed
-
         val rotationDiff = getRotationDifference(mc.thePlayer.serverRotationYaw, mc.thePlayer.serverRotationPitch, destinationRotation.first, destinationRotation.second)
 
         // is enemy visible to player on screen. Fov is about to be right with that you can actually see on the screen. Still not 100% accurate, but it is fast check.
@@ -53,7 +52,8 @@ class AimBot : Module("AimBot", "Helps you aim another player", ModuleCategory.C
         if (silentRotationValue.get()) {
             setServerRotation(targetRotation.first, targetRotation.second)
         } else {
-            mc.thePlayer.setPositionAndRotation(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, targetRotation.first, targetRotation.second)
+            mc.thePlayer.rotationYaw = targetRotation.first
+            mc.thePlayer.rotationPitch = targetRotation.second
         }
     }
 }

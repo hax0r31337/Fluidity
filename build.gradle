@@ -99,7 +99,7 @@ classes.dependsOn(moveResources)
 
 jar {
     manifest.attributes(
-            "FMLCorePlugin": "me.liuli.fluidity.MixinLoader",
+            "FMLCorePlugin": "me.liuli.fluidity.inject.MixinLoader",
             "FMLCorePluginContainsFMLMod": true,
             "ForceLoadAsMod": true,
             "MixinConfigs": "mixins.fluidity.json",
