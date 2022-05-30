@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets
 
 class ConfigManager : Listener {
     val gson = GsonBuilder().setPrettyPrinting().create()
-    val rootPath = File(mc.mcDataDir, Fluidity.name)
+    val rootPath = File(mc.mcDataDir, Fluidity.NAME)
     val configPath = File(rootPath, "configs")
     val configSetFile = File(rootPath, "config.json")
 

@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiMainMenu extends MixinGuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks, CallbackInfo callbackInfo) {
-        final String str = Fluidity.getColoredName()+"§f v"+ Fluidity.getVersion();
+        final String str = Fluidity.COLORED_NAME+"§f v"+ Fluidity.VERSION;
         // render client brand
         this.fontRendererObj.drawString(str, this.width - this.fontRendererObj.getStringWidth(str) - 2, 2, 16777215, false);
     }

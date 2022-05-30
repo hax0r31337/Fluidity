@@ -7,7 +7,7 @@ import net.minecraft.util.IChatComponent
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.Display
 
-private val logger = LogManager.getLogger(Fluidity.name)
+private val logger = LogManager.getLogger(Fluidity.NAME)
 
 fun logInfo(msg: String) {
     logger.info(msg)
@@ -26,7 +26,7 @@ fun logError(msg: String, t: Throwable) {
 }
 
 fun displayAlert(message: String) {
-    displayChatMessage("§7[${Fluidity.coloredName}§7] §f$message")
+    displayChatMessage("§7[${Fluidity.COLORED_NAME}§7] §f$message")
 }
 
 fun displayChatMessage(message: String) {
@@ -40,6 +40,6 @@ fun displayChatMessage(message: String) {
 }
 
 fun setTitle(status: String? = null) {
-    Display.setTitle("${Fluidity.name} v${Fluidity.version}" +
+    Display.setTitle("${Fluidity.NAME} v${Fluidity.VERSION}" +
             if (status != null && status.isNotEmpty()) { " | $status" } else { "" })
 }

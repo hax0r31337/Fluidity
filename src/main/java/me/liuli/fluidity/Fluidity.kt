@@ -11,14 +11,10 @@ import me.liuli.fluidity.util.other.DiscordRPC
 import kotlin.concurrent.thread
 
 object Fluidity {
-    @JvmStatic
-    val name = "Fluidity"
-    @JvmStatic
-    val coloredName = "§3F§bluidity"
-    @JvmStatic
-    val version = "1.0.0"
-    @JvmStatic
-    val author = "Liulihaocai"
+    const val NAME = "Fluidity"
+    const val COLORED_NAME = "§3F§bluidity"
+    const val VERSION = "1.0.0"
+    const val AUTHOR = "Liulihaocai"
 
     lateinit var eventManager: EventManager
     lateinit var configManager: ConfigManager
@@ -26,12 +22,12 @@ object Fluidity {
     lateinit var moduleManager: ModuleManager
 
     fun init() {
-        logInfo("Initialize $name v$version")
+        logInfo("Initialize $NAME v$VERSION")
         eventManager = EventManager()
     }
 
     fun load() {
-        logInfo("Loading $name v$version")
+        logInfo("Loading $NAME v$VERSION")
         setTitle("Loading Client...")
 
         configManager = ConfigManager()

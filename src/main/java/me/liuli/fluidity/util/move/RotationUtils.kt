@@ -117,3 +117,18 @@ fun limitAngleChange(aYaw: Float, aPitch: Float, bYaw: Float, bPitch: Float, tur
         aPitch + if (pitchDifference > turnSpeed) turnSpeed else pitchDifference.coerceAtLeast(-turnSpeed)
     )
 }
+
+fun fixSensitivity(yaw: Float, pitch: Float, sensitivity: Float = mc.gameSettings.mouseSensitivity): Pair<Float, Float> {
+    val f = sensitivity * 0.6F + 0.2F
+    val gcd = f * f * f * 1.2F
+
+    // fix yaw
+    var deltaYaw = yaw - lastReportedYaw
+    deltaYaw -= deltaYaw % gcd
+
+    // fix pitch
+    var deltaPitch = pitch - lastReportedPitch
+    deltaPitch -= deltaPitch % gcd
+
+    return Pair(lastReportedYaw + deltaYaw, lastReportedPitch + deltaPitch)
+}

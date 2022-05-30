@@ -26,6 +26,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private val priorityValue = ListValue("Priority", arrayOf("Health", "Distance", "Fov", "LivingTime", "Armor", "HurtResistantTime"), "Distance")
     private val fovValue = FloatValue("FOV", 180F, 1F, 180F)
     private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
+    private val throughWallsValue = BoolValue("ThroughWalls", false)
     private val onlyHoldMouseValue = BoolValue("OnlyHoldMouse", true)
     private val silentRotationValue = BoolValue("SilentRotation", false)
 
@@ -47,7 +48,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
 
         val entity = mc.theWorld.loadedEntityList
             .filter {
-                Targets.isTarget(it, true) && mc.thePlayer.canEntityBeSeen(it) &&
+                Targets.isTarget(it, true) && (throughWallsValue.get() || mc.thePlayer.canEntityBeSeen(it)) &&
                         mc.thePlayer.getDistanceToEntityBox(it) <= rangeValue.get() && getRotationDifference(it) <= fovValue.get()
             }.map { it as EntityLivingBase }.let { targets ->
                 when (priorityValue.get()) {
@@ -97,6 +98,12 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
                 else if (pitch < -90)
                     pitch = -90F
             }
+        }
+
+        // fix GCD sensitivity to bypass some anti-cheat measures
+        fixSensitivity(yaw, pitch).also {
+            yaw = it.first
+            pitch = it.second
         }
 
         if (silentRotationValue.get()) {

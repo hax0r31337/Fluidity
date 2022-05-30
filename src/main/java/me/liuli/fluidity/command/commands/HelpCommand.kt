@@ -11,7 +11,7 @@ class HelpCommand : Command("help", "Show the list of commands") {
             val command = it.value
             command != this && command !is ModuleCommand
         }
-        chat("${Fluidity.name} Client Commands(${commands.size}):")
+        chat("${Fluidity.NAME} Client Commands(${commands.size}):")
         commands.forEach {
             val command = it.value
             displayChatMessage(" ${Fluidity.commandManager.prefix}${command.command} - ${command.description}")
