@@ -7,12 +7,15 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
+import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
 import me.liuli.fluidity.util.other.nextFloat
 import me.liuli.fluidity.util.other.random
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
+import net.minecraft.entity.EntityLivingBase
+import kotlin.math.floor
 import kotlin.random.Random
 
 class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
@@ -20,6 +23,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private val rangeValue = FloatValue("Range", 4.5f, 1f, 10f)
     private val minTurnSpeedValue = FloatValue("MinTurnSpeed", 10f, 1F, 180F)
     private val maxTurnSpeedValue = FloatValue("MaxTurnSpeed", 50f, 1F, 180F)
+    private val priorityValue = ListValue("Priority", arrayOf("Health", "Distance", "Fov", "LivingTime", "Armor", "HurtResistantTime"), "Distance")
     private val fovValue = FloatValue("FOV", 180F, 1F, 180F)
     private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
     private val onlyHoldMouseValue = BoolValue("OnlyHoldMouse", true)
@@ -45,8 +49,17 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
             .filter {
                 Targets.isTarget(it, true) && mc.thePlayer.canEntityBeSeen(it) &&
                         mc.thePlayer.getDistanceToEntityBox(it) <= rangeValue.get() && getRotationDifference(it) <= fovValue.get()
-            }
-            .minByOrNull { getRotationDifference(it) } ?: return playerRotation
+            }.map { it as EntityLivingBase }.let { targets ->
+                when (priorityValue.get()) {
+                    "Distance" -> targets.minByOrNull { mc.thePlayer.getDistanceToEntityBox(it) } // Sort by distance
+                    "Health" -> targets.minByOrNull { it.health } // Sort by health
+                    "Fov" -> targets.minByOrNull { getRotationDifference(it) } // Sort by FOV
+                    "LivingTime" -> targets.minByOrNull { -it.ticksExisted } // Sort by existence
+                    "Armor" -> targets.minByOrNull { it.totalArmorValue } // Sort by armor
+                    "HurtResistantTime" -> targets.minByOrNull { it.hurtResistantTime } // Sort by armor
+                    else -> targets.firstOrNull()
+                }
+            } ?: return playerRotation
 
         val boundingBox = entity.entityBoundingBox ?: return playerRotation
 
@@ -67,9 +80,9 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         var (yaw, pitch) = limitAngleChange(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second,
             ((rotationDiff / 180) * maxTurnSpeedValue.get() + (1 - rotationDiff / 180) * minTurnSpeedValue.get()).toFloat())
 
-        if (yaw.toInt() == mc.thePlayer.rotationYaw.toInt() && pitch.toInt() == mc.thePlayer.rotationPitch.toInt()) {
+        if (floor(yaw) == floor(mc.thePlayer.rotationYaw) && floor(pitch) == floor(mc.thePlayer.rotationPitch)) {
             needAimBack = false
-            return
+            if (silentRotationValue.get()) return
         }
 
         if (hasTarget && jitterValue.get() != 0f) {

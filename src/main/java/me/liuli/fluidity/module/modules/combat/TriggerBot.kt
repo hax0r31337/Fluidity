@@ -42,9 +42,9 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
             mc.playerController.attackEntity(mc.thePlayer,  mc.objectMouseOver.entityHit)
             clickTimer.update(minCpsValue.get(), maxCpsValue.get())
         }
-        if (autoBlockValue.get() && mc.thePlayer.heldItem?.item is ItemSword) {
+        if (autoBlockValue.get()) {
             val reach = if(Reach.state) Reach.combatReachValue.get().toDouble() else 3.0
-            if (mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < reach && Targets.isTarget(it, true) }) {
+            if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < reach && Targets.isTarget(it, true) }) {
                 lastBlocked = true
                 mc.gameSettings.keyBindUseItem.pressed = true
             } else {
