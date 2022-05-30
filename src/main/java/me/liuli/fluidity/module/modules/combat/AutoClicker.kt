@@ -51,20 +51,18 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
 
     @EventMethod
     fun onUpdate(event: UpdateEvent) {
-        val thePlayer = mc.thePlayer ?: return
-
         if (jitterValue.get() != 0f && (leftValue.get() && mc.gameSettings.keyBindAttack.isKeyDown && mc.playerController.curBlockDamageMP == 0F
-                    || rightValue.get() && mc.gameSettings.keyBindUseItem.isKeyDown && !thePlayer.isUsingItem)) {
-            if (Random.nextBoolean()) thePlayer.rotationYaw += nextFloat(-jitterValue.get(), jitterValue.get())
+                    || rightValue.get() && mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer.isUsingItem)) {
+            if (Random.nextBoolean()) mc.thePlayer.rotationYaw += nextFloat(-jitterValue.get(), jitterValue.get())
 
             if (Random.nextBoolean()) {
-                thePlayer.rotationPitch += nextFloat(-jitterValue.get(), jitterValue.get())
+                mc.thePlayer.rotationPitch += nextFloat(-jitterValue.get(), jitterValue.get())
 
                 // Make sure pitch is not going into unlegit values
-                if (thePlayer.rotationPitch > 90)
-                    thePlayer.rotationPitch = 90F
-                else if (thePlayer.rotationPitch < -90)
-                    thePlayer.rotationPitch = -90F
+                if (mc.thePlayer.rotationPitch > 90)
+                    mc.thePlayer.rotationPitch = 90F
+                else if (mc.thePlayer.rotationPitch < -90)
+                    mc.thePlayer.rotationPitch = -90F
             }
         }
     }
