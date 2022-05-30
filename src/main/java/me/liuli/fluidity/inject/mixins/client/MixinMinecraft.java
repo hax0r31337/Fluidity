@@ -81,7 +81,7 @@ public abstract class MixinMinecraft {
     @Inject(method = "sendClickBlockToController", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/MovingObjectPosition;getBlockPos()Lnet/minecraft/util/BlockPos;"))
     private void onClickBlock(CallbackInfo callbackInfo) {
         if (this.leftClickCounter == 0 && theWorld.getBlockState(objectMouseOver.getBlockPos()).getBlock().getMaterial() != Material.air) {
-            Fluidity.eventManager.callEvent(new ClickBlockEvent(objectMouseOver.getBlockPos(), this.objectMouseOver.sideHit));
+            Fluidity.eventManager.callEvent(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, objectMouseOver.getBlockPos(), this.objectMouseOver.sideHit));
         }
     }
 
@@ -118,7 +118,7 @@ public abstract class MixinMinecraft {
                 BlockPos blockPos = this.objectMouseOver.getBlockPos();
 
                 if(this.leftClickCounter == 0)
-                    Fluidity.eventManager.callEvent(new ClickBlockEvent(blockPos, this.objectMouseOver.sideHit));
+                    Fluidity.eventManager.callEvent(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, blockPos, this.objectMouseOver.sideHit));
 
                 if(this.theWorld.getBlockState(blockPos).getBlock().getMaterial() != Material.air && this.playerController.onPlayerDamageBlock(blockPos, this.objectMouseOver.sideHit)) {
                     this.effectRenderer.addBlockHitEffects(blockPos, this.objectMouseOver.sideHit);

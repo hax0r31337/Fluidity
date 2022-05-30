@@ -12,6 +12,8 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.other.nextFloat
 import me.liuli.fluidity.util.timing.ClickTimer
 import net.minecraft.client.settings.KeyBinding
+import net.minecraft.item.ItemBlock
+import net.minecraft.item.ItemSword
 import kotlin.random.Random
 
 class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a mouse button.", category = ModuleCategory.COMBAT) {
@@ -19,8 +21,10 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
     private val minCpsValue = IntValue("MinCPS", 7, 1, 20)
     private val maxCpsValue = IntValue("MaxCPS", 12, 1, 20)
 
-    private val rightValue = BoolValue("Right", true)
     private val leftValue = BoolValue("Left", true)
+    private val leftSwordOnlyValue = BoolValue("LeftSwordOnly", false)
+    private val rightValue = BoolValue("Right", true)
+    private val rightBlockOnlyValue = BoolValue("RightBlockOnly", false)
     private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
 
     private val leftClickTimer = ClickTimer()
@@ -34,7 +38,7 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
     @EventMethod
     fun onRender(event: Render3DEvent) {
         // Left click
-        if (mc.gameSettings.keyBindAttack.isKeyDown && leftValue.get() &&
+        if (mc.gameSettings.keyBindAttack.isKeyDown && leftValue.get() && (!leftSwordOnlyValue.get() || mc.thePlayer.heldItem?.item is ItemSword) &&
             leftClickTimer.canClick() && mc.playerController.curBlockDamageMP == 0F) {
             KeyBinding.onTick(mc.gameSettings.keyBindAttack.keyCode) // Minecraft Click Handling
 
@@ -42,7 +46,8 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
         }
 
         // Right click
-        if (mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer!!.isUsingItem && rightValue.get() && rightClickTimer.canClick()) {
+        if (mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer!!.isUsingItem &&
+            (!rightBlockOnlyValue.get() || mc.thePlayer.heldItem?.item is ItemBlock) && rightValue.get() && rightClickTimer.canClick()) {
             KeyBinding.onTick(mc.gameSettings.keyBindUseItem.keyCode) // Minecraft Click Handling
 
             rightClickTimer.update(minCpsValue.get(), maxCpsValue.get())
