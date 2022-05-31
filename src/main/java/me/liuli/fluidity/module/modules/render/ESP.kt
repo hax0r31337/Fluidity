@@ -11,8 +11,7 @@ import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.drawRect
-import me.liuli.fluidity.util.world.healthColor
-import me.liuli.fluidity.util.world.healthPercent
+import me.liuli.fluidity.util.world.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
@@ -38,9 +37,9 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
         val color = Color(colorRedValue.get(), colorGreenValue.get(), colorBlueValue.get())
         mc.theWorld.loadedEntityList.filter { Targets.isTarget(it, onlyShowAttackableValue.get()) }.forEach { entity ->
             val entityBox = entity.entityBoundingBox
-            val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * mc.timer.renderPartialTicks - mc.renderManager.renderPosX
-            val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * mc.timer.renderPartialTicks - mc.renderManager.renderPosY
-            val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * mc.timer.renderPartialTicks - mc.renderManager.renderPosZ
+            val x = entity.renderPosX
+            val y = entity.renderPosY
+            val z = entity.renderPosZ
             val axisAlignedBB = AxisAlignedBB(
                 entityBox.minX - entity.posX + x,
                 entityBox.minY - entity.posY + y,

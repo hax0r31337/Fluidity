@@ -10,6 +10,8 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.world.getEnchantment
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemBlock
+import net.minecraft.item.ItemFood
+import net.minecraft.item.ItemPotion
 import net.minecraft.item.ItemSword
 import net.minecraft.item.ItemTool
 
@@ -18,7 +20,7 @@ class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCatego
     private val attackValue = BoolValue("Attack", true)
     private val attackOnlySwordValue = BoolValue("AttackOnlySword", true)
     private val mineBlockValue = BoolValue("MineBlock", true)
-    private val placeBlockValue = BoolValue("PlaceBlock", true)
+    private val placeBlockValue = BoolValue("PlaceBlock", false)
 
     @EventMethod
     fun onAttack(event: AttackEvent) {
@@ -58,6 +60,11 @@ class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCatego
                 swapItem(bestSlot)
             }
         } else if (event.type == ClickBlockEvent.Type.RIGHT && placeBlockValue.get()) {
+            val cur = mc.thePlayer.inventory.getCurrentItem()?.item
+            if (cur != null && (cur is ItemBlock || cur is ItemFood || cur is ItemPotion)) {
+                return
+            }
+
             val (slot, _) = (0..8)
                 .map { Pair(it, mc.thePlayer.inventory.getStackInSlot(it)) }
                 .filter { it.second?.item is ItemBlock && it.second?.stackSize ?: 0 > 0 }

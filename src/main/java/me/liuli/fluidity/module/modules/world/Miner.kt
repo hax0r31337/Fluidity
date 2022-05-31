@@ -7,6 +7,9 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BlockValue
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
+import me.liuli.fluidity.util.world.getBlock
+import me.liuli.fluidity.util.world.getCenterDistance
+import net.minecraft.block.Block
 import net.minecraft.util.BlockPos
 
 //class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) {
@@ -25,6 +28,9 @@ import net.minecraft.util.BlockPos
 //
 //    @EventMethod
 //    fun onUpdate(event: UpdateEvent) {
+//        if (pos == null || (pos!!.getBlock()?.let { Block.getIdFromBlock(it) } ?: -1) != blockValue.get() ||
+//            pos!!.getCenterDistance() > rangeValue.get())
+//            pos = find(blockValue.get())
 //
 //    }
 //

@@ -35,6 +35,16 @@ fun EntityLivingBase.healthColor(alpha: Int = 255): Color {
     return Color(max(min(255 - pct, 255), 0), max(min(pct, 255), 0), 0, alpha)
 }
 
+val Entity.renderPosX: Double
+    get() = this.lastTickPosX + (this.posX - this.lastTickPosX) * mc.timer.renderPartialTicks - mc.renderManager.renderPosX
+
+val Entity.renderPosY: Double
+    get() = this.lastTickPosY + (this.posY - this.lastTickPosY) * mc.timer.renderPartialTicks - mc.renderManager.renderPosY
+
+val Entity.renderPosZ: Double
+    get() = this.lastTickPosZ + (this.posZ - this.lastTickPosZ) * mc.timer.renderPartialTicks - mc.renderManager.renderPosZ
+
+
 private fun getNearestPointBB(eye: Vec3, box: AxisAlignedBB): Vec3 {
     val origin = doubleArrayOf(eye.xCoord, eye.yCoord, eye.zCoord)
     val destMins = doubleArrayOf(box.minX, box.minY, box.minZ)

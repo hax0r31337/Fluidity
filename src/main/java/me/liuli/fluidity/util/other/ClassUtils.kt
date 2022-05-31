@@ -1,8 +1,10 @@
 package me.liuli.fluidity.util.other
 
+import com.google.gson.JsonParser
 import org.apache.logging.log4j.core.config.plugins.ResolverUtil
 import java.lang.reflect.Modifier
 
+val jsonParser = JsonParser()
 
 /**
  * scan classes with specified superclass like what Reflections do but with log4j [ResolverUtil]
