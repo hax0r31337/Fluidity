@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiSpectator {
     @Inject(method = "renderTooltip", at = @At("RETURN"))
     private void renderTooltip(ScaledResolution sr, float partialTicks, CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new Render2DEvent(partialTicks));
+        Fluidity.eventManager.callEvent(new Render2DEvent(sr, partialTicks));
     }
 }

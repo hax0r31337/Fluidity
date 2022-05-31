@@ -1,6 +1,7 @@
 package me.liuli.fluidity.event
 
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
@@ -55,7 +56,7 @@ class PacketEvent(val packet: Packet<*>, val type: Type) : EventCancellable() {
     }
 }
 
-class Render2DEvent(val partialTicks: Float) : Event()
+class Render2DEvent(val scaledResolution: ScaledResolution, val partialTicks: Float) : Event()
 
 class RenderScreenEvent(val mouseX: Int, val mouseY: Int, val partialTicks: Float) : Event()
 

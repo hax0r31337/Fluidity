@@ -6,13 +6,13 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.lastReportedPitch
 import me.liuli.fluidity.util.move.lastReportedYaw
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EntitySelectors
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
+import java.awt.Color
+import kotlin.math.*
 
 
 /**
@@ -27,6 +27,14 @@ fun Entity.getDistanceToEntityBox(entity: Entity): Double {
     return sqrt(xDist.pow(2) + yDist.pow(2) + zDist.pow(2))
 }
 
+val EntityLivingBase.healthPercent: Float
+    get() = (this.health / this.maxHealth).coerceIn(0F, 1F)
+
+fun EntityLivingBase.healthColor(alpha: Int = 255): Color {
+    val pct = (healthPercent * 255F).toInt()
+    return Color(max(min(255 - pct, 255), 0), max(min(pct, 255), 0), 0, alpha)
+}
+
 private fun getNearestPointBB(eye: Vec3, box: AxisAlignedBB): Vec3 {
     val origin = doubleArrayOf(eye.xCoord, eye.yCoord, eye.zCoord)
     val destMins = doubleArrayOf(box.minX, box.minY, box.minZ)
@@ -36,7 +44,6 @@ private fun getNearestPointBB(eye: Vec3, box: AxisAlignedBB): Vec3 {
     }
     return Vec3(origin[0], origin[1], origin[2])
 }
-
 
 fun rayTraceEntity(range: Double, entity: Entity = mc.thePlayer, yaw: Float = lastReportedYaw, pitch: Float = lastReportedPitch, entityFilter: (Entity) -> Boolean = { true }): Entity? {
     mc.theWorld ?: return null
