@@ -9,6 +9,7 @@ import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.*
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.setClientRotation
 import me.liuli.fluidity.util.move.setServerRotation
 import me.liuli.fluidity.util.move.toRotation
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
@@ -67,13 +68,10 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
             return
         }
 
-        val rotation = toRotation(Vec3(pos!!.x.toDouble(), pos!!.y.toDouble(), pos!!.z.toDouble()), true)
+        val rotation = toRotation(Vec3(pos!!.x.toDouble() + 0.5, pos!!.y.toDouble() + 0.5, pos!!.z.toDouble() + 0.5), true)
         when(rotationsValue.get()) {
             "Silent" -> setServerRotation(rotation.first, rotation.second)
-            "Direct" -> {
-                mc.thePlayer.rotationYaw = rotation.first
-                mc.thePlayer.rotationPitch = rotation.second
-            }
+            "Direct" -> setClientRotation(rotation.first, rotation.second)
         }
 
         when(actionValue.get()) {

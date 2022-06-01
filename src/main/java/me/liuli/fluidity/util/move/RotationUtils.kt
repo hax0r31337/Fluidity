@@ -24,8 +24,18 @@ var lastReportedYaw = 0f
 var lastReportedPitch = 0f
 
 fun setServerRotation(yaw: Float, pitch: Float) {
-    silentRotationYaw = yaw
-    silentRotationPitch = pitch
+    // fix GCD sensitivity to bypass some anti-cheat measures
+    fixSensitivity(yaw, pitch).also {
+        silentRotationYaw = it.first
+        silentRotationPitch = it.second
+    }
+}
+
+fun setClientRotation(yaw: Float, pitch: Float) {
+    fixSensitivity(yaw, pitch).also {
+        mc.thePlayer.rotationYaw = it.first
+        mc.thePlayer.rotationPitch = it.second
+    }
 }
 
 fun EntityLivingBase.applyVisualYawUpdate() {

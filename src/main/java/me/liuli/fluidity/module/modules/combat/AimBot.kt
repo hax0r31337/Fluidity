@@ -98,17 +98,10 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
             }
         }
 
-        // fix GCD sensitivity to bypass some anti-cheat measures
-        fixSensitivity(yaw, pitch).also {
-            yaw = it.first
-            pitch = it.second
-        }
-
         if (silentRotationValue.get()) {
             setServerRotation(yaw, pitch)
         } else {
-            mc.thePlayer.rotationYaw = yaw
-            mc.thePlayer.rotationPitch = pitch
+            setClientRotation(yaw, pitch)
         }
     }
 }
