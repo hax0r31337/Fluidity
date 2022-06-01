@@ -47,18 +47,20 @@ fun drawAxisAlignedBB(
 ) {
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
     GL11.glEnable(GL11.GL_BLEND)
-    GL11.glLineWidth(outlineWidth)
     GL11.glDisable(GL11.GL_TEXTURE_2D)
     GL11.glDisable(GL11.GL_DEPTH_TEST)
     GL11.glDepthMask(false)
-    glColor(color)
 
-    GL11.glLineWidth(outlineWidth)
-    glColor(color.red, color.green, color.blue, outlineAlpha)
-    drawSelectionBoundingBox(axisAlignedBB)
+    if (outlineWidth != 0f && outlineAlpha != 0) {
+        GL11.glLineWidth(outlineWidth)
+        glColor(color.red, color.green, color.blue, outlineAlpha)
+        drawSelectionBoundingBox(axisAlignedBB)
+    }
 
-    glColor(color.red, color.green, color.blue, boxAlpha)
-    drawFilledBox(axisAlignedBB)
+    if (boxAlpha != 0) {
+        glColor(color.red, color.green, color.blue, boxAlpha)
+        drawFilledBox(axisAlignedBB)
+    }
 
     GlStateManager.resetColor()
     GL11.glEnable(GL11.GL_TEXTURE_2D)

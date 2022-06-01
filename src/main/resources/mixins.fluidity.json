@@ -26,6 +26,7 @@
     "render.MixinLayerArmorBase",
     "render.MixinModelBiped",
     "render.MixinRenderItem",
-    "render.MixinRendererLivingEntity"
+    "render.MixinRendererLivingEntity",
+    "other.MixinBlock"
   ]
 }

@@ -127,15 +127,28 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
     fun onRender3D(event: Render3DEvent) {
         pos ?: return
 
-        val axisAlignedBB = AxisAlignedBB(
-            pos!!.x - mc.renderManager.renderPosX,
-            pos!!.y - mc.renderManager.renderPosY,
-            pos!!.z - mc.renderManager.renderPosZ,
-            pos!!.x + 1.0 - mc.renderManager.renderPosX,
-            pos!!.y + 1.0 - mc.renderManager.renderPosY,
-            pos!!.z + 1.0 - mc.renderManager.renderPosZ
+        val rx = mc.renderManager.renderPosX
+        val ry = mc.renderManager.renderPosY
+        val rz = mc.renderManager.renderPosZ
+
+        val axisMining = AxisAlignedBB(
+            pos!!.x + 0.5 - (currentDamage * 0.5) - rx,
+            pos!!.y + 0.5 - (currentDamage * 0.5) - ry,
+            pos!!.z + 0.5 - (currentDamage * 0.5) - rz,
+            pos!!.x + 0.5 + (currentDamage * 0.5) - rx,
+            pos!!.y + 0.5 + (currentDamage * 0.5) - ry,
+            pos!!.z + 0.5 + (currentDamage * 0.5) - rz
         )
-        drawAxisAlignedBB(axisAlignedBB, Color.ORANGE, 1f, 150, 50)
+        val axisBlock = AxisAlignedBB(
+            pos!!.x - rx,
+            pos!!.y - ry,
+            pos!!.z - rz,
+            pos!!.x + 1.0 - rx,
+            pos!!.y + 1.0 - ry,
+            pos!!.z + 1.0 - rz
+        )
+        drawAxisAlignedBB(axisMining, Color.GREEN, 0f, 0, 50)
+        drawAxisAlignedBB(axisBlock, Color.ORANGE, 1f, 150, 50)
     }
 
     private fun find(targetID: Int): BlockPos? {
