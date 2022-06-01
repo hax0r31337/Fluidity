@@ -30,11 +30,11 @@ public class MixinGuiScreen {
 
     @Inject(method = "drawScreen", at = @At("RETURN"))
     public void drawScreen(int mouseX, int mouseY, float partialTicks, CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new RenderScreenEvent(mouseX, mouseY, partialTicks));
+        Fluidity.eventManager.call(new RenderScreenEvent(mouseX, mouseY, partialTicks));
     }
 
     @Inject(method = "keyTyped", at = @At("RETURN"))
     private void keyTyped(char typedChar, int keyCode, CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new GuiKeyEvent(typedChar, keyCode));
+        Fluidity.eventManager.call(new GuiKeyEvent(typedChar, keyCode));
     }
 }

@@ -183,7 +183,7 @@ public abstract class MixinEntity {
             return;
 
         final StrafeEvent strafeEvent = new StrafeEvent(strafe, forward, friction);
-        Fluidity.eventManager.callEvent(strafeEvent);
+        Fluidity.eventManager.call(strafeEvent);
 
         if (strafeEvent.getCancelled())
             callbackInfo.cancel();

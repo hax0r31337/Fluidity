@@ -112,7 +112,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
     @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"), cancellable = true)
     public void onUpdateWalkingPlayer(CallbackInfo ci) {
         try {
-            Fluidity.eventManager.callEvent(new MotionEvent(EventState.PRE));
+            Fluidity.eventManager.call(new MotionEvent(EventState.PRE));
 
             boolean flag = this.isSprinting();
             if (flag != this.serverSprintState) {
@@ -185,7 +185,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
                 }
             }
 
-            Fluidity.eventManager.callEvent(new MotionEvent(EventState.POST));
+            Fluidity.eventManager.call(new MotionEvent(EventState.POST));
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -195,7 +195,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
 
     @Overwrite
     public void onLivingUpdate() {
-        Fluidity.eventManager.callEvent(new UpdateEvent());
+        Fluidity.eventManager.call(new UpdateEvent());
 
         if (this.sprintingTicksLeft > 0) {
             --this.sprintingTicksLeft;
@@ -250,7 +250,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
         this.movementInput.updatePlayerMoveState();
         if (this.isUsingItem() && !this.isRiding()) {
             final SlowDownEvent slowDownEvent = new SlowDownEvent(0.2F, 0.2F);
-            Fluidity.eventManager.callEvent(slowDownEvent);
+            Fluidity.eventManager.call(slowDownEvent);
             this.movementInput.moveStrafe *= slowDownEvent.getStrafe();
             this.movementInput.moveForward *= slowDownEvent.getForward();
             this.sprintToggleTimer = 0;
@@ -341,7 +341,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
     @Override
     public void moveEntity(double x, double y, double z) {
         MoveEvent moveEvent = new MoveEvent(x, y, z);
-        Fluidity.eventManager.callEvent(moveEvent);
+        Fluidity.eventManager.call(moveEvent);
 
         if (moveEvent.getCancelled())
             return;
@@ -444,7 +444,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
 
             if (this.stepHeight > 0.0F && flag1 && (d3 != x || d5 != z)) {
                 StepEvent stepEvent = new StepEvent(this.stepHeight);
-                Fluidity.eventManager.callEvent(stepEvent);
+                Fluidity.eventManager.call(stepEvent);
                 double d11 = x;
                 double d7 = y;
                 double d8 = z;

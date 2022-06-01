@@ -13,7 +13,7 @@ class EventManager {
         }
     }
 
-    fun callEvent(event: Event) {
+    fun call(event: Event) {
         for (lm in methods) {
             if (lm.listener.listen() && lm.isMatchEvent(event)) {
                 try {

@@ -75,13 +75,13 @@ public abstract class MixinMinecraft {
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V", shift = At.Shift.AFTER))
     private void onKey(CallbackInfo callbackInfo) {
         if(Keyboard.getEventKeyState() && currentScreen == null)
-            Fluidity.eventManager.callEvent(new KeyEvent(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey()));
+            Fluidity.eventManager.call(new KeyEvent(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey()));
     }
 
     @Inject(method = "sendClickBlockToController", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/MovingObjectPosition;getBlockPos()Lnet/minecraft/util/BlockPos;"))
     private void onClickBlock(CallbackInfo callbackInfo) {
         if (this.leftClickCounter == 0 && theWorld.getBlockState(objectMouseOver.getBlockPos()).getBlock().getMaterial() != Material.air) {
-            Fluidity.eventManager.callEvent(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, objectMouseOver.getBlockPos(), this.objectMouseOver.sideHit));
+            Fluidity.eventManager.call(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, objectMouseOver.getBlockPos(), this.objectMouseOver.sideHit));
         }
     }
 
@@ -95,12 +95,12 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("HEAD"))
     private void loadWorld(WorldClient p_loadWorld_1_, String p_loadWorld_2_, final CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new WorldEvent(p_loadWorld_1_));
+        Fluidity.eventManager.call(new WorldEvent(p_loadWorld_1_));
     }
 
     @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", shift = At.Shift.AFTER))
     private void displayGuiScreen(CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new ScreenEvent(currentScreen));
+        Fluidity.eventManager.call(new ScreenEvent(currentScreen));
     }
 
     @Inject(method = "clickMouse", at = @At("HEAD"))
@@ -118,7 +118,7 @@ public abstract class MixinMinecraft {
                 BlockPos blockPos = this.objectMouseOver.getBlockPos();
 
                 if(this.leftClickCounter == 0)
-                    Fluidity.eventManager.callEvent(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, blockPos, this.objectMouseOver.sideHit));
+                    Fluidity.eventManager.call(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, blockPos, this.objectMouseOver.sideHit));
 
                 if(this.theWorld.getBlockState(blockPos).getBlock().getMaterial() != Material.air && this.playerController.onPlayerDamageBlock(blockPos, this.objectMouseOver.sideHit)) {
                     this.effectRenderer.addBlockHitEffects(blockPos, this.objectMouseOver.sideHit);

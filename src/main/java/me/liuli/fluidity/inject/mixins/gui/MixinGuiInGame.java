@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiInGame {
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
     private void renderTooltip(ScaledResolution sr, float partialTicks, CallbackInfo callbackInfo) {
-        Fluidity.eventManager.callEvent(new Render2DEvent(sr, partialTicks));
+        Fluidity.eventManager.call(new Render2DEvent(sr, partialTicks));
     }
 }

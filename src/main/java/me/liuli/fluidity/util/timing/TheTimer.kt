@@ -11,6 +11,8 @@ class TheTimer {
         return System.currentTimeMillis() - time
     }
 
+    fun hasTimePassed(time: Int) = hasTimePassed(time.toLong())
+
     fun hasTimePassed(time: Long): Boolean {
         return getTimePassed() >= time
     }

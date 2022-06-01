@@ -19,7 +19,7 @@ public class MixinNetworkManager {
             return;
 
         final PacketEvent event = new PacketEvent(packet, PacketEvent.Type.RECEIVE);
-        Fluidity.eventManager.callEvent(event);
+        Fluidity.eventManager.call(event);
 
         if(event.getCancelled())
             callback.cancel();
@@ -31,7 +31,7 @@ public class MixinNetworkManager {
             return;
 
         final PacketEvent event = new PacketEvent(packet, PacketEvent.Type.SEND);
-        Fluidity.eventManager.callEvent(event);
+        Fluidity.eventManager.call(event);
 
         if(event.getCancelled())
             callback.cancel();

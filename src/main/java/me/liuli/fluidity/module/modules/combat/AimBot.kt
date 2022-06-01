@@ -8,11 +8,9 @@ import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
-import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
 import me.liuli.fluidity.util.other.nextFloat
-import me.liuli.fluidity.util.other.random
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
 import net.minecraft.entity.EntityLivingBase
 import kotlin.math.floor

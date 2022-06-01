@@ -31,12 +31,12 @@ class ModuleCommand(private val module: Module, private val values: List<Value<*
         }
 
         if (args.size < 2) {
-            if (value is IntValue || value is FloatValue || value is StringValue || value is BoolValue) {
+            if (value is BlockValue) {
+                chatSyntax("${args[0].lowercase()} <block> (now=${getBlockName(value.get())})")
+            } else if (value is IntValue || value is FloatValue || value is StringValue || value is BoolValue) {
                 chatSyntax("${args[0].lowercase()} <value> (now=${value.get()})")
             } else if (value is ListValue) {
                 chatSyntax("${args[0].lowercase()} <${value.values.joinToString(separator = "/").lowercase()}> (now=${value.get()})")
-            } else if (value is BlockValue) {
-                chatSyntax("${args[0].lowercase()} <block> (now=${getBlockName(value.get())})")
             }
             return
         }

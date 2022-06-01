@@ -9,11 +9,7 @@ import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.world.getEnchantment
 import net.minecraft.enchantment.Enchantment
-import net.minecraft.item.ItemBlock
-import net.minecraft.item.ItemFood
-import net.minecraft.item.ItemPotion
-import net.minecraft.item.ItemSword
-import net.minecraft.item.ItemTool
+import net.minecraft.item.*
 
 class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCategory.MISC) {
 
