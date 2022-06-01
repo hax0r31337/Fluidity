@@ -165,6 +165,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
                     moved = false;
                 }
 
+                RotationUtilsKt.applyVisualYawUpdate(mc.thePlayer);
                 RotationUtilsKt.setLastReportedYaw(yaw);
                 RotationUtilsKt.setLastReportedPitch(pitch);
                 RotationUtilsKt.setSilentRotationYaw(Float.NaN);

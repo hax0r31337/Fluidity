@@ -155,10 +155,10 @@ fun drawFilledBox(axisAlignedBB: AxisAlignedBB) {
 
 fun quickDrawRect(x: Float, y: Float, x2: Float, y2: Float) {
     GL11.glBegin(GL11.GL_QUADS)
-    GL11.glVertex2d(x2.toDouble(), y.toDouble())
-    GL11.glVertex2d(x.toDouble(), y.toDouble())
-    GL11.glVertex2d(x.toDouble(), y2.toDouble())
-    GL11.glVertex2d(x2.toDouble(), y2.toDouble())
+    GL11.glVertex2f(x2, y)
+    GL11.glVertex2f(x, y)
+    GL11.glVertex2f(x, y2)
+    GL11.glVertex2f(x2, y2)
     GL11.glEnd()
 }
 

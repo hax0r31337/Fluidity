@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.ClickBlockEvent;
 import me.liuli.fluidity.event.KeyEvent;
 import me.liuli.fluidity.event.ScreenEvent;
 import me.liuli.fluidity.event.WorldEvent;
+import me.liuli.fluidity.module.modules.render.ESP;
 import me.liuli.fluidity.util.client.ClientUtilsKt;
 import me.liuli.fluidity.util.move.RotationUtilsKt;
 import net.minecraft.block.material.Material;
@@ -82,14 +83,6 @@ public abstract class MixinMinecraft {
     private void onClickBlock(CallbackInfo callbackInfo) {
         if (this.leftClickCounter == 0 && theWorld.getBlockState(objectMouseOver.getBlockPos()).getBlock().getMaterial() != Material.air) {
             Fluidity.eventManager.call(new ClickBlockEvent(ClickBlockEvent.Type.LEFT, objectMouseOver.getBlockPos(), this.objectMouseOver.sideHit));
-        }
-    }
-
-
-    @Inject(method = "getRenderViewEntity", at = @At("HEAD"))
-    public void getRenderViewEntity(CallbackInfoReturnable<Entity> cir){
-        if (thePlayer != null) {
-            RotationUtilsKt.applyVisualYawUpdate(thePlayer);
         }
     }
 
