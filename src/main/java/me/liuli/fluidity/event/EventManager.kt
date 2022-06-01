@@ -1,39 +1,31 @@
 package me.liuli.fluidity.event
 
 import java.lang.reflect.Method
+import java.lang.Class
 
 class EventManager {
-    private val methods = mutableListOf<ListenerMethod>()
+    private val handlers = mutableMapOf<Class<out Event>, MutableList<Handler>>()
 
     fun registerListener(listener: Listener) {
         for (method in listener.javaClass.declaredMethods) {
             if (method.isAnnotationPresent(EventMethod::class.java)) {
-                methods.add(ListenerMethod(method, listener))
+                registerHandler(HandlerMethod(method, listener))
             }
         }
+    }
+
+    fun registerHandler(handler: Handler) {
+        (handlers[handler.target] ?: mutableListOf<Handler>().also { handlers[handler.target] = it })
+            .add(handler)
+    }
+
+    fun <T : Event> registerFunction(func: (T) -> Unit, target: Class<T>) {
+        registerHandler(HandlerFunction(func, target))
     }
 
     fun call(event: Event) {
-        for (lm in methods) {
-            if (lm.listener.listen() && lm.isMatchEvent(event)) {
-                try {
-                    lm.method.invoke(lm.listener, event)
-                } catch (t: Throwable) {
-                    Exception("An error occurred while handling the event: ", t).printStackTrace()
-                }
-            }
+        for (handler in (handlers[event.javaClass] ?: return)) {
+            handler.invoke(event)
         }
-    }
-}
-
-class ListenerMethod(val method: Method, val listener: Listener) {
-    init {
-        if (!method.isAccessible) {
-            method.isAccessible = true
-        }
-    }
-
-    fun isMatchEvent(event: Event): Boolean {
-        return method.parameterTypes[0] == event.javaClass
     }
 }

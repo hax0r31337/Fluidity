@@ -10,7 +10,6 @@ import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
-import me.liuli.fluidity.util.render.drawRect
 import me.liuli.fluidity.util.render.quickDrawRect
 import me.liuli.fluidity.util.world.*
 import net.minecraft.client.renderer.GlStateManager
