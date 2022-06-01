@@ -162,6 +162,16 @@ fun quickDrawRect(x: Float, y: Float, x2: Float, y2: Float) {
     GL11.glEnd()
 }
 
+fun quickDrawRect(x: Float, y: Float, x2: Float, y2: Float, color: Int) {
+    glColor(color)
+    GL11.glBegin(GL11.GL_QUADS)
+    GL11.glVertex2f(x2, y)
+    GL11.glVertex2f(x, y)
+    GL11.glVertex2f(x, y2)
+    GL11.glVertex2f(x2, y2)
+    GL11.glEnd()
+}
+
 fun drawRect(x: Float, y: Float, x2: Float, y2: Float, color: Int) {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glDisable(GL11.GL_TEXTURE_2D)

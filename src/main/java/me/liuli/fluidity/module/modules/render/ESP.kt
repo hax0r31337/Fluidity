@@ -11,6 +11,7 @@ import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.drawRect
+import me.liuli.fluidity.util.render.quickDrawRect
 import me.liuli.fluidity.util.world.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
@@ -35,7 +36,12 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
     @EventMethod
     fun onRender3D(event: Render3DEvent) {
         val color = Color(colorRedValue.get(), colorGreenValue.get(), colorBlueValue.get())
-        mc.theWorld.loadedEntityList.filter { Targets.isTarget(it, onlyShowAttackableValue.get()) }.forEach { entity ->
+        val list = mc.theWorld.loadedEntityList.filter { Targets.isTarget(it, onlyShowAttackableValue.get()) }
+            .also { if(it.isEmpty()) return }
+
+        val bgColor = Color(0, 0, 0, nameAlphaValue.get()).rgb
+
+        list.forEach { entity ->
             val entityBox = entity.entityBoundingBox
             val x = entity.renderPosX
             val y = entity.renderPosY
@@ -66,10 +72,20 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 GL11.glScalef(-scale, -scale, scale)
                 GL11.glTranslatef(0f, -mc.fontRendererObj.FONT_HEIGHT * 1.4f, 0f)
 
-                val width = (mc.fontRendererObj.getStringWidth(entity.name) / 2f) * 1.3f
-                drawRect(-width, mc.fontRendererObj.FONT_HEIGHT * -0.3f, width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, Color(0, 0, 0, nameAlphaValue.get()))
-                drawRect(-width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, -width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.4f, entity.healthColor(nameAlphaValue.get()))
-                drawRect(-width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.1f, width, mc.fontRendererObj.FONT_HEIGHT * 1.4f, Color(0, 0, 0, nameAlphaValue.get()))
+                val width = (mc.fontRendererObj.getStringWidth(entity.name) / 2f) + 5f
+
+                GL11.glEnable(GL11.GL_BLEND)
+                GL11.glDisable(GL11.GL_TEXTURE_2D)
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+                GL11.glEnable(GL11.GL_LINE_SMOOTH)
+
+                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * -0.3f, width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, bgColor)
+                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, -width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.4f, entity.healthColor(nameAlphaValue.get()).rgb)
+                quickDrawRect(-width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.1f, width, mc.fontRendererObj.FONT_HEIGHT * 1.4f, bgColor)
+
+                GL11.glEnable(GL11.GL_TEXTURE_2D)
+                GL11.glDisable(GL11.GL_BLEND)
+                GL11.glDisable(GL11.GL_LINE_SMOOTH)
 
                 mc.fontRendererObj.drawString(entity.name, -mc.fontRendererObj.getStringWidth(entity.name) / 2f, 0f, Color.WHITE.rgb, false)
 
