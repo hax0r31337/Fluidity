@@ -14,7 +14,7 @@ public class MixinRendererLivingEntity {
 
     @Inject(method = "canRenderName", at = @At("HEAD"), cancellable = true)
     private <T extends EntityLivingBase> void canRenderName(T entity, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
-        if (ESP.INSTANCE.getState() && Targets.INSTANCE.isTarget(entity, ESP.INSTANCE.getOnlyShowAttackableValue().get()))
+        if (ESP.INSTANCE.getState() && ESP.INSTANCE.getNameValue().get() && Targets.INSTANCE.isTarget(entity, ESP.INSTANCE.getOnlyShowAttackableValue().get()))
             callbackInfoReturnable.setReturnValue(false);
     }
 }

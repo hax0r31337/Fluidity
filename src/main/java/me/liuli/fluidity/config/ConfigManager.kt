@@ -101,6 +101,11 @@ class ConfigManager : Listener {
     fun loadDefault() {
         val configSet = if (configSetFile.exists()) { JsonParser().parse(BufferedReader(FileReader(configSetFile))).asJsonObject } else { JsonObject() }
 
+        antiForge = if (configSet.has("anti-forge")) {
+            configSet.get("anti-forge").asBoolean
+        } else {
+            false
+        }
         load(if (configSet.has("file")) {
             configSet.get("file").asString
         } else {
@@ -112,6 +117,7 @@ class ConfigManager : Listener {
         val configSet = JsonObject()
 
         configSet.addProperty("file", nowConfig)
+        configSet.addProperty("anti-forge", antiForge)
 
         val writer = BufferedWriter(OutputStreamWriter(FileOutputStream(configSetFile), StandardCharsets.UTF_8))
         writer.write(gson.toJson(configSet))
@@ -128,4 +134,8 @@ class ConfigManager : Listener {
     }
 
     override fun listen() = true
+
+    companion object {
+        var antiForge = false
+    }
 }

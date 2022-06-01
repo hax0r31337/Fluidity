@@ -7,7 +7,7 @@ import me.liuli.fluidity.module.ModuleManager
 import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.client.setTitle
-import me.liuli.fluidity.util.other.DiscordRPC
+import me.liuli.fluidity.module.special.DiscordRPC
 import kotlin.concurrent.thread
 
 object Fluidity {

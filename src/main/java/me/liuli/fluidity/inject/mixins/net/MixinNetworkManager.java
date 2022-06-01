@@ -1,4 +1,4 @@
-package me.liuli.fluidity.inject.mixins.other;
+package me.liuli.fluidity.inject.mixins.net;
 
 import io.netty.channel.ChannelHandlerContext;
 import me.liuli.fluidity.Fluidity;

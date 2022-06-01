@@ -1,4 +1,4 @@
-package me.liuli.fluidity.inject.mixins.other;
+package me.liuli.fluidity.inject.mixins.net;
 
 import me.liuli.fluidity.module.modules.misc.NoRotateSet;
 import net.minecraft.client.network.NetHandlerPlayClient;

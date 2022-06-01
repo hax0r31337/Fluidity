@@ -1,4 +1,4 @@
-package me.liuli.fluidity.util.other
+package me.liuli.fluidity.module.special
 
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener

@@ -30,8 +30,12 @@ class Velocity : Module("Velocity", "Prevent you from knockback", ModuleCategory
             if ((packet is S0BPacketAnimation && packet.animationType == 1 && packet.entityID == mc.thePlayer.entityId)
                 || (packet is S19PacketEntityStatus && packet.opCode.toInt() == 2 && packet.getEntity(mc.theWorld) == mc.thePlayer)) {
                 isLastDamage = true
-            } else if (!isLastDamage && (packet is S12PacketEntityVelocity || packet is S27PacketExplosion)) {
-                return
+            } else if (packet is S12PacketEntityVelocity || packet is S27PacketExplosion) {
+                if (isLastDamage) {
+                    isLastDamage = false
+                } else {
+                    return
+                }
             }
         }
 

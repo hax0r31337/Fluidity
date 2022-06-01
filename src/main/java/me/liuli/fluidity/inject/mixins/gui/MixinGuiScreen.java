@@ -4,6 +4,7 @@ import me.liuli.fluidity.Fluidity;
 import me.liuli.fluidity.event.GuiKeyEvent;
 import me.liuli.fluidity.event.RenderScreenEvent;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,8 +12,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
+
 @Mixin(GuiScreen.class)
 public class MixinGuiScreen {
+
+    @Shadow
+    protected List<GuiButton> buttonList;
     @Shadow
     protected FontRenderer fontRendererObj;
 
