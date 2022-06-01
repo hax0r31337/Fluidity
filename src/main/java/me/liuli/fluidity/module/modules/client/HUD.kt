@@ -30,24 +30,37 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
         if (modules.isEmpty())
             return
 
-        var index = 0
+        var idx = 0
         val blank = fontHeight / 2f
         GL11.glPushMatrix()
         GL11.glTranslatef(event.scaledResolution.scaledWidth.toFloat(), 0f, 0f)
         var color = rainbow(1)
         var nWidth = fontRenderer.getStringWidth(modules[0].name) + blank * 2f
-        modules.forEachIndexed { idx, module ->
-            if (module.state) {
-                module.animate = 1.0.coerceAtMost(module.animate + pct)
+        modules.forEachIndexed { realIndex, module ->
+            module.animate = if (module.state) {
+                module.animate + pct
             } else {
-                module.animate = 0.0.coerceAtLeast(module.animate - pct)
+                module.animate - pct
+            }.coerceIn(0.0, 1.0)
+            val animate = if (module.state) { EaseUtils.easeOutCubic(module.animate) } else { EaseUtils.easeInCubic(module.animate) }.toFloat()
+
+            if (animate == 0f) {
+                nWidth = if (modules.size > realIndex + 1) {
+                    fontRenderer.getStringWidth(modules[realIndex + 1].name) + blank * 2f
+                } else {
+                    0f
+                }
+                return@forEachIndexed
+            } else if (animate != 1f) {
+                GL11.glScalef(1f, animate, 1f)
             }
+
             val width = nWidth
             val height = fontHeight + blank
-            val xOffset = (-width * if (module.state) { EaseUtils.easeOutCubic(module.animate) } else { EaseUtils.easeInCubic(module.animate) }).toFloat()
+            val xOffset = -width * animate
             // draw outline
-            nWidth = if (modules.size > idx + 1) {
-                fontRenderer.getStringWidth(modules[idx + 1].name) + blank * 2f
+            nWidth = if (modules.size > realIndex + 1) {
+                fontRenderer.getStringWidth(modules[realIndex + 1].name) + blank * 2f
             } else {
                 0f
             }
@@ -85,8 +98,12 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
 
             fontRenderer.drawString(module.name, blank + xOffset, blank * 0.6f, color.rgb, false)
 
-            GL11.glTranslatef(0f, fontHeight + blank, 0f)
-            index++
+            if (animate != 1f) {
+                GL11.glScalef(1f, 1f / animate, 1f)
+            }
+
+            GL11.glTranslatef(0f, (fontHeight + blank) * animate, 0f)
+            idx++
             color = nColor
         }
         GL11.glPopMatrix()
