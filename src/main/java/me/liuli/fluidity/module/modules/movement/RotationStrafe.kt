@@ -4,6 +4,7 @@ import me.liuli.fluidity.event.EventMethod
 import me.liuli.fluidity.event.StrafeEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.silentRotationYaw
@@ -12,9 +13,12 @@ import net.minecraft.util.MathHelper
 class RotationStrafe : Module("RotationStrafe", "Make you move \"correctly\"", ModuleCategory.MOVEMENT) {
 
     private val modeValue = ListValue("Mode", arrayOf("Strict", "Simple"), "Strict")
+    private val onlyOnGroundValue = BoolValue("OnlyOnGround", false)
 
     @EventMethod
     fun onStrafe(event: StrafeEvent) {
+        if (onlyOnGroundValue.get() && !mc.thePlayer.onGround) return
+
         if (silentRotationYaw.isNaN()) return
         val yaw = silentRotationYaw
 

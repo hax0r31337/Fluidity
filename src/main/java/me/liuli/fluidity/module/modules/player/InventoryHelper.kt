@@ -23,6 +23,8 @@ import java.awt.Color
 object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory", ModuleCategory.PLAYER) {
 
     private val modeValue = ListValue("Mode", arrayOf("Auto", "Manual", "Visual"), "Visual")
+    private val stealChestValue = BoolValue("StealChest", false)
+    private val autoCloseValue = BoolValue("AutoClose", false)
     private val clickMaxCpsValue = IntValue("ClickMaxCPS", 4, 1, 20)
     private val clickMinCpsValue = IntValue("ClickMinCPS", 2, 1, 20)
     private val usefulRedValue = IntValue("Useful-Red", 0, 0, 255)
@@ -71,6 +73,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                 usefulItems.add(slot)
             } else if (lvl == ItemLevel.GARBAGE) {
                 garbageItems.add(slot)
+            } else if (slot.stack != null) {
+                normalItems.add(slot)
             }
         }
         usefulItemColor = Color(usefulRedValue.get(), usefulGreenValue.get(), usefulBlueValue.get()).rgb
@@ -83,24 +87,59 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
         val sr = ScaledResolution(mc)
         val mouseX = Mouse.getX() * sr.scaledWidth / mc.displayWidth
         val mouseY = sr.scaledHeight - Mouse.getY() * sr.scaledHeight / mc.displayHeight - 1
-        garbageItems.forEach {
-            if (processClick(it, gui, ItemLevel.GARBAGE, mouseX, mouseY)) {
-                clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
-                return
+        if (mc.currentScreen is GuiInventory) {
+            // sort inventory
+            garbageItems.forEach {
+                if (processClick(it, gui, ItemLevel.GARBAGE, mouseX, mouseY)) {
+                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    return
+                }
+            }
+            usefulItems.forEach {
+                if (processClick(it, gui, ItemLevel.BETTER, mouseX, mouseY)) {
+                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    return
+                }
+            }
+            normalItems.forEach {
+                if (it.slotNumber !in 36..44 && processClick(it, gui, ItemLevel.NORMAL, mouseX, mouseY)) {
+                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    return
+                }
+            }
+            if (autoCloseValue.get()) {
+                mc.thePlayer.closeScreen()
+            }
+        } else if (stealChestValue.get()) {
+            // steal items
+            usefulItems.forEach {
+                if (processSteal(it, gui, mouseX, mouseY)) {
+                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    return
+                }
+            }
+            normalItems.forEach {
+                if (processSteal(it, gui, mouseX, mouseY)) {
+                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    return
+                }
+            }
+            if (autoCloseValue.get()) {
+                mc.thePlayer.closeScreen()
             }
         }
-        usefulItems.forEach {
-            if (processClick(it, gui, ItemLevel.BETTER, mouseX, mouseY)) {
-                clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
-                return
-            }
+    }
+
+    private fun processSteal(slot: Slot, gui: GuiContainer, mouseX: Int, mouseY: Int): Boolean {
+        if (slot.slotNumber !in 0..(gui.inventorySlots.inventorySlots.size - 37)) {
+            return false
         }
-        normalItems.forEach {
-            if (it.slotNumber !in 36..44 && processClick(it, gui, ItemLevel.NORMAL, mouseX, mouseY)) {
-                clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
-                return
-            }
+        if (modeValue.get() == "Manual" && !gui.isMouseOverSlot(slot, mouseX, mouseY)) {
+            return false
         }
+
+        mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, 0, 1, mc.thePlayer)
+        return true
     }
 
     private fun processClick(slot: Slot, gui: GuiContainer, lvl: ItemLevel, mouseX: Int, mouseY: Int): Boolean {
@@ -134,6 +173,14 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
         }
     }
 
+    private fun compNum(a: Float, b: Float, aSlot: Int, bSlot: Int): Boolean {
+        return if (a == b) {
+            aSlot < bSlot
+        } else {
+            a < b
+        }
+    }
+
     private fun getItemLevel(slot: Slot, container: Container): ItemLevel {
         val stack = slot.stack ?: return ItemLevel.NORMAL
         val item = stack.item ?: return ItemLevel.NORMAL
@@ -141,8 +188,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
         return when {
             item is ItemSword || item is ItemTool -> {
                 val dmg = stack.getAttackDamage()
-                if (container.inventorySlots.none { (it.stack?.item is ItemSword || it.stack?.item is ItemTool)
-                            && it.stack != stack && dmg < it.stack.getAttackDamage() }) {
+                if (container.inventorySlots.none { (it.stack?.item?.javaClass == item.javaClass)
+                            && it.stack != stack && compNum(dmg, it.stack.getAttackDamage(), slot.slotNumber, it.slotNumber) }) {
                     ItemLevel.BETTER
                 } else {
                     ItemLevel.GARBAGE
@@ -151,16 +198,16 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             item is ItemArmor -> {
                 val prot = stack.getArmorProtection()
                 if (container.inventorySlots.none { (it.stack?.item is ItemArmor) && (it.stack.item as ItemArmor).armorType == item.armorType
-                            && it.stack != stack && prot > it.stack.getArmorProtection() }) {
+                            && it.stack != stack && compNum(it.stack.getArmorProtection(), prot, slot.slotNumber, it.slotNumber) }) {
                     ItemLevel.BETTER
                 } else {
                     ItemLevel.GARBAGE
                 }
             }
             item is ItemBow -> {
-                val pwr = stack.getEnchantment(Enchantment.power)
-                if (container.inventorySlots.none { it.stack?.item is ItemBow && it.stack != stack && pwr < it.stack.getEnchantment(
-                        Enchantment.power) }) {
+                val pwr = stack.getEnchantment(Enchantment.power).toFloat()
+                if (container.inventorySlots.none { it.stack?.item is ItemBow && it.stack != stack
+                            && compNum(pwr, it.stack.getEnchantment(Enchantment.power).toFloat(), slot.slotNumber, it.slotNumber) }) {
                     ItemLevel.BETTER
                 } else {
                     ItemLevel.GARBAGE
@@ -169,8 +216,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             else -> {
                 if (item is ItemFood || stack.unlocalizedName == "item.arrow" ||
                         (item is ItemBlock && item.isUsefulBlock()) ||
-                        item is ItemBed || (item is ItemPotion && (!onlyPositivePotionValue.get() || stack.isPositivePotion())) ||
-                        item is ItemEnderPearl || item is ItemBucket || ignoreVehiclesValue.get() && (item is ItemBoat || item is ItemMinecart)) {
+                        item is ItemSnowball || item is ItemEgg || (item is ItemPotion && (!onlyPositivePotionValue.get() || stack.isPositivePotion())) ||
+                        item is ItemEnderPearl || item is ItemBucket || (ignoreVehiclesValue.get() && (item is ItemBoat || item is ItemMinecart))) {
                     ItemLevel.NORMAL
                 } else {
                     ItemLevel.GARBAGE
