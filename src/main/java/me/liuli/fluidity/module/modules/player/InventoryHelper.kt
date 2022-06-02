@@ -33,6 +33,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     private val garbageRedValue = IntValue("Garbage-Red", 255, 0, 255)
     private val garbageGreenValue = IntValue("Garbage-Green", 0, 0, 255)
     private val garbageBlueValue = IntValue("Garbage-Blue", 0, 0, 255)
+    private val tipAlphaValue = IntValue("TipAlpha", 255, 0, 255)
     private val ignoreVehiclesValue = BoolValue("IgnoreVehicles", false)
     private val onlyPositivePotionValue = BoolValue("OnlyPositivePotion", false)
     private val sortSwordValue = IntValue("SortSword", 0, -1, 8)
@@ -77,8 +78,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                 normalItems.add(slot)
             }
         }
-        usefulItemColor = Color(usefulRedValue.get(), usefulGreenValue.get(), usefulBlueValue.get()).rgb
-        garbageItemColor = Color(garbageRedValue.get(), garbageGreenValue.get(), garbageBlueValue.get()).rgb
+        usefulItemColor = Color(usefulRedValue.get(), usefulGreenValue.get(), usefulBlueValue.get(), tipAlphaValue.get()).rgb
+        garbageItemColor = Color(garbageRedValue.get(), garbageGreenValue.get(), garbageBlueValue.get(), tipAlphaValue.get()).rgb
 
         val canClick = clickTimer.canClick() && modeValue.get() != "Visual"
         if (!canClick) {

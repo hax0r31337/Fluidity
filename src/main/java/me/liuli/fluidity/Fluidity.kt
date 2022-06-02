@@ -8,13 +8,26 @@ import me.liuli.fluidity.module.special.DiscordRPC
 import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.client.setTitle
+import java.util.*
 import kotlin.concurrent.thread
 
 object Fluidity {
-    const val NAME = "Fluidity"
-    const val COLORED_NAME = "§3F§bluidity"
-    const val VERSION = "1.0.0"
-    const val AUTHOR = "Liulihaocai"
+
+    val gitInfo = Properties().also {
+        val inputStream = Fluidity::class.java.classLoader.getResourceAsStream("git.properties")
+        if(inputStream != null) {
+            it.load(inputStream)
+        } else {
+            throw RuntimeException("git.properties not found")
+        }
+    }
+
+    @JvmField
+    val NAME = "Fluidity"
+    @JvmField
+    val COLORED_NAME = "§3F§bluidity"
+    @JvmField
+    val VERSION = gitInfo["git.commit.id.abbrev"]?.let { "git-$it" } ?: "unknown"
 
     lateinit var eventManager: EventManager
     lateinit var configManager: ConfigManager
@@ -28,7 +41,7 @@ object Fluidity {
 
     fun load() {
         logInfo("Loading $NAME v$VERSION")
-        setTitle("Loading Client...")
+        setTitle("LoadClient")
 
         configManager = ConfigManager()
         eventManager.registerListener(configManager)
@@ -48,7 +61,7 @@ object Fluidity {
             }
         }
 
-        setTitle(null)
+        setTitle("HaveFun")
     }
 
     fun shutdown() {

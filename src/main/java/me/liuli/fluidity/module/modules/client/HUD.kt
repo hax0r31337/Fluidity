@@ -24,8 +24,8 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
         val fontRenderer = mc.fontRendererObj
         val fontHeight = fontRenderer.FONT_HEIGHT
 
-        fontRenderer.drawString("F", 10, 10, rainbow(1).rgb)
-        fontRenderer.drawString("luidity", 10 + fontRenderer.getStringWidth("F"), 10, Color.WHITE.rgb)
+        fontRenderer.drawString(Fluidity.NAME.substring(0, 1), 10, 10, rainbow(1).rgb)
+        fontRenderer.drawString(Fluidity.NAME.substring(1), 10 + fontRenderer.getStringWidth(Fluidity.NAME.substring(0, 1)), 10, Color.WHITE.rgb)
 
         val modules = Fluidity.moduleManager.modules.filter { (it.state || it.animate != 0.0) && it.array }
             .sortedBy { -fontRenderer.getStringWidth(it.name) }

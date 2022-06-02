@@ -40,6 +40,10 @@ class Velocity : Module("Velocity", "Prevent you from knockback", ModuleCategory
         }
 
         if (packet is S12PacketEntityVelocity) {
+            if (packet.entityID != mc.thePlayer.entityId) {
+                return
+            }
+
             if (modeValue.get() == "Vanilla") {
                 event.cancel()
             } else if (modeValue.get() == "Simple") {
