@@ -17,6 +17,7 @@
     "gui.MixinGuiScreen",
     "gui.MixinGuiSpectator",
     "gui.MixinGuiMultiplayer",
+    "gui.MixinGuiContainer",
     "net.MixinNetworkManager",
     "net.MixinNetHandlerPlayClient",
     "net.MixinC00Handshake",

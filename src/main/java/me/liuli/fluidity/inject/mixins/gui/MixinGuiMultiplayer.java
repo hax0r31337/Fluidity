@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiMultiplayer.class)
-public class MixinGuiMultiplayer extends MixinGuiScreen {
+public abstract class MixinGuiMultiplayer extends MixinGuiScreen {
 
     private GuiButton button;
 

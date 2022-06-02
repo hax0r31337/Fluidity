@@ -1,7 +1,5 @@
 package me.liuli.fluidity.event
 
-import java.lang.reflect.Method
-
 interface Handler {
 
     val target: Class<out Event>

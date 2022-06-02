@@ -109,5 +109,6 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
             color = nColor
         }
         GL11.glPopMatrix()
+        GL11.glColor4f(1f, 1f, 1f, 1f)
     }
 }

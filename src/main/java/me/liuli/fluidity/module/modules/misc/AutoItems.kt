@@ -7,6 +7,7 @@ import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.world.getAttackDamage
 import me.liuli.fluidity.util.world.getEnchantment
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.*
@@ -27,10 +28,7 @@ class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCatego
         val (slot, _) = (0..8)
             .map { Pair(it, mc.thePlayer.inventory.getStackInSlot(it)) }
             .filter { it.second != null && (it.second.item is ItemSword || (it.second.item is ItemTool && !attackOnlySwordValue.get())) }
-            .maxByOrNull {
-                (it.second.attributeModifiers["generic.attackDamage"].first()?.amount
-                    ?: 0.0) + 1.25 * getEnchantment(it.second, Enchantment.sharpness)
-            } ?: return
+            .maxByOrNull { it.second.getAttackDamage() } ?: return
         swapItem(slot)
     }
 

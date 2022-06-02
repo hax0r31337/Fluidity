@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiMainMenu.class)
-public class MixinGuiMainMenu extends MixinGuiScreen {
+public abstract class MixinGuiMainMenu extends MixinGuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks, CallbackInfo callbackInfo) {
         final String str = Fluidity.COLORED_NAME+"§f v"+ Fluidity.VERSION;
