@@ -8,8 +8,6 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.world.getAttackDamage
-import me.liuli.fluidity.util.world.getEnchantment
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.*
 
 class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCategory.MISC) {

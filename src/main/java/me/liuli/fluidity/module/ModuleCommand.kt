@@ -3,7 +3,6 @@ package me.liuli.fluidity.module
 import me.liuli.fluidity.command.Command
 import me.liuli.fluidity.module.value.*
 import me.liuli.fluidity.util.render.colorToHexString
-import me.liuli.fluidity.util.render.toHexString
 import me.liuli.fluidity.util.world.getBlockName
 import net.minecraft.block.Block
 import java.awt.Color

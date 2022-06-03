@@ -1,5 +1,6 @@
 package me.liuli.fluidity.util.render
 
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -197,4 +198,8 @@ fun drawRect(x: Float, y: Float, x2: Float, y2: Float, color: Int) {
 
 fun drawRect(x: Float, y: Float, x2: Float, y2: Float, color: Color) {
     drawRect(x, y, x2, y2, color.rgb)
+}
+
+fun FontRenderer.drawCenteredString(str: String, x: Float, y: Float, color: Int, shadow: Boolean = false) {
+    this.drawString(str, x - getStringWidth(str) / 2, y, color, shadow)
 }

@@ -5,6 +5,7 @@ import me.liuli.fluidity.config.ConfigManager
 import me.liuli.fluidity.event.EventManager
 import me.liuli.fluidity.module.ModuleManager
 import me.liuli.fluidity.module.special.DiscordRPC
+import me.liuli.fluidity.util.client.Debugger
 import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.client.setTitle
@@ -28,6 +29,8 @@ object Fluidity {
     val COLORED_NAME = "§3F§bluidity"
     @JvmField
     val VERSION = gitInfo["git.commit.id.abbrev"]?.let { "git-$it" } ?: "unknown"
+    @JvmField
+    val DEBUG_MODE = System.getProperty("fluidity.debug")?.toBoolean() ?: false
 
     lateinit var eventManager: EventManager
     lateinit var configManager: ConfigManager
@@ -45,6 +48,10 @@ object Fluidity {
 
         configManager = ConfigManager()
         eventManager.registerListener(configManager)
+
+        if (DEBUG_MODE) {
+            eventManager.registerListener(Debugger)
+        }
 
         commandManager = CommandManager()
 

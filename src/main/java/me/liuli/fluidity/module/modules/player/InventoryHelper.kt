@@ -167,7 +167,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
 
     private fun compNum(a: Float, b: Float, aSlot: Int, bSlot: Int): Boolean {
         return if (a == b) {
-            aSlot < bSlot
+            aSlot > bSlot
         } else {
             a < b
         }
