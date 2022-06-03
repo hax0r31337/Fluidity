@@ -32,9 +32,9 @@ public abstract class MixinGuiContainer extends MixinGuiScreen {
 
         int color = -1;
         if (InventoryHelper.INSTANCE.getUsefulItems().contains(slot)) {
-            color = InventoryHelper.INSTANCE.getUsefulItemColor();
+            color = InventoryHelper.INSTANCE.getUsefulColorValue().get();
         } else if (InventoryHelper.INSTANCE.getGarbageItems().contains(slot)) {
-            color = InventoryHelper.INSTANCE.getGarbageItemColor();
+            color = InventoryHelper.INSTANCE.getGarbageColorValue().get();
         }
         if (color != -1) {
             GL11.glDisable(GL11.GL_TEXTURE_2D);

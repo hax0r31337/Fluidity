@@ -2,8 +2,11 @@ package me.liuli.fluidity.module
 
 import me.liuli.fluidity.command.Command
 import me.liuli.fluidity.module.value.*
+import me.liuli.fluidity.util.render.colorToHexString
+import me.liuli.fluidity.util.render.toHexString
 import me.liuli.fluidity.util.world.getBlockName
 import net.minecraft.block.Block
+import java.awt.Color
 
 /**
  * Module command
@@ -31,7 +34,9 @@ class ModuleCommand(private val module: Module, private val values: List<Value<*
         }
 
         if (args.size < 2) {
-            if (value is BlockValue) {
+            if (value is ColorValue) {
+                chatSyntax("${args[0].lowercase()} <color> (now=${colorToHexString(value.get())})")
+            } else if (value is BlockValue) {
                 chatSyntax("${args[0].lowercase()} <block> (now=${getBlockName(value.get())})")
             } else if (value is IntValue || value is FloatValue || value is StringValue || value is BoolValue) {
                 chatSyntax("${args[0].lowercase()} <value> (now=${value.get()})")
@@ -43,6 +48,28 @@ class ModuleCommand(private val module: Module, private val values: List<Value<*
 
         try {
             when (value) {
+                is ColorValue -> {
+                    try {
+                        val color = if (args[1].startsWith("#")) {
+                            args[1] = args[1].substring(1)
+                            if (args[1].length == 6) {
+                                Color(args[1].substring(0, 2).toInt(16), args[1].substring(2, 4).toInt(16), args[1].substring(4, 6).toInt(16)).rgb
+                            } else if (args[1].length == 8) {
+                                Color(args[1].substring(0, 2).toInt(16), args[1].substring(2, 4).toInt(16), args[1].substring(4, 6).toInt(16), args[1].substring(6, 8).toInt(16)).rgb
+                            } else {
+                                throw IllegalArgumentException("Invalid color format")
+                            }
+                        } else {
+                            Integer.decode(args[1])
+                        }
+                        value.set(color)
+                        chat("${module.name} ${args[0].lowercase()} was set to ${colorToHexString(color)}.")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        chat("Invalid color (${e.message})")
+                    }
+                    return
+                }
                 is BlockValue -> {
                     var id: Int
 

@@ -35,12 +35,12 @@ object Fluidity {
     lateinit var moduleManager: ModuleManager
 
     fun init() {
-        logInfo("Initialize $NAME v$VERSION")
+        logInfo("Initialize $NAME $VERSION")
         eventManager = EventManager()
     }
 
     fun load() {
-        logInfo("Loading $NAME v$VERSION")
+        logInfo("Loading $NAME $VERSION")
         setTitle("LoadClient")
 
         configManager = ConfigManager()

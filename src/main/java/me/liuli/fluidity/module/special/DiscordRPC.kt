@@ -40,7 +40,7 @@ object DiscordRPC {
         val builder = RichPresence.Builder()
         builder.setStartTimestamp(timestamp)
         builder.setLargeImage("c4dd5cb4c8cf6d883676c4e30d64ecb2")
-        builder.setDetails("v${Fluidity.VERSION}")
+        builder.setDetails("${Fluidity.VERSION}")
         builder.setState("${Fluidity.moduleManager.modules.count { it.state }} of ${Fluidity.moduleManager.modules.size} modules enabled")
 
         // Check ipc client is connected and send rpc

@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
+import me.liuli.fluidity.module.value.ColorValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
@@ -27,13 +28,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     private val autoCloseValue = BoolValue("AutoClose", false)
     private val clickMaxCpsValue = IntValue("ClickMaxCPS", 4, 1, 20)
     private val clickMinCpsValue = IntValue("ClickMinCPS", 2, 1, 20)
-    private val usefulRedValue = IntValue("Useful-Red", 0, 0, 255)
-    private val usefulGreenValue = IntValue("Useful-Green", 255, 0, 255)
-    private val usefulBlueValue = IntValue("Useful-Blue", 0, 0, 255)
-    private val garbageRedValue = IntValue("Garbage-Red", 255, 0, 255)
-    private val garbageGreenValue = IntValue("Garbage-Green", 0, 0, 255)
-    private val garbageBlueValue = IntValue("Garbage-Blue", 0, 0, 255)
-    private val tipAlphaValue = IntValue("TipAlpha", 255, 0, 255)
+    val usefulColorValue = ColorValue("UsefulColor", Color.GREEN.rgb)
+    val garbageColorValue = ColorValue("GarbageColor", Color.RED.rgb)
     private val ignoreVehiclesValue = BoolValue("IgnoreVehicles", false)
     private val onlyPositivePotionValue = BoolValue("OnlyPositivePotion", false)
     private val sortSwordValue = IntValue("SortSword", 0, -1, 8)
@@ -43,9 +39,6 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     val usefulItems = mutableListOf<Slot>()
     val garbageItems = mutableListOf<Slot>()
     val normalItems = mutableListOf<Slot>()
-
-    var usefulItemColor = 0
-    var garbageItemColor = 0
 
     private val clickTimer = ClickTimer()
 
@@ -78,8 +71,6 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                 normalItems.add(slot)
             }
         }
-        usefulItemColor = Color(usefulRedValue.get(), usefulGreenValue.get(), usefulBlueValue.get(), tipAlphaValue.get()).rgb
-        garbageItemColor = Color(garbageRedValue.get(), garbageGreenValue.get(), garbageBlueValue.get(), tipAlphaValue.get()).rgb
 
         val canClick = clickTimer.canClick() && modeValue.get() != "Visual"
         if (!canClick) {

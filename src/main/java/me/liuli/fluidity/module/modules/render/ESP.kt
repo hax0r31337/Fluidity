@@ -6,6 +6,7 @@ import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.value.BoolValue
+import me.liuli.fluidity.module.value.ColorValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.util.mc
@@ -21,24 +22,21 @@ import java.awt.Color
 object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCategory.RENDER) {
 
     val onlyShowAttackableValue = BoolValue("OnlyShowAttackable", false)
-    private val colorRedValue = IntValue("ColorRed", 255, 0, 255)
-    private val colorGreenValue = IntValue("ColorGreen", 255, 0, 255)
-    private val colorBlueValue = IntValue("ColorBlue", 255, 0, 255)
+    private val colorValue = ColorValue("Color", Color.WHITE.rgb)
     private val boxAlphaValue = IntValue("BoxAlpha", 50, 0, 255)
     private val outlineAlphaValue = IntValue("OutlineAlpha", 255, 0, 255)
     private val outlineThicknessValue = FloatValue("OutlineThickness", 1f, 1f, 10f)
     val nameValue = BoolValue("Name", true)
     private val scaleValue = FloatValue("NameScale", 2F, 1F, 4F)
-    private val nameAlphaValue = IntValue("NameAlpha", 150, 0, 255)
+    private val nameBackgroundColorValue = ColorValue("NameBackgroundColor", Color(0, 0, 0, 150).rgb)
     private val scaleMultiplierValue = FloatValue("NameScaleMultiplier", 4F, 1F, 10F)
 
     @EventMethod
     fun onRender3D(event: Render3DEvent) {
-        val color = Color(colorRedValue.get(), colorGreenValue.get(), colorBlueValue.get())
         val list = mc.theWorld.loadedEntityList.filter { Targets.isTarget(it, onlyShowAttackableValue.get()) }
             .also { if(it.isEmpty()) return }
 
-        val bgColor = Color(0, 0, 0, nameAlphaValue.get()).rgb
+        val nameAlpha = nameBackgroundColorValue.get() shr 24 and 0xFF
 
         list.forEach { entity ->
             val entityBox = entity.entityBoundingBox
@@ -53,7 +51,7 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 entityBox.maxY - entity.posY + y,
                 entityBox.maxZ - entity.posZ + z
             )
-            drawAxisAlignedBB(axisAlignedBB, if((entity as EntityLivingBase).hurtTime > 0) { Color.RED } else { color }, outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
+            drawAxisAlignedBB(axisAlignedBB, if((entity as EntityLivingBase).hurtTime > 0) { 0xFF0000 } else { colorValue.get() }, outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
 
             if (nameValue.get()) {
                 GL11.glPushMatrix()
@@ -78,9 +76,9 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
                 GL11.glEnable(GL11.GL_LINE_SMOOTH)
 
-                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * -0.3f, width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, bgColor)
-                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, -width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.4f, entity.healthColor(nameAlphaValue.get()).rgb)
-                quickDrawRect(-width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.1f, width, mc.fontRendererObj.FONT_HEIGHT * 1.4f, bgColor)
+                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * -0.3f, width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, nameBackgroundColorValue.get())
+                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, -width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.4f, entity.healthColor(nameAlpha).rgb)
+                quickDrawRect(-width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.1f, width, mc.fontRendererObj.FONT_HEIGHT * 1.4f, nameBackgroundColorValue.get())
 
                 GL11.glEnable(GL11.GL_TEXTURE_2D)
                 GL11.glDisable(GL11.GL_BLEND)

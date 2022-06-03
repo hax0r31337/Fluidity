@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.event.WorldEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.value.ColorValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
@@ -24,9 +25,7 @@ import java.util.*
 class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall", ModuleCategory.RENDER) {
 
     private val modeValue = ListValue("Mode", arrayOf("All", "FairySoul", "Gift"), "All")
-    private val colorRedValue = IntValue("ColorRed", 147, 0, 255)
-    private val colorGreenValue = IntValue("ColorGreen", 112, 0, 255)
-    private val colorBlueValue = IntValue("ColorBlue", 219, 0, 255)
+    private val colorValue = ColorValue("Color", Color.WHITE.rgb)
     private val boxAlphaValue = IntValue("BoxAlpha", 50, 0, 255)
     private val outlineAlphaValue = IntValue("OutlineAlpha", 255, 0, 255)
     private val outlineThicknessValue = FloatValue("OutlineThickness", 1f, 1f, 10f)
@@ -44,7 +43,6 @@ class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall
 
     @EventMethod
     fun onRender3D(event: Render3DEvent) {
-        val color = Color(colorRedValue.get(), colorGreenValue.get(), colorBlueValue.get())
         mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()
             .forEach { entity ->
                 // get helmet
@@ -88,7 +86,7 @@ class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall
                     entityBox.maxY - entity.posY + y,
                     entityBox.maxZ - entity.posZ + z + 0.2
                 )
-                drawAxisAlignedBB(axisAlignedBB, color, outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
+                drawAxisAlignedBB(axisAlignedBB, colorValue.get(), outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
             }
     }
 

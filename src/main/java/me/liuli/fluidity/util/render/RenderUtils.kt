@@ -34,13 +34,24 @@ fun glColor(hex: Int) {
     GlStateManager.color(red, green, blue, alpha)
 }
 
+fun glColor(hex: Int, alpha: Int) {
+    val red = (hex shr 16 and 0xFF) / 255f
+    val green = (hex shr 8 and 0xFF) / 255f
+    val blue = (hex and 0xFF) / 255f
+    GlStateManager.color(red, green, blue, alpha / 255f)
+}
+
 fun glColor(red: Int, green: Int, blue: Int, alpha: Int) {
     GlStateManager.color(red / 255f, green / 255f, blue / 255f, alpha / 255f)
 }
 
+fun drawAxisAlignedBB(axisAlignedBB: AxisAlignedBB, color: Color, outlineWidth: Float, outlineAlpha: Int = 95, boxAlpha: Int = 35) {
+    drawAxisAlignedBB(axisAlignedBB, color.rgb, outlineWidth, outlineAlpha, boxAlpha)
+}
+
 fun drawAxisAlignedBB(
     axisAlignedBB: AxisAlignedBB,
-    color: Color,
+    color: Int,
     outlineWidth: Float,
     outlineAlpha: Int = 95,
     boxAlpha: Int = 35
@@ -53,12 +64,12 @@ fun drawAxisAlignedBB(
 
     if (outlineWidth != 0f && outlineAlpha != 0) {
         GL11.glLineWidth(outlineWidth)
-        glColor(color.red, color.green, color.blue, outlineAlpha)
+        glColor(color, outlineAlpha)
         drawSelectionBoundingBox(axisAlignedBB)
     }
 
     if (boxAlpha != 0) {
-        glColor(color.red, color.green, color.blue, boxAlpha)
+        glColor(color, boxAlpha)
         drawFilledBox(axisAlignedBB)
     }
 
