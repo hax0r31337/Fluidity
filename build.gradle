@@ -33,7 +33,7 @@ minecraft {
     runDir = "run"
     mappings = "stable_22"
     makeObfSourceJar = false
-    clientJvmArgs += ["-Dfml.coreMods.load=me.liuli.fluidity.inject.MixinLoader", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true", "-Dmixin.dumpTargetOnFailure=true", "-Xmx1024m -Xms1024m"]
+    clientJvmArgs += ["-Dfluidity.debug", "-Dfml.coreMods.load=me.liuli.fluidity.inject.MixinLoader", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true", "-Dmixin.dumpTargetOnFailure=true", "-Xmx1024m -Xms1024m"]
 }
 
 configurations {
