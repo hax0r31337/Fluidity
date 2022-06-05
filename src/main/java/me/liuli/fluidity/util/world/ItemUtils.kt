@@ -19,7 +19,7 @@ fun ItemStack.getEnchantment(enchantment: Enchantment): Int {
 }
 
 fun ItemStack.getAttackDamage(): Float {
-    return (this.attributeModifiers["generic.attackDamage"].first()?.amount ?: 0.0).toFloat() +
+    return (this.attributeModifiers["generic.attackDamage"].firstOrNull()?.amount ?: 0.0).toFloat() +
             1.25f * this.getEnchantment(Enchantment.sharpness) +
             1.5f * this.getEnchantment(Enchantment.fireAspect)
 }
