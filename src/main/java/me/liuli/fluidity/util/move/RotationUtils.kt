@@ -142,3 +142,9 @@ fun fixSensitivity(yaw: Float, pitch: Float, sensitivity: Float = mc.gameSetting
 
     return Pair(lastReportedYaw + deltaYaw, lastReportedPitch + deltaPitch)
 }
+
+fun jitterRotation(jitter: Float, originalYaw: Float = mc.thePlayer.serverRotationYaw, originalPitch: Float = mc.thePlayer.serverRotationPitch): Pair<Float, Float> {
+    val yaw = originalYaw + (Math.random() - 0.5) * jitter
+    val pitch = originalPitch + (Math.random() - 0.5) * jitter
+    return Pair(yaw.toFloat(), pitch.toFloat().coerceIn(-90f, 90f))
+}

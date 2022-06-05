@@ -9,6 +9,7 @@ import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.jitterRotation
 import me.liuli.fluidity.util.other.nextFloat
 import me.liuli.fluidity.util.timing.ClickTimer
 import net.minecraft.client.settings.KeyBinding
@@ -58,17 +59,9 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
     fun onUpdate(event: UpdateEvent) {
         if (jitterValue.get() != 0f && (leftValue.get() && mc.gameSettings.keyBindAttack.isKeyDown && mc.playerController.curBlockDamageMP == 0F
                     || rightValue.get() && mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer.isUsingItem)) {
-            if (Random.nextBoolean()) mc.thePlayer.rotationYaw += nextFloat(-jitterValue.get(), jitterValue.get())
-
-            if (Random.nextBoolean()) {
-                mc.thePlayer.rotationPitch += nextFloat(-jitterValue.get(), jitterValue.get())
-
-                // Make sure pitch is not going into unlegit values
-                if (mc.thePlayer.rotationPitch > 90)
-                    mc.thePlayer.rotationPitch = 90F
-                else if (mc.thePlayer.rotationPitch < -90)
-                    mc.thePlayer.rotationPitch = -90F
-            }
+            val jitter = jitterRotation(jitterValue.get(), mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+            mc.thePlayer.rotationYaw = jitter.first
+            mc.thePlayer.rotationPitch = jitter.second
         }
     }
 }

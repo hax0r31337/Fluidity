@@ -6,6 +6,7 @@ import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
+import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.client.PacketUtils
@@ -13,6 +14,8 @@ import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.client.realMotionX
 import me.liuli.fluidity.util.client.realMotionY
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.jitterRotation
+import me.liuli.fluidity.util.move.setServerRotation
 import me.liuli.fluidity.util.other.inRange
 import me.liuli.fluidity.util.timing.TheTimer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -24,6 +27,7 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
     private val detectionValue = ListValue("Detection", arrayOf("Motion", "Sound"), "Sound")
     private val recastValue = BoolValue("Recast", true)
     private val recastDelayValue = IntValue("RecastDelay", 500, 0, 1000)
+    private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
 
     private var stage = Stage.NOTHING
     private val recastTimer = TheTimer()
@@ -43,9 +47,16 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
                 Stage.NOTHING
             }
             return
-        } else if (stage == Stage.RECASTING && recastTimer.hasTimePassed(recastDelayValue.get())) {
-            mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-            stage = Stage.NOTHING
+        } else if (stage == Stage.RECASTING) {
+            if (jitterValue.get() != 0f) {
+                jitterRotation(jitterValue.get()).also {
+                    setServerRotation(it.first, it.second)
+                }
+            }
+            if (recastTimer.hasTimePassed(recastDelayValue.get())) {
+                mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
+                stage = Stage.NOTHING
+            }
         }
     }
 

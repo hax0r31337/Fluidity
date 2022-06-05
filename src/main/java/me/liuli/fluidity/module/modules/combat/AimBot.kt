@@ -85,16 +85,9 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         }
 
         if (hasTarget && jitterValue.get() != 0f) {
-            if (Random.nextBoolean()) yaw += nextFloat(-jitterValue.get(), jitterValue.get())
-
-            if (Random.nextBoolean()) {
-                pitch += nextFloat(-jitterValue.get(), jitterValue.get())
-
-                // Make sure pitch is not going into unlegit values
-                if (pitch > 90)
-                    pitch = 90F
-                else if (pitch < -90)
-                    pitch = -90F
+            jitterRotation(jitterValue.get(), yaw, pitch).also {
+                yaw = it.first
+                pitch = it.second
             }
         }
 
