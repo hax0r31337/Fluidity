@@ -51,8 +51,8 @@ class ConfigManager : Listener {
         }
     }
 
-    fun load(name: String) {
-        if (nowConfig != name) {
+    fun load(name: String, saveOld: Boolean = true) {
+        if (saveOld && nowConfig != name) {
             save() // 保存老配置
         }
 
@@ -79,7 +79,7 @@ class ConfigManager : Listener {
     }
 
     fun reload() {
-        load(nowConfig)
+        load(nowConfig, false)
     }
 
     fun save() {
@@ -110,7 +110,7 @@ class ConfigManager : Listener {
             configSet.get("file").asString
         } else {
             "default"
-        })
+        }, false)
     }
 
     fun saveConfigSet() {
