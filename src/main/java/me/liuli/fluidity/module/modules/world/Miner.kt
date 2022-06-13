@@ -31,6 +31,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
     private val switchValue = IntValue("SwitchDelay", 250, 0, 1000)
     private val actionValue = ListValue("Action", arrayOf("Destroy", "Use"), "Destroy")
     private val rotationsValue = ListValue("Rotations", arrayOf("Silent", "Direct", "None"), "Silent")
+    private val updateHandleValue = ListValue("UpdateHandle", arrayOf("NotTarget", "Breakable", "None"), "NotTarget")
     private val swingValue = BoolValue("Swing", true)
     private val throughWallsValue = BoolValue("ThroughWalls", false)
 
@@ -48,8 +49,9 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
 
     @EventMethod
     fun onUpdate(event: UpdateEvent) {
-        if (pos == null || (pos!!.getBlock()?.let { Block.getIdFromBlock(it) } ?: -1) != blockValue.get() ||
-            pos!!.getCenterDistance() > rangeValue.get()) {
+        if (pos == null || pos!!.getCenterDistance() > rangeValue.get()
+            || (updateHandleValue.get() == "NotTarget" && (pos!!.getBlock()?.let { Block.getIdFromBlock(it) } ?: -1) != blockValue.get())
+            || (updateHandleValue.get() == "Breakable" && (pos!!.getBlock()?.getBlockHardness(mc.theWorld, pos!!) ?: -1f) < 0f)) {
             pos = find(blockValue.get())
         }
 
