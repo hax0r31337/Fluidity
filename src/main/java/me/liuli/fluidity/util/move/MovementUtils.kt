@@ -27,6 +27,6 @@ fun EntityPlayerSP.strafe(value: Float) {
     }
 
     val yaw = direction
-    this.motionX -= sin(yaw) * value
-    this.motionZ += cos(yaw) * value
+    this.motionX = -sin(yaw) * value
+    this.motionZ = cos(yaw) * value
 }
