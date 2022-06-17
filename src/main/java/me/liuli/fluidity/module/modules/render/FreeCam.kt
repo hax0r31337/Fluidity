@@ -39,6 +39,7 @@ class FreeCam : Module("FreeCam", "Allows you to move out of your body", ModuleC
     }
 
     override fun onDisable() {
+        mc.thePlayer ?: return
         mc.thePlayer.setPosition(posX, posY, posZ)
         mc.thePlayer.motionX = motionX
         mc.thePlayer.motionY = motionY
