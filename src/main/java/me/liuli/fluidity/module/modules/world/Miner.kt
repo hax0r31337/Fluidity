@@ -17,6 +17,7 @@ import me.liuli.fluidity.util.timing.TheTimer
 import me.liuli.fluidity.util.world.getBlock
 import me.liuli.fluidity.util.world.getCenterDistance
 import net.minecraft.block.Block
+import net.minecraft.init.Blocks
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -34,6 +35,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
     private val updateHandleValue = ListValue("UpdateHandle", arrayOf("NotTarget", "Breakable", "None"), "NotTarget")
     private val swingValue = BoolValue("Swing", true)
     private val throughWallsValue = BoolValue("ThroughWalls", false)
+    private val bypassValue = BoolValue("Bypass", false)
 
     private var pos: BlockPos? = null
     private var oldPos: BlockPos? = null
@@ -78,7 +80,15 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
 
         when(actionValue.get()) {
             "Destroy" -> {
-                val block = pos!!.getBlock() ?: return
+                var block = pos!!.getBlock() ?: return
+                var pos = pos
+                if (bypassValue.get()) {
+                    val blockUp = BlockPos(pos!!.x, pos!!.y + 1, pos!!.z).getBlock()
+                    if (blockUp != null && blockUp != Blocks.air) {
+                        block = blockUp
+                        pos = BlockPos(pos!!.x, pos!!.y + 1, pos!!.z)
+                    }
+                }
 
                 if (currentDamage == 0F) {
                     val event = ClickBlockEvent(ClickBlockEvent.Type.LEFT, pos, EnumFacing.DOWN)
