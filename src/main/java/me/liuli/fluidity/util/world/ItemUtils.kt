@@ -55,9 +55,9 @@ private val positivePotions = arrayOf(Potion.regeneration.id, Potion.moveSpeed.i
     Potion.fireResistance.id)
 
 fun ItemStack.isPositivePotion(): Boolean {
-    if (this.item !is ItemPotion) return false
+    if (this.item == null && this.item !is ItemPotion) return false
 
-    (this.item as ItemPotion).getEffects(this).forEach {
+    (this.item as ItemPotion).getEffects(this)?.forEach {
         if (positivePotions.contains(it.potionID)) {
             return true
         }
