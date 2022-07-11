@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.render
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -20,7 +20,7 @@ class ChestESP : Module("ChestESP", "Allow you see chests through wall", ModuleC
     private val outlineAlphaValue = IntValue("OutlineAlpha", 255, 0, 255)
     private val outlineThicknessValue = FloatValue("OutlineThickness", 1f, 1f, 10f)
 
-    @EventMethod
+    @Listen
     fun onRender3D(event: Render3DEvent) {
         mc.theWorld.loadedTileEntityList.filterIsInstance<TileEntityChest>()
             .forEach { entity ->

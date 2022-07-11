@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.player
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -49,7 +49,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
         clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         usefulItems.clear()
         garbageItems.clear()

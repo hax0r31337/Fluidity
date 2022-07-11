@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import me.liuli.fluidity.Fluidity
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.util.client.logError
@@ -124,7 +124,7 @@ class ConfigManager : Listener {
         writer.close()
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         if (timer.hasTimePassed(60 * 1000L)) { // save it every minute
             logInfo("Auto-saving $nowConfig.json")

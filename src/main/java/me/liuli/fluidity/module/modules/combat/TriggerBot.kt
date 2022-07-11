@@ -1,7 +1,7 @@
 package me.liuli.fluidity.module.modules.combat
 
-import me.liuli.fluidity.event.EventMethod
-import me.liuli.fluidity.event.MotionEvent
+import me.liuli.fluidity.event.Listen
+import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets
@@ -47,8 +47,8 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
         }
     }
 
-    @EventMethod
-    fun onPreMotion(event: MotionEvent) {
+    @Listen
+    fun onPreMotion(event: PreMotionEvent) {
         if (autoBlockValue.get()) {
             if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < reach && Targets.isTarget(it, true) }) {
                 lastBlocked = true

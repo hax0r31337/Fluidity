@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.render
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
@@ -46,7 +46,7 @@ class FreeCam : Module("FreeCam", "Allows you to move out of your body", ModuleC
         mc.thePlayer.motionZ = motionZ
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         mc.thePlayer.noClip = true
         mc.thePlayer.fallDistance = 0f
@@ -60,7 +60,7 @@ class FreeCam : Module("FreeCam", "Allows you to move out of your body", ModuleC
         mc.thePlayer.strafe(speedValue.get())
     }
 
-    @EventMethod
+    @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
         if (packet is C03PacketPlayer) {

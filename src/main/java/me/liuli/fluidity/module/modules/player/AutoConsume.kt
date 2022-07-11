@@ -1,12 +1,11 @@
 package me.liuli.fluidity.module.modules.player
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
-import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -24,7 +23,7 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
         prevSlot = -1
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         if (consumed && prevSlot != -1) { // recover
             mc.thePlayer.inventory.currentItem = prevSlot

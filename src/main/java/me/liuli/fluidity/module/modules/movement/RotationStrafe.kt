@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.movement
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.StrafeEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -15,7 +15,7 @@ class RotationStrafe : Module("RotationStrafe", "Make you move \"correctly\"", M
     private val modeValue = ListValue("Mode", arrayOf("Strict", "Simple"), "Strict")
     private val onlyOnGroundValue = BoolValue("OnlyOnGround", false)
 
-    @EventMethod
+    @Listen
     fun onStrafe(event: StrafeEvent) {
         if (onlyOnGroundValue.get() && !mc.thePlayer.onGround) return
 

@@ -31,7 +31,9 @@ class MoveEvent(var x: Double, var y: Double, var z: Double) : EventCancellable(
 
 class StrafeEvent(val strafe: Float, val forward: Float, val friction: Float) : EventCancellable()
 
-class MotionEvent(val eventState: EventState) : Event()
+class PreMotionEvent : Event()
+
+class PostMotionEvent : Event()
 
 class SlowDownEvent(var strafe: Float, var forward: Float) : Event()
 
@@ -61,7 +63,3 @@ class Render2DEvent(val scaledResolution: ScaledResolution, val partialTicks: Fl
 class RenderScreenEvent(val mouseX: Int, val mouseY: Int, val partialTicks: Float) : Event()
 
 class Render3DEvent(val partialTicks: Float) : Event()
-
-enum class EventState(val stateName: String) {
-    PRE("PRE"), POST("POST")
-}

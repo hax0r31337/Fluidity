@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.render
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -31,7 +31,7 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
     private val nameBackgroundColorValue = ColorValue("NameBackgroundColor", Color(0, 0, 0, 150).rgb)
     private val scaleMultiplierValue = FloatValue("NameScaleMultiplier", 4F, 1F, 10F)
 
-    @EventMethod
+    @Listen
     fun onRender3D(event: Render3DEvent) {
         val list = mc.theWorld.loadedEntityList.filter { Targets.isTarget(it, onlyShowAttackableValue.get()) }
             .also { if(it.isEmpty()) return }

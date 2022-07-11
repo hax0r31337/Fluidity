@@ -26,4 +26,4 @@ interface Listener {
     fun listen(): Boolean
 }
 
-annotation class EventMethod()
+annotation class Listen()

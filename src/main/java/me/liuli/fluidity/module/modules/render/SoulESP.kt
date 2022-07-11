@@ -1,7 +1,7 @@
 package me.liuli.fluidity.module.modules.render
 
 import me.liuli.fluidity.event.AttackEvent
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.event.WorldEvent
 import me.liuli.fluidity.module.Module
@@ -20,7 +20,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemSkull
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
-import java.awt.Color
 import java.util.*
 
 class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall", ModuleCategory.RENDER) {
@@ -40,13 +39,13 @@ class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall
         clicked.clear()
     }
 
-    @EventMethod
+    @Listen
     fun onWorld(event: WorldEvent) {
         parsed.clear()
         clicked.clear()
     }
 
-    @EventMethod
+    @Listen
     fun onAttack(event: AttackEvent) {
         if (!parsed.containsKey(event.targetEntity.entityId))
             return
@@ -54,7 +53,7 @@ class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall
         clicked.add(event.targetEntity.entityId)
     }
 
-    @EventMethod
+    @Listen
     fun onRender3D(event: Render3DEvent) {
         mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()
             .forEach { entity ->

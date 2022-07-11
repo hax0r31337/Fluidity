@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.render
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -20,7 +20,7 @@ import java.awt.Color
 
 class Projectiles : Module("Projectiles", "Allows you to see where arrows will land", ModuleCategory.RENDER) {
 
-    @EventMethod
+    @Listen
     fun onRender3D(event: Render3DEvent) {
         mc.thePlayer.heldItem ?: return
 

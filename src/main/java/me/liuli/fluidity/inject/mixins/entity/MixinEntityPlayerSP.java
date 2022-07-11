@@ -112,7 +112,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
     @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"), cancellable = true)
     public void onUpdateWalkingPlayer(CallbackInfo ci) {
         try {
-            Fluidity.eventManager.call(new MotionEvent(EventState.PRE));
+            Fluidity.eventManager.call(new PreMotionEvent());
 
             boolean flag = this.isSprinting();
             if (flag != this.serverSprintState) {
@@ -186,7 +186,7 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
                 }
             }
 
-            Fluidity.eventManager.call(new MotionEvent(EventState.POST));
+            Fluidity.eventManager.call(new PostMotionEvent());
         } catch (final Exception e) {
             e.printStackTrace();
         }

@@ -1,7 +1,7 @@
 package me.liuli.fluidity.util.client
 
 import me.liuli.fluidity.Fluidity
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.event.Render2DEvent
 import me.liuli.fluidity.util.mc
@@ -9,7 +9,7 @@ import me.liuli.fluidity.util.render.drawCenteredString
 
 object Debugger : Listener {
 
-    @EventMethod
+    @Listen
     fun onRender2D(event: Render2DEvent) {
         if (!mc.gameSettings.showDebugInfo) return
 

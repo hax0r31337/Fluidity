@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.combat
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
@@ -10,12 +10,10 @@ import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.jitterRotation
-import me.liuli.fluidity.util.other.nextFloat
 import me.liuli.fluidity.util.timing.ClickTimer
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.item.ItemBlock
 import net.minecraft.item.ItemSword
-import kotlin.random.Random
 
 class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a mouse button.", category = ModuleCategory.COMBAT) {
 
@@ -36,7 +34,7 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
         rightClickTimer.update(minCpsValue.get(), maxCpsValue.get())
     }
 
-    @EventMethod
+    @Listen
     fun onRender(event: Render3DEvent) {
         // Left click
         if (mc.gameSettings.keyBindAttack.isKeyDown && leftValue.get() && (!leftSwordOnlyValue.get() || mc.thePlayer.heldItem?.item is ItemSword) &&
@@ -55,7 +53,7 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
         }
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         if (jitterValue.get() != 0f && (leftValue.get() && mc.gameSettings.keyBindAttack.isKeyDown && mc.playerController.curBlockDamageMP == 0F
                     || rightValue.get() && mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer.isUsingItem)) {

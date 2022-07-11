@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.world
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
@@ -9,10 +9,7 @@ import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
-import me.liuli.fluidity.util.client.PacketUtils
 import me.liuli.fluidity.util.client.displayAlert
-import me.liuli.fluidity.util.client.realMotionX
-import me.liuli.fluidity.util.client.realMotionY
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.jitterRotation
 import me.liuli.fluidity.util.move.setServerRotation
@@ -36,7 +33,7 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
         stage = Stage.NOTHING
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         if (stage == Stage.RECOVERING) {
             mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
@@ -60,7 +57,7 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
         }
     }
 
-    @EventMethod
+    @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
         if (detectionValue.get() == "Sound" && packet is S29PacketSoundEffect && mc.thePlayer?.fishEntity != null

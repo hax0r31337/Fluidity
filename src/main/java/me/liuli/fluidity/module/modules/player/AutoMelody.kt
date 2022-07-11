@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.player
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -10,7 +10,7 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 
 class AutoMelody : Module("AutoMelody", "Automatically plays Hypixel SkyBlock melody", ModuleCategory.PLAYER) {
 
-    @EventMethod
+    @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
 

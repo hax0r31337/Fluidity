@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.combat
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -10,11 +10,9 @@ import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
-import me.liuli.fluidity.util.other.nextFloat
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
 import net.minecraft.entity.EntityLivingBase
 import kotlin.math.floor
-import kotlin.random.Random
 
 class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
 
@@ -67,7 +65,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         return toRotation(getCenter(boundingBox), true)
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         val destinationRotation = getRotation()
 

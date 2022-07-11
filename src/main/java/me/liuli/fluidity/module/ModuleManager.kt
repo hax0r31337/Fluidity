@@ -1,8 +1,8 @@
 package me.liuli.fluidity.module
 
 import me.liuli.fluidity.Fluidity
-import me.liuli.fluidity.event.EventMethod
 import me.liuli.fluidity.event.KeyEvent
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.client.logError
@@ -49,7 +49,7 @@ class ModuleManager : Listener {
         return null
     }
 
-    @EventMethod
+    @Listen
     private fun onKey(event: KeyEvent) {
         if (pendingKeyBindModule != null) {
             pendingKeyBindModule!!.keyBind = event.key

@@ -2,7 +2,7 @@ package me.liuli.fluidity.module.special
 
 import io.netty.buffer.Unpooled
 import me.liuli.fluidity.config.ConfigManager
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.util.mc
@@ -11,7 +11,7 @@ import net.minecraft.network.play.client.C17PacketCustomPayload
 
 class AntiForge : Listener {
 
-    @EventMethod
+    @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
         if (mc.isIntegratedServerRunning) {

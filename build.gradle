@@ -64,9 +64,6 @@ shadowJar {
     configurations = [project.configurations.include]
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
 
-    // Ultralight native files are going to be downloaded from our cloud
-    exclude "native-binaries/**"
-
     exclude "LICENSE.txt"
 
     exclude "com/sun/jna/**"

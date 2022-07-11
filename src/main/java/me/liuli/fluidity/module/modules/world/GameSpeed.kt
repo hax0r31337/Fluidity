@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.world
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -11,7 +11,7 @@ class GameSpeed : Module("GameSpeed", "Change Minecraft tick speed", ModuleCateg
 
     private val speedValue = FloatValue("Speed", 1.5f, 0.1f, 5f)
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         mc.timer.timerSpeed = speedValue.get()
     }

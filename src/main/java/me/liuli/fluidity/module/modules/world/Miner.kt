@@ -2,7 +2,7 @@ package me.liuli.fluidity.module.modules.world
 
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.ClickBlockEvent
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
@@ -47,7 +47,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
         switchTimer.reset()
     }
 
-    @EventMethod
+    @Listen
     fun onUpdate(event: UpdateEvent) {
         if (pos == null || pos!!.getCenterDistance() > rangeValue.get()
             || (updateHandleValue.get() == "NotTarget" && (pos!!.getBlock()?.let { Block.getIdFromBlock(it) } ?: -1) != blockValue.get())
@@ -125,7 +125,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
         }
     }
 
-    @EventMethod
+    @Listen
     fun onRender3D(event: Render3DEvent) {
         pos ?: return
 

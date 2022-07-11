@@ -1,7 +1,7 @@
 package me.liuli.fluidity.module.modules.client
 
 import me.liuli.fluidity.Fluidity
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render2DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -16,7 +16,7 @@ import java.awt.Color
 class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, defaultOn = true) {
     private var lastUpdate = System.currentTimeMillis()
 
-    @EventMethod
+    @Listen
     fun onRender2d(event: Render2DEvent) {
         val time = System.currentTimeMillis()
         val pct = (time - lastUpdate) / 800.0

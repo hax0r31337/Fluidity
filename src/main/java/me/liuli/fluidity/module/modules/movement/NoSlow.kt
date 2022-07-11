@@ -1,8 +1,8 @@
 package me.liuli.fluidity.module.modules.movement
 
-import me.liuli.fluidity.event.EventMethod
-import me.liuli.fluidity.event.EventState
-import me.liuli.fluidity.event.MotionEvent
+import me.liuli.fluidity.event.Listen
+import me.liuli.fluidity.event.PostMotionEvent
+import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.event.SlowDownEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -25,15 +25,24 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
     private val bowForwardMultiplier = FloatValue("BowForwardMultiplier", 1.0F, 0.2F, 1.0F)
     private val bowStrafeMultiplier = FloatValue("BowStrafeMultiplier", 1.0F, 0.2F, 1.0F)
 
-    @EventMethod
-    fun onMotion(event: MotionEvent) {
+    @Listen
+    fun onPreMotion(event: PreMotionEvent) {
+        processMotion(true)
+    }
+
+    @Listen
+    fun onPostMotion(event: PostMotionEvent) {
+        processMotion(false)
+    }
+
+    private fun processMotion(pre: Boolean) {
         if (!mc.thePlayer.isUsingItem || mc.thePlayer.heldItem?.item !is ItemSword) {
             return
         }
         when(modeValue.get()) {
             "Hypixel" -> {
                 if (mc.thePlayer.ticksExisted % 10 == 0) {
-                    if (event.eventState == EventState.PRE) {
+                    if (pre) {
                         mc.netHandler.addToSendQueue(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
                     } else {
                         mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0.0f, 0.0f, 0.0f))
@@ -43,7 +52,7 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
         }
     }
 
-    @EventMethod
+    @Listen
     fun onSlowDown(event: SlowDownEvent) {
         val heldItem = mc.thePlayer.heldItem?.item
 

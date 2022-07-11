@@ -1,6 +1,6 @@
 package me.liuli.fluidity.module.modules.combat
 
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -22,7 +22,7 @@ class Velocity : Module("Velocity", "Prevent you from knockback", ModuleCategory
 
     private var isLastDamage = false
 
-    @EventMethod
+    @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
 

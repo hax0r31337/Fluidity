@@ -2,7 +2,7 @@ package me.liuli.fluidity.module.modules.misc
 
 import me.liuli.fluidity.event.AttackEvent
 import me.liuli.fluidity.event.ClickBlockEvent
-import me.liuli.fluidity.event.EventMethod
+import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
@@ -17,7 +17,7 @@ class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCatego
     private val mineBlockValue = BoolValue("MineBlock", true)
     private val placeBlockValue = BoolValue("PlaceBlock", false)
 
-    @EventMethod
+    @Listen
     fun onAttack(event: AttackEvent) {
         if (!attackValue.get())
             return
@@ -30,7 +30,7 @@ class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCatego
         swapItem(slot)
     }
 
-    @EventMethod
+    @Listen
     fun onClick(event: ClickBlockEvent) {
         if (event.type == ClickBlockEvent.Type.LEFT && mineBlockValue.get()) {
             var bestSpeed = 1F
