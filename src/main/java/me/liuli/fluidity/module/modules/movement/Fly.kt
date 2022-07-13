@@ -8,6 +8,7 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
+import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.direction
 import me.liuli.fluidity.util.move.strafe
@@ -59,20 +60,27 @@ class Fly : Module("Fly", "Make you like a bird", ModuleCategory.MOVEMENT) {
             "Matrix" -> {
                 if (boostMotion == 0) {
                     val yaw = mc.thePlayer.direction
+//                    displayAlert("REQ ${mc.thePlayer.posX} ${mc.thePlayer.posY} ${mc.thePlayer.posZ}")
                     mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true))
                     mc.netHandler.addToSendQueue(C04PacketPlayerPosition(mc.thePlayer.posX + -sin(yaw) * 1.5, mc.thePlayer.posY + 1, mc.thePlayer.posZ + cos(yaw) * 1.5, false))
                     boostMotion = 1
-                    mc.timer.timerSpeed = 0.1f
+                } else if (boostMotion == 1) {
+                    mc.thePlayer.motionX = 0.0
+                    mc.thePlayer.motionY = 0.0
+                    mc.thePlayer.motionZ = 0.0
                 } else if (boostMotion == 2) {
-                    mc.thePlayer.strafe(1.5f)
-                    mc.thePlayer.motionY = 0.8
+                    mc.thePlayer.strafe(hSpeedValue.get()/*1.95f*/)
+//                    mc.thePlayer.motionX = -sin(mc.thePlayer.rotationYaw) * 1.6
+//                    mc.thePlayer.motionZ = cos(mc.thePlayer.rotationYaw) * 1.6
+                    mc.thePlayer.motionY = vSpeedValue.get().toDouble()/*0.65*/
                     boostMotion = 3
-                } else if (boostMotion < 5) {
+                    mc.timer.timerSpeed = 0.15f
+//                    displayAlert("SET")
+                } else {
                     boostMotion++
-//                    chat("Boost $boostMotion")
-                } else if (boostMotion >= 5) {
                     mc.timer.timerSpeed = 1f
-                    if (mc.thePlayer.posY < launchY) {
+//                    displayAlert("UNSET")
+                    if (mc.thePlayer.posY < launchY && boostMotion > 10) {
                         boostMotion = 0
                     }
                 }
@@ -84,11 +92,14 @@ class Fly : Module("Fly", "Make you like a bird", ModuleCategory.MOVEMENT) {
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
         if (modeValue.get() == "Matrix" && mc.currentScreen == null && packet is S08PacketPlayerPosLook) {
-            mc.thePlayer.setPosition(packet.x, packet.y, packet.z)
-            mc.netHandler.addToSendQueue(C03PacketPlayer.C06PacketPlayerPosLook(packet.x, packet.y, packet.z, packet.yaw, packet.pitch, false))
             if (boostMotion == 1) {
                 boostMotion = 2
             }
+            mc.thePlayer.setPosition(packet.x, packet.y, packet.z)
+//            displayAlert("FLAG ${packet.x} ${packet.y} ${packet.z}")
+            mc.netHandler.addToSendQueue(C03PacketPlayer.C06PacketPlayerPosLook(packet.x, packet.y, packet.z, packet.yaw, packet.pitch, false))
+            event.cancel()
+        } else if (modeValue.get() == "Matrix" && mc.currentScreen == null && packet is C03PacketPlayer && boostMotion == 1) {
             event.cancel()
         }
     }
