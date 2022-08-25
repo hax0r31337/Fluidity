@@ -10,6 +10,7 @@ import me.liuli.fluidity.util.render.EaseUtils
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.rainbow
 import me.liuli.fluidity.util.render.reAlpha
+import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
@@ -38,6 +39,8 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
         GL11.glTranslatef(event.scaledResolution.scaledWidth.toFloat(), 0f, 0f)
         var color = rainbow(1)
         var nWidth = fontRenderer.getStringWidth(modules[0].name) + blank * 2f
+        GL11.glEnable(GL11.GL_LINE_SMOOTH)
+        GL11.glShadeModel(GL11.GL_SMOOTH)
         modules.forEachIndexed { realIndex, module ->
             module.animate = if (module.state) {
                 module.animate + pct
@@ -67,11 +70,7 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
                 0f
             }
 
-            GL11.glEnable(GL11.GL_BLEND)
             GL11.glDisable(GL11.GL_TEXTURE_2D)
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-            GL11.glEnable(GL11.GL_LINE_SMOOTH)
-            GL11.glShadeModel(GL11.GL_SMOOTH)
 
             val nColor = rainbow(idx + 1)
 
@@ -93,10 +92,7 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
             GL11.glVertex2f(xOffset + width - nWidth, height)
             GL11.glEnd()
 
-            GL11.glShadeModel(GL11.GL_FLAT)
             GL11.glEnable(GL11.GL_TEXTURE_2D)
-            GL11.glDisable(GL11.GL_BLEND)
-            GL11.glDisable(GL11.GL_LINE_SMOOTH)
 
             fontRenderer.drawString(module.name, blank + xOffset, blank * 0.6f, color.rgb, false)
 
@@ -108,7 +104,10 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
             idx++
             color = nColor
         }
+        GL11.glShadeModel(GL11.GL_FLAT)
+        GL11.glDisable(GL11.GL_LINE_SMOOTH)
         GL11.glPopMatrix()
+        GlStateManager.resetColor()
         GL11.glColor4f(1f, 1f, 1f, 1f)
     }
 }
