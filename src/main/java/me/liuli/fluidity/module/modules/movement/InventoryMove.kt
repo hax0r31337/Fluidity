@@ -15,7 +15,7 @@ class InventoryMove : Module("InventoryMove", "Allows you to walk while opening 
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-         if (mc.currentScreen !is GuiChat && mc.currentScreen !is GuiIngameMenu && mc.currentScreen !is GuiEditSign) {
+         if (mc.currentScreen != null && mc.currentScreen !is GuiChat && mc.currentScreen !is GuiIngameMenu && mc.currentScreen !is GuiEditSign) {
             mc.gameSettings.keyBindForward.pressed = GameSettings.isKeyDown(mc.gameSettings.keyBindForward)
             mc.gameSettings.keyBindBack.pressed = GameSettings.isKeyDown(mc.gameSettings.keyBindBack)
             mc.gameSettings.keyBindRight.pressed = GameSettings.isKeyDown(mc.gameSettings.keyBindRight)

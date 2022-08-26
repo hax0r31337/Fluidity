@@ -88,7 +88,6 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
 
                 GL11.glEnable(GL11.GL_DEPTH_TEST)
 
-                GlStateManager.resetColor()
                 GL11.glColor4f(1f, 1f, 1f, 1f)
                 GL11.glPopMatrix()
             }

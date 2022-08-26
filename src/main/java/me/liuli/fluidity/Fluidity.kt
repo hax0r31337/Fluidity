@@ -5,6 +5,7 @@ import me.liuli.fluidity.config.ConfigManager
 import me.liuli.fluidity.event.EventManager
 import me.liuli.fluidity.module.ModuleManager
 import me.liuli.fluidity.module.special.DiscordRPC
+import me.liuli.fluidity.pathfinder.Pathfinder
 import me.liuli.fluidity.util.client.Debugger
 import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.client.logInfo
@@ -54,6 +55,8 @@ object Fluidity {
         }
 
         commandManager = CommandManager()
+
+        eventManager.registerListener(Pathfinder)
 
         moduleManager = ModuleManager()
         eventManager.registerListener(moduleManager)

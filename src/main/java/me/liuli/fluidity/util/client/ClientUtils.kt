@@ -40,6 +40,6 @@ fun displayChatMessage(message: String) {
 }
 
 fun setTitle(status: String? = null) {
-    Display.setTitle("${Fluidity.NAME}->${Fluidity.VERSION}" +
-            if (!status.isNullOrEmpty()) { "::$status" } else { "" })
+    Display.setTitle("${Fluidity.NAME}::${Fluidity.VERSION}" +
+            if (!status.isNullOrEmpty()) { "->$status" } else { "" })
 }

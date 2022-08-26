@@ -148,3 +148,16 @@ fun jitterRotation(jitter: Float, originalYaw: Float = mc.thePlayer.serverRotati
     val pitch = originalPitch + (Math.random() - 0.5) * jitter
     return Pair(yaw.toFloat(), pitch.toFloat().coerceIn(-90f, 90f))
 }
+
+fun getViewVector(yaw: Float, pitch: Float): Vec3d {
+    val csPitch = Math.cos(pitch.toDouble())
+    val snPitch = Math.sin(pitch.toDouble())
+    val csYaw = Math.cos(yaw.toDouble())
+    val snYaw = Math.sin(yaw.toDouble())
+    return Vec3d(-snYaw * csPitch, snPitch, -csYaw * csPitch)
+}
+
+fun lookAt(x: Double, y: Double, z: Double) {
+    val rotation = toRotation(Vec3(x, y, z), true)
+    setClientRotation(rotation.first, rotation.second)
+}

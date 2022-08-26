@@ -74,7 +74,6 @@ fun drawAxisAlignedBB(
         drawFilledBox(axisAlignedBB)
     }
 
-    GlStateManager.resetColor()
     GL11.glEnable(GL11.GL_TEXTURE_2D)
     GL11.glEnable(GL11.GL_DEPTH_TEST)
     GL11.glDepthMask(true)

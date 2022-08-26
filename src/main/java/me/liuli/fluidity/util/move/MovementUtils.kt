@@ -1,6 +1,8 @@
 package me.liuli.fluidity.util.move
 
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.AxisAlignedBB
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -29,4 +31,11 @@ fun EntityPlayerSP.strafe(value: Float) {
     val yaw = direction
     this.motionX = -sin(yaw) * value
     this.motionZ = cos(yaw) * value
+}
+
+fun EntityPlayer.syncPosition() {
+    val f = width / 2.0
+    this.entityBoundingBox = AxisAlignedBB(
+        this.posX - f, this.posY, this.posZ - f,
+        this.posX + f, this.posY + this.height.toDouble(), this.posZ + f)
 }

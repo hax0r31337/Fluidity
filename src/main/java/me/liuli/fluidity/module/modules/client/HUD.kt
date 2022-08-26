@@ -107,7 +107,6 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
         GL11.glShadeModel(GL11.GL_FLAT)
         GL11.glDisable(GL11.GL_LINE_SMOOTH)
         GL11.glPopMatrix()
-        GlStateManager.resetColor()
         GL11.glColor4f(1f, 1f, 1f, 1f)
     }
 }
