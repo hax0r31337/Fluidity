@@ -29,25 +29,25 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
 
     private val antibotValue = ListValue("AntiBot", arrayOf("None"), "None")
 
-    fun isTarget(entity: Entity, canAttackCheck: Boolean = true): Boolean {
-        if (entity is EntityLivingBase && (deadValue.get() || entity.isEntityAlive()) && entity !== mc.thePlayer) {
-            if (invisibleValue.get() || !entity.isInvisible()) {
-                if (playerValue.get() && entity is EntityPlayer) {
+    fun Entity.isTarget(canAttackCheck: Boolean = true): Boolean {
+        if (this is EntityLivingBase && (deadValue.get() || this.isEntityAlive()) && this !== mc.thePlayer) {
+            if (invisibleValue.get() || !this.isInvisible()) {
+                if (playerValue.get() && this is EntityPlayer) {
                     if (canAttackCheck) {
-                        if (isBot(entity)) {
+                        if (this.isBot) {
                             return false
                         }
 
-                        if (entity.isSpectator) {
+                        if (this.isSpectator) {
                             return false
                         }
 
-                        if (entity.isPlayerSleeping) {
+                        if (this.isPlayerSleeping) {
                             return false
                         }
 
                         if (playerTeamValue.get()) {
-                            return !isTeammate(entity)
+                            return !this.isTeammate
                         }
 
                         return true
@@ -55,30 +55,28 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
 
                     return true
                 }
-                return mobValue.get() && isMob(entity) || animalValue.get() && isAnimal(entity)
+                return mobValue.get() && this.isMob || animalValue.get() && this.isAnimal
             }
         }
         return false
     }
 
-    private fun isTeammate(entity: EntityPlayer): Boolean {
-        if (mc.thePlayer.displayName != null && entity.displayName != null)
-            return false
+    private val EntityPlayer.isTeammate: Boolean
+        get() {
+            if (mc.thePlayer.displayName != null && this.displayName != null)
+                return false
 
-        val targetName = entity.displayName.formattedText.replace("§r", "")
-        val clientName = mc.thePlayer.displayName.formattedText.replace("§r", "")
-        return targetName.startsWith("§${clientName[1]}")
-    }
+            val targetName = this.displayName.formattedText.replace("§r", "")
+            val clientName = mc.thePlayer.displayName.formattedText.replace("§r", "")
+            return targetName.startsWith("§${clientName[1]}")
+        }
 
-    private fun isAnimal(entity: Entity): Boolean {
-        return entity is EntityAnimal || entity is EntitySquid || entity is EntityGolem || entity is EntityVillager || entity is EntityBat
-    }
+    private val Entity.isAnimal: Boolean
+        get() = this is EntityAnimal || this is EntitySquid || this is EntityGolem || this is EntityVillager || this is EntityBat
 
-    private fun isMob(entity: Entity): Boolean {
-        return entity is EntityMob || entity is EntitySlime || entity is EntityGhast || entity is EntityDragon
-    }
+    private val Entity.isMob: Boolean
+        get() = this is EntityMob || this is EntitySlime || this is EntityGhast || this is EntityDragon
 
-    private fun isBot(entity: EntityPlayer): Boolean {
-        return false // TODO: implement AntiBot
-    }
+    private val EntityPlayer.isBot: Boolean
+        get() = false // TODO: implement AntiBot
 }

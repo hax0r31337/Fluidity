@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets
+import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
@@ -44,7 +45,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
 
         val entity = mc.theWorld.loadedEntityList
             .filter {
-                Targets.isTarget(it, true) && (throughWallsValue.get() || mc.thePlayer.canEntityBeSeen(it)) &&
+                it.isTarget(true) && (throughWallsValue.get() || mc.thePlayer.canEntityBeSeen(it)) &&
                         mc.thePlayer.getDistanceToEntityBox(it) <= rangeValue.get() && getRotationDifference(it) <= fovValue.get()
             }.map { it as EntityLivingBase }.let { targets ->
                 when (priorityValue.get()) {

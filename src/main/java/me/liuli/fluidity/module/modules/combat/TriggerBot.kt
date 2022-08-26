@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets
+import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
@@ -50,7 +51,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
         if (autoBlockValue.get()) {
-            if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < reach && Targets.isTarget(it, true) }) {
+            if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < reach && it.isTarget(true) }) {
                 lastBlocked = true
                 mc.gameSettings.keyBindUseItem.pressed = true
             } else {
@@ -62,7 +63,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
         }
         if (clickTimer.canClick()) {
             val target = rayTraceTarget() ?: return
-            if (!Targets.isTarget(target, true)) {
+            if (!target.isTarget(true)) {
                 return
             }
             // attack

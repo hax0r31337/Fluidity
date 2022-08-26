@@ -11,7 +11,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.GameSettings
 
 // Not compiled, built by BRAIN-DEVELOPMENT-KIT XD
-class InventoryMove : Module("InventoryMove", "Allows you to walk while opening the inventory.", ModuleCategory.MOVEMENT) {
+object InventoryMove : Module("InventoryMove", "Allows you to walk while opening the inventory.", ModuleCategory.MOVEMENT) {
 
     @Listen
     fun onUpdate(event: UpdateEvent) {

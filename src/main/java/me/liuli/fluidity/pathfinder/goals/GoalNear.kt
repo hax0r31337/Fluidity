@@ -1,6 +1,5 @@
 package me.liuli.fluidity.pathfinder.goals
 
-import me.liuli.fluidity.pathfinder.goals.GoalBlock
 import net.minecraft.util.Vec3i
 
 /**

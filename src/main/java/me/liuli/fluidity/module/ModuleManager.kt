@@ -11,6 +11,7 @@ import me.liuli.fluidity.util.other.resolvePackage
 import org.lwjgl.input.Keyboard
 
 class ModuleManager : Listener {
+
     val modules = mutableListOf<Module>()
 
     private var pendingKeyBindModule: Module? = null

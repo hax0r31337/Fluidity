@@ -1,9 +1,12 @@
 package me.liuli.fluidity.util.move
 
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.BlockPos
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.sin
 
 fun EntityPlayerSP.isMoving(): Boolean {
@@ -39,3 +42,6 @@ fun EntityPlayer.syncPosition() {
         this.posX - f, this.posY, this.posZ - f,
         this.posX + f, this.posY + this.height.toDouble(), this.posZ + f)
 }
+
+val Entity.floorPosition: BlockPos
+    get() = BlockPos(floor(posX).toInt(), floor(posY).toInt(), floor(posZ).toInt())

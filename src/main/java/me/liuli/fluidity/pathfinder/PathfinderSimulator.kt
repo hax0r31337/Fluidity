@@ -47,8 +47,8 @@ object PathfinderSimulator {
 
     fun getController(nextPoint: PathMove, jump: Boolean, sprint: Boolean, jumpAfter: Int = 0): (EntitySimulatable, Int) -> Unit {
         return { state, tick ->
-            val dx = nextPoint.postX - state.position.x
-            val dz = nextPoint.postZ - state.position.z
+            val dx = nextPoint.postX - state.posX
+            val dz = nextPoint.postZ - state.posZ
             state.rotationYaw = MathHelper.wrapAngleTo180_float(Math.toDegrees(atan2(-dx, dz)).toFloat())
 
             state.moveForward = 1f

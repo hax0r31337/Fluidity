@@ -1,6 +1,7 @@
 package me.liuli.fluidity.util.world
 
 import com.mojang.authlib.GameProfile
+import me.liuli.fluidity.util.move.floorPosition
 import net.minecraft.block.BlockIce
 import net.minecraft.block.BlockLadder
 import net.minecraft.block.BlockPackedIce
@@ -105,7 +106,7 @@ class EntitySimulatable(world: World) : EntityOtherPlayerMP(world, GameProfile(U
     private fun moveInAir() {
         var acceleration = 0.02
         var inertia = 0.91
-        val blockUnder = worldObj.getBlockState(position.down())?.block ?: Blocks.air
+        val blockUnder = worldObj.getBlockState(floorPosition.down())?.block ?: Blocks.air
 
         if (onGround) {
             inertia *= when(blockUnder) {
@@ -118,7 +119,7 @@ class EntitySimulatable(world: World) : EntityOtherPlayerMP(world, GameProfile(U
 
         applyHeading(acceleration)
 
-        if ((worldObj.getBlockState(position)?.block ?: Blocks.air) is BlockLadder) {
+        if ((worldObj.getBlockState(floorPosition)?.block ?: Blocks.air) is BlockLadder) {
             motionX = motionX.coerceIn(-0.15, 0.15)
             motionZ = motionZ.coerceIn(-0.15, 0.15)
             motionY = motionY.coerceAtLeast(if (isSneaking) .0 else -0.15)
@@ -127,7 +128,7 @@ class EntitySimulatable(world: World) : EntityOtherPlayerMP(world, GameProfile(U
         movePlayer()
 
         // refresh isOnClimbableBlock cuz position changed
-        if (((worldObj.getBlockState(position)?.block ?: Blocks.air) is BlockLadder)
+        if (((worldObj.getBlockState(floorPosition)?.block ?: Blocks.air) is BlockLadder)
             && (isCollidedHorizontally || jump)) {
             motionY = 0.2
         }

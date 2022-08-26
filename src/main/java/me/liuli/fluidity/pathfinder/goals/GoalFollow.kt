@@ -2,19 +2,19 @@ package me.liuli.fluidity.pathfinder.goals
 
 import me.liuli.fluidity.pathfinder.path.PathMove
 import me.liuli.fluidity.util.move.distanceXZ
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.Entity
 import net.minecraft.util.Vec3i
 import kotlin.math.abs
 
-open class GoalFollow(val entity: EntityLivingBase, range: Double) : IGoal {
+open class GoalFollow(val entity: Entity, range: Double) : IGoal {
 
-    protected var x = entity.position.x
-    protected var y = entity.position.y
-    protected var z = entity.position.z
+    protected var x = entity.posX
+    protected var y = entity.posY
+    protected var z = entity.posZ
     protected val rangeSq = range * range
 
     override fun heuristic(node: PathMove): Double {
-        return distanceXZ(this.x - node.x, this.z - node.z).toDouble() + abs(this.y - node.y)
+        return distanceXZ(this.x - node.x, this.z - node.z) + abs(this.y - node.y)
     }
 
     override fun isEnd(pos: Vec3i): Boolean {
@@ -25,9 +25,9 @@ open class GoalFollow(val entity: EntityLivingBase, range: Double) : IGoal {
     }
 
     override fun hasChanged(): Boolean {
-        val px = entity.position.x
-        val py = entity.position.y
-        val pz = entity.position.z
+        val px = entity.posX
+        val py = entity.posY
+        val pz = entity.posZ
         val dx = this.x - px
         val dy = this.y - py
         val dz = this.z - pz

@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets
+import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.ColorValue
 import me.liuli.fluidity.module.value.FloatValue
@@ -33,7 +34,7 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
 
     @Listen
     fun onRender3D(event: Render3DEvent) {
-        val list = mc.theWorld.loadedEntityList.filter { Targets.isTarget(it, onlyShowAttackableValue.get()) }
+        val list = mc.theWorld.loadedEntityList.filter { it.isTarget(onlyShowAttackableValue.get()) }
             .also { if(it.isEmpty()) return }
 
         val nameAlpha = nameBackgroundColorValue.get() shr 24 and 0xFF

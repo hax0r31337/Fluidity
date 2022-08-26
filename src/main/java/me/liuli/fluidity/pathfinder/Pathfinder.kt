@@ -23,20 +23,26 @@ SOFTWARE.
  */
 package me.liuli.fluidity.pathfinder
 
+import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.*
+import me.liuli.fluidity.module.modules.movement.InventoryMove
 import me.liuli.fluidity.pathfinder.algorithm.AStar
 import me.liuli.fluidity.pathfinder.goals.IGoal
 import me.liuli.fluidity.pathfinder.path.PathMove
 import me.liuli.fluidity.pathfinder.path.PathPlaceInfo
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
-import me.liuli.fluidity.util.move.*
+import me.liuli.fluidity.util.move.Vec3d
+import me.liuli.fluidity.util.move.floorPosition
+import me.liuli.fluidity.util.move.lookAt
+import me.liuli.fluidity.util.move.syncPosition
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.rainbow
 import net.minecraft.block.Block
 import net.minecraft.block.BlockLadder
 import net.minecraft.block.BlockLiquid
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.network.play.server.S21PacketChunkData
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
@@ -96,18 +102,20 @@ object Pathfinder : Listener {
     fun fullStop() {
         clearControlState()
 
+//        val floorPos = mc.thePlayer.floorPosition
+
         // Force horizontal velocity to 0 (otherwise inertia can move us too far)
         // Kind of cheaty, but the server will not tell the difference
-        mc.thePlayer.motionX = .0
-        mc.thePlayer.motionZ = .0
-        val blockX = mc.thePlayer.position.x + 0.5
-        val blockZ = mc.thePlayer.position.z + 0.5
+//        mc.thePlayer.motionX = .0
+//        mc.thePlayer.motionZ = .0
+//        val blockX = floorPos.x + 0.5
+//        val blockZ = floorPos.z + 0.5
 
         // Make sure our bounding box don't collide with neighboring blocks
         // otherwise recenter the position
-        if (abs(mc.thePlayer.position.x - blockX) < 0.2) mc.thePlayer.posX = blockX
-        if (abs(mc.thePlayer.position.z - blockZ) < 0.2) mc.thePlayer.posZ = blockZ
-        mc.thePlayer.syncPosition()
+//        if (abs(floorPos.x - blockX) < 0.2) mc.thePlayer.posX = blockX
+//        if (abs(floorPos.z - blockZ) < 0.2) mc.thePlayer.posZ = blockZ
+//        mc.thePlayer.syncPosition()
     }
 
     private fun postProcessPath(path: MutableList<PathMove>) {
@@ -209,7 +217,7 @@ object Pathfinder : Listener {
 //    }
 
     fun getPathTo(goal: IGoal): AStar.Result {
-        val pos = mc.thePlayer.position
+        val pos = mc.thePlayer.floorPosition
         val dy = mc.thePlayer.posY - pos.y
         val block = mc.theWorld.getBlockState(pos)
 
@@ -330,6 +338,10 @@ object Pathfinder : Listener {
 
     @Listen
     private fun onUpdate(event: UpdateEvent) {
+        if (mc.currentScreen is GuiContainer && !InventoryMove.state) {
+            clearControlState()
+            return
+        }
         if (stateGoal != null) {
             if (!stateGoal!!.isValid()) {
                 stop()
@@ -338,9 +350,7 @@ object Pathfinder : Listener {
             }
         }
         if (aStarContext != null && aStarTimedOut) {
-            displayAlert("ASTAR TIMED OUT")
             val result = aStarContext!!.compute()
-            displayAlert("${result.path.size}")
             postProcessPath(result.path)
             pathFromPlayer(result.path)
             path = result.path
@@ -355,16 +365,14 @@ object Pathfinder : Listener {
             if (stateGoal == null) {
                 return
             }
-            if (stateGoal!!.isEnd(mc.thePlayer.position)) {
+            if (stateGoal!!.isEnd(mc.thePlayer.floorPosition)) {
                 if (!dynamicGoal) {
                     // goal reached
                     stateGoal = null
                     fullStop()
                 }
             } else if (!pathUpdated) {
-                displayAlert("PROCESS PATH")
                 val result = getPathTo(stateGoal!!)
-                displayAlert("${result.path.size}")
                 postProcessPath(result.path)
                 path = result.path
                 aStarTimedOut = result.status == AStar.ResultStatus.PARTIAL
@@ -455,7 +463,7 @@ object Pathfinder : Listener {
             if (path.isEmpty()) { // done
                 // If the block the bot is standing on is not a full block only checking for the floored position can fail as
                 // the distance to the goal can get greater then 0 when the vector is floored.
-                if (!dynamicGoal && stateGoal != null && (stateGoal!!.isEnd(mc.thePlayer.position) || stateGoal!!.isEnd(mc.thePlayer.position.down(1)))) {
+                if (!dynamicGoal && stateGoal != null && (stateGoal!!.isEnd(mc.thePlayer.floorPosition) || stateGoal!!.isEnd(mc.thePlayer.floorPosition.down(1)))) {
                     stateGoal = null
                 }
                 fullStop()
@@ -476,27 +484,21 @@ object Pathfinder : Listener {
         mc.gameSettings.keyBindJump.pressed = false
 
         if (mc.thePlayer.isInWater) {
-            displayAlert("W")
             mc.gameSettings.keyBindJump.pressed = true
             mc.gameSettings.keyBindSprint.pressed = false
         } else if (settings.allowSprinting && PathfinderSimulator.canStraightLine(path, true)) {
-            displayAlert("SL")
             mc.gameSettings.keyBindJump.pressed = false
             mc.gameSettings.keyBindSprint.pressed = true
         } else if (settings.allowSprinting && PathfinderSimulator.canSprintJump(path)) {
-            displayAlert("SJ")
             mc.gameSettings.keyBindJump.pressed = true
             mc.gameSettings.keyBindSprint.pressed = true
         } else if (PathfinderSimulator.canStraightLine(path)) {
-            displayAlert("SL")
             mc.gameSettings.keyBindJump.pressed = false
             mc.gameSettings.keyBindSprint.pressed = false
         } else if (PathfinderSimulator.canWalkJump(path)) {
-            displayAlert("WJ")
             mc.gameSettings.keyBindJump.pressed = true
             mc.gameSettings.keyBindSprint.pressed = false
         } else {
-            displayAlert("L")
             mc.gameSettings.keyBindForward.pressed = false
             mc.gameSettings.keyBindSprint.pressed = false
         }
