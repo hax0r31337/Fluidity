@@ -13,7 +13,6 @@ public abstract class MixinGuiMultiplayer extends MixinGuiScreen {
 
     private GuiButton button;
 
-
     @Inject(method = "initGui", at = @At("RETURN"))
     private void initGui(CallbackInfo callbackInfo) {
         button = new GuiButton(996, 8, 8, 98, 20,

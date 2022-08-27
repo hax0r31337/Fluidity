@@ -1,9 +1,15 @@
 package me.liuli.fluidity.util.render
 
 import java.awt.Color
+import java.util.regex.Pattern
 import kotlin.math.abs
 
 private val startTime = System.currentTimeMillis()
+private val COLOR_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]")
+
+fun stripColor(input: String): String {
+    return COLOR_PATTERN.matcher(input).replaceAll("")
+}
 
 fun rainbow(index: Int, lowest: Float = 0.07f, bigest: Float = 0.6f, indexOffset: Int = 300): Color {
     return Color.getHSBColor((abs(((((System.currentTimeMillis() - startTime).toInt() + index * indexOffset) / 5000f) % 2) - 1) * (bigest - lowest)) + lowest, 0.7f, 1f)
