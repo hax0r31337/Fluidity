@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
+import kotlin.math.atan
 import kotlin.math.atan2
 import kotlin.math.hypot
 import kotlin.math.sqrt
@@ -160,4 +161,27 @@ fun getViewVector(yaw: Float, pitch: Float): Vec3d {
 fun lookAt(x: Double, y: Double, z: Double) {
     val rotation = toRotation(Vec3(x, y, z), true)
     setClientRotation(rotation.first, rotation.second)
+}
+
+/**
+ * Face target with bow
+ *
+ * @param target your enemy
+ * @param silent client side rotations
+ * @param predict predict new enemy position
+ * @param predictSize predict size of predict
+ */
+fun faceBow(targetX: Double, targetY: Double, targetZ: Double): Pair<Float, Float> {
+    val posX = targetX - mc.thePlayer.posX
+    val posY = targetY - mc.thePlayer.posY
+    val posZ = targetZ - mc.thePlayer.posZ
+    val posSqrt = sqrt(posX * posX + posZ * posZ)
+    var velocity = mc.thePlayer.itemInUseDuration / 20f
+    velocity = (velocity * velocity + velocity * 2) / 3
+    if (velocity > 1) velocity = 1f
+    velocity = velocity * velocity
+    return  Pair(
+        (atan2(posZ, posX) * 180 / Math.PI).toFloat() - 90,
+        -Math.toDegrees(atan((velocity - sqrt(velocity * velocity - 0.006f * (0.006f * (posSqrt * posSqrt) + 2 * posY * (velocity)))) / (0.006f * posSqrt))).toFloat().coerceIn(-90f, 90f)
+    )
 }
