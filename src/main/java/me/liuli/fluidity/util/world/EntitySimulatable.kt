@@ -7,6 +7,7 @@ import net.minecraft.block.BlockLadder
 import net.minecraft.block.BlockPackedIce
 import net.minecraft.block.BlockSlime
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.init.Blocks
 import net.minecraft.potion.Potion
@@ -16,6 +17,14 @@ import java.util.UUID
 import kotlin.math.*
 
 class EntitySimulatable(world: World) : EntityOtherPlayerMP(world, GameProfile(UUID.randomUUID(), "")) {
+
+    constructor(thePlayer: EntityPlayerSP) : this(thePlayer.worldObj) {
+        this.copyLocationAndAnglesFrom(thePlayer)
+        this.speedOnGround = thePlayer.speedOnGround
+        this.motionX = thePlayer.motionX
+        this.motionY = thePlayer.motionY
+        this.motionZ = thePlayer.motionZ
+    }
 
     init {
         noClip = false

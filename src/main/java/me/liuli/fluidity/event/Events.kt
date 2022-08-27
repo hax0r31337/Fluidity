@@ -10,7 +10,7 @@ import net.minecraft.util.EnumFacing
 
 class UpdateEvent : Event()
 
-class AttackEvent(val targetEntity: Entity) : Event()
+class AttackEvent(val targetEntity: Entity) : EventCancellable()
 
 class StepEvent(var stepHeight: Float) : Event()
 

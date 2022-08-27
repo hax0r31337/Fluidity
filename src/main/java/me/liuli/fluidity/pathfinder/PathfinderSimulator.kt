@@ -19,7 +19,7 @@ object PathfinderSimulator {
      * @returns [FakePlayer] A player state of the final simulation tick
      */
     fun simulateUntil(goal: (EntitySimulatable) -> Boolean, controller: (EntitySimulatable, Int) -> Unit, ticks: Int = 1, stateIn: EntitySimulatable? = null): EntitySimulatable {
-        val state = stateIn ?: EntitySimulatable(mc.theWorld).apply { copyLocationAndAnglesFrom(mc.thePlayer) }
+        val state = stateIn ?: EntitySimulatable(mc.thePlayer)
 
         for (i in 0 until ticks) {
             controller(state, i)
@@ -67,7 +67,7 @@ object PathfinderSimulator {
             val r2 = 0.15 * 0.15
             (delta.x * delta.x + delta.z * delta.z) <= r2 && abs(delta.y) < 0.001 && (state.onGround || state.isInWater)
         }
-        val state = EntitySimulatable(mc.theWorld).apply { copyLocationAndAnglesFrom(mc.thePlayer) }
+        val state = EntitySimulatable(mc.thePlayer)
         state.apply {
             posX = n1.postX
             posY = n1.postY

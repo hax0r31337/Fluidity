@@ -11,6 +11,7 @@ import me.liuli.fluidity.pathfinder.goals.GoalFollow
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.distanceXZ
 import me.liuli.fluidity.util.move.floorPosition
+import net.minecraft.entity.monster.EntityEnderman
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -26,7 +27,7 @@ class AutoMobs : Module("AutoMobs", "Move to mobs automatically", ModuleCategory
     @Listen
     fun onUpdate(event: UpdateEvent) {
         val pos = mc.thePlayer.floorPosition
-        val nearestEntity = mc.theWorld.loadedEntityList.filter { it.isTarget(true) }
+        val nearestEntity = mc.theWorld.loadedEntityList.filter { it.isTarget() }
             .minByOrNull { distanceXZ(pos.x - it.posX, pos.z - it.posZ) + abs(pos.y - it.posY) * yMultiplierValue.get() } ?: return
         if (Pathfinder.stateGoal is GoalFollow && (Pathfinder.stateGoal as GoalFollow).entity == nearestEntity) {
             return

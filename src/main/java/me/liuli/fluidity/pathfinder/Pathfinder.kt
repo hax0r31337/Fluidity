@@ -68,6 +68,8 @@ object Pathfinder : Listener {
     private var lastNodeTime = System.currentTimeMillis()
     private var returningPos: Vec3i? = null
     private var stopPathing = false
+    val hasPath: Boolean
+        get() = path.isNotEmpty()
 
     fun setGoal(goal: IGoal, dynamic: Boolean = false) {
         this.stateGoal = goal
@@ -482,6 +484,7 @@ object Pathfinder : Listener {
         mc.thePlayer.rotationYaw = MathHelper.wrapAngleTo180_float(Math.toDegrees(atan2(-dx, dz)).toFloat())
         mc.gameSettings.keyBindForward.pressed = true
         mc.gameSettings.keyBindJump.pressed = false
+        mc.gameSettings.keyBindSneak.pressed = false
 
         if (mc.thePlayer.isInWater) {
             mc.gameSettings.keyBindJump.pressed = true
@@ -501,6 +504,7 @@ object Pathfinder : Listener {
         } else {
             mc.gameSettings.keyBindForward.pressed = false
             mc.gameSettings.keyBindSprint.pressed = false
+            mc.gameSettings.keyBindSneak.pressed = true
         }
 
         // check for futility
