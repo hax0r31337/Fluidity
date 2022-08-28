@@ -27,9 +27,6 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     private val clickTimer = ClickTimer()
     private var lastBlocked = false
 
-    private val reach: Double
-        get() = if(Reach.state) Reach.combatReachValue.get().toDouble() else 3.0
-
     override fun onEnable() {
         clickTimer.update(minCpsValue.get(), maxCpsValue.get())
         lastBlocked = false
@@ -43,7 +40,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
 
     private fun rayTraceTarget(): Entity? {
         return when(rayTraceValue.get()) {
-            "ThroughWall" -> rayTraceEntity(reach)
+            "ThroughWall" -> rayTraceEntity(Reach.reach)
             else -> mc.objectMouseOver?.entityHit
         }
     }
@@ -51,7 +48,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
         if (autoBlockValue.get()) {
-            if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < reach && it.isTarget(true) }) {
+            if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }) {
                 lastBlocked = true
                 mc.gameSettings.keyBindUseItem.pressed = true
             } else {

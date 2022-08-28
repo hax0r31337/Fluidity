@@ -12,6 +12,7 @@ import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
+import me.liuli.fluidity.util.world.raycastEntity
 import net.minecraft.entity.EntityLivingBase
 import kotlin.math.floor
 
@@ -26,6 +27,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private val throughWallsValue = BoolValue("ThroughWalls", false)
     private val onlyHoldMouseValue = BoolValue("OnlyHoldMouse", true)
     private val silentRotationValue = BoolValue("SilentRotation", false)
+    private val lockValue = BoolValue("Lock", false)
 
     private val playerRotation: Pair<Float, Float>
         get() = Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
@@ -63,7 +65,14 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
 
         hasTarget = true
         needAimBack = true
-        return toRotation(getCenter(boundingBox), true)
+
+        val correctAim = toRotation(getCenter(boundingBox), true)
+        if (lockValue.get()) return correctAim
+
+        // simple searching
+        return if (raycastEntity(Reach.reach, correctAim.first, mc.thePlayer.rotationPitch) { it == entity } != null) {
+            Pair(correctAim.first, mc.thePlayer.rotationPitch)
+        } else correctAim
     }
 
     @Listen

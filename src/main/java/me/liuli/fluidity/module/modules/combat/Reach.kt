@@ -10,6 +10,9 @@ object Reach : Module("Reach", "Increase your hand length", ModuleCategory.COMBA
     val combatReachValue = FloatValue("CombatReach", 3.5f, 3f, 7f)
     val buildReachValue = FloatValue("BuildReach", 5f, 4.5f, 7f)
 
+    val reach: Double
+        get() = if(state) combatReachValue.get().toDouble() else 3.0
+
     val maxRange: Float
         get() = max(combatReachValue.get(), buildReachValue.get())
 }

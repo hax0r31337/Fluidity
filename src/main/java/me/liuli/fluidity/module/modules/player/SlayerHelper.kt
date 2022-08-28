@@ -79,20 +79,15 @@ class SlayerHelper : Module("SlayerHelper", "Auto purchase for slayer quest", Mo
                 stage = 2
             }
             3 -> {
-                val cont = mc.currentScreen as? GuiChest ?: return
-                if (cont.lowerChestInventory.displayName.unformattedText.contains("Slayer", true)) {
-                    stage = 4
-                }
-
                 if (clickItem { stripColor(it.displayName).contains("Complete", true) } == -1) {
-                    restoreSession()
-                    displayAlert("ERROR 1")
+                    stage = 4
                 }
             }
             4 -> {
                 val cont = mc.currentScreen as? GuiChest ?: return
                 if (cont.lowerChestInventory.displayName.unformattedText.contains(slayerType.split(" ")[0], true)) {
                     stage = 5
+                    return
                 }
 
                 if (clickItem("Slayer") { stripColor(it.displayName).contains(slayerType.split(" ")[0]) } == -1) {
@@ -104,6 +99,7 @@ class SlayerHelper : Module("SlayerHelper", "Auto purchase for slayer quest", Mo
                 val cont = mc.currentScreen as? GuiChest ?: return
                 if (cont.lowerChestInventory.displayName.unformattedText.contains("Confirm", true)) {
                     stage = 6
+                    return
                 }
 
                 if (clickItem(slayerType.split(" ")[0]) { stripColor(it.displayName).contains(slayerType.split(" ").last()) } == -1) {
@@ -114,6 +110,7 @@ class SlayerHelper : Module("SlayerHelper", "Auto purchase for slayer quest", Mo
             6 -> {
                 if (mc.currentScreen == null) {
                     restoreSession()
+                    return
                 }
 
                 if (clickItem("Confirm") { stripColor(it.displayName).contains("Confirm", true) } == -1) {

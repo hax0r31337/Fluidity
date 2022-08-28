@@ -11,6 +11,8 @@ class Sprint : Module("Sprint", "Automatically make you sprint", ModuleCategory.
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        mc.thePlayer.isSprinting = !Pathfinder.hasPath
+        if (!Pathfinder.hasPath) {
+            mc.thePlayer.isSprinting = true
+        }
     }
 }

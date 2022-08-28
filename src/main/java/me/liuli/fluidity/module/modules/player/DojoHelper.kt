@@ -27,6 +27,8 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import java.util.*
+import kotlin.concurrent.schedule
 
 class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYER) {
 
@@ -70,8 +72,7 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                     }
                 }
                 for (block in currentGoodBlocks.map { it }) {
-                    val state = mc.theWorld.getBlockState(block)
-                    if (state.toString() != "minecraft:wool[color=lime]") {
+                    if (mc.thePlayer.getDistanceSq(block.x + 0.5, block.y.toDouble() + 1, block.z + 0.5) < 0.3) {
                         currentGoodBlocks.remove(block)
                     }
                 }
@@ -136,10 +137,12 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
             "Swift" -> {
                 if (packet is S23PacketBlockChange) {
                     swiftDojoBlockProc(packet.blockState, packet.blockPosition)
+//                    event.cancel()
                 } else if (packet is S22PacketMultiBlockChange) {
                     packet.changedBlocks.forEach {
                         swiftDojoBlockProc(it.blockState, it.pos)
                     }
+//                    event.cancel()
                 }
             }
             "Discipline" -> {
@@ -150,6 +153,8 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                     val slot = disciplinePickSlot(target)
                     if (slot != -1 && serverSlot != slot) {
                         event.cancel()
+                    } else if (target is EntityZombie) {
+                        mc.theWorld.removeEntity(target)
                     }
                 }
             }
@@ -189,8 +194,9 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
     }
 
     private fun swiftDojoBlockProc(state: IBlockState, pos: BlockPos) {
-        if (pos.distanceSq(mc.thePlayer.floorPosition) < 100 && state.toString() == "minecraft:wool[color=lime]" && !currentGoodBlocks.contains(pos)) {
+        if (pos.distanceSq(mc.thePlayer.floorPosition) < 900 && state.toString() == "minecraft:wool[color=lime]" && !currentGoodBlocks.contains(pos)) {
             currentGoodBlocks.add(pos)
         }
+//        mc.theWorld.invalidateRegionAndSetBlock(pos, state)
     }
 }
