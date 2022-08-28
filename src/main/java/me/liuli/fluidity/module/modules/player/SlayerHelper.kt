@@ -108,7 +108,7 @@ class SlayerHelper : Module("SlayerHelper", "Auto purchase for slayer quest", Mo
                 }
             }
             6 -> {
-                if (mc.currentScreen == null) {
+                if (mc.currentScreen !is GuiChest) {
                     restoreSession()
                     return
                 }
