@@ -2,6 +2,7 @@ package me.liuli.fluidity.module.modules.client
 
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.modules.misc.DungeonAssist
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
@@ -27,16 +28,17 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
     private val invisibleValue = BoolValue("Invisible", false)
     private val deadValue = BoolValue("Dead", false)
 
-    private val antibotValue = ListValue("AntiBot", arrayOf("None"), "None")
+    private val antibotValue = ListValue("AntiBot", arrayOf("None", "SkyBlockDungeon"), "None")
 
     fun Entity.isTarget(canAttackCheck: Boolean = true): Boolean {
         if (this is EntityLivingBase && (deadValue.get() || this.isEntityAlive()) && this !== mc.thePlayer) {
             if (invisibleValue.get() || !this.isInvisible()) {
+                if (this.isBot) {
+                    return false
+                }
+
                 if (playerValue.get() && this is EntityPlayer) {
                     if (canAttackCheck) {
-                        if (this.isBot) {
-                            return false
-                        }
 
                         if (this.isSpectator) {
                             return false
@@ -61,7 +63,7 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
         return false
     }
 
-    private val EntityPlayer.isTeammate: Boolean
+    val EntityPlayer.isTeammate: Boolean
         get() {
             if (mc.thePlayer.displayName != null && this.displayName != null)
                 return false
@@ -71,12 +73,20 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
             return targetName.startsWith("§${clientName[1]}")
         }
 
-    private val Entity.isAnimal: Boolean
+    val Entity.isAnimal: Boolean
         get() = this is EntityAnimal || this is EntitySquid || this is EntityGolem || this is EntityVillager || this is EntityBat
 
-    private val Entity.isMob: Boolean
+    val Entity.isMob: Boolean
         get() = this is EntityMob || this is EntitySlime || this is EntityGhast || this is EntityDragon
 
-    private val EntityPlayer.isBot: Boolean
-        get() = false // TODO: implement AntiBot
+    val EntityLivingBase.isBot: Boolean
+        get() =
+            when(antibotValue.get()) {
+                "SkyBlockDungeon" -> {
+                    if (DungeonAssist.state) {
+                        !DungeonAssist.getName(this.entityId).contains("✯")
+                    } else false
+                }
+                else -> false
+            } // TODO: implement AntiBot
 }

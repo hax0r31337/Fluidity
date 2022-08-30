@@ -130,18 +130,22 @@ object Pathfinder : Listener {
                 node.postZ = node.z + 0.5
                 return@forEachIndexed
             }
-            var npY = node.y
-            var np = b?.let { getPositionOnTopOf(it.block, it) }
-            if (np == null) np = mc.theWorld.getBlockState(BlockPos(node.x, node.y - 1, node.z))?.let { npY -= 1; getPositionOnTopOf(it.block, it) }
-            if (np != null) {
-                node.postX += np.x
-                node.postY = npY + np.y
-                node.postZ += np.z
-            } else {
-                node.postX = node.x + 0.5
-                node.postY -= 1
-                node.postZ = node.z + 0.5
-            }
+
+            node.postX = node.x + 0.5
+            node.postY = node.y.toDouble()
+            node.postZ = node.z + 0.5
+//            var npY = node.y
+//            var np = b?.let { getPositionOnTopOf(it.block, it) }
+//            if (np == null) np = mc.theWorld.getBlockState(BlockPos(node.x, node.y - 1, node.z))?.let { npY -= 1; getPositionOnTopOf(it.block, it) }
+//            if (np != null) {
+//                node.postX += np.x
+//                node.postY = npY + np.y
+//                node.postZ += np.z
+//            } else {
+//                node.postX = node.x + 0.5
+//                node.postY = node.y - 1.0
+//                node.postZ = node.z + 0.5
+//            }
         }
 
         if (path.isEmpty()) {
@@ -308,7 +312,6 @@ object Pathfinder : Listener {
     private fun onRender3D(event: Render3DEvent) {
         if (path.isEmpty()) return
 
-        GL11.glPushMatrix()
         GL11.glDisable(GL11.GL_TEXTURE_2D)
         GL11.glEnable(GL11.GL_LINE_SMOOTH)
         GL11.glShadeModel(GL11.GL_SMOOTH)
@@ -326,7 +329,7 @@ object Pathfinder : Listener {
         for (pos in path) {
             glColor(rainbow(idx))
             idx++
-            GL11.glVertex3d(pos.x + 0.5 - renderPosX, pos.y - renderPosY, pos.z + 0.5 - renderPosZ)
+            GL11.glVertex3d(pos.postX - renderPosX, pos.postY - renderPosY, pos.postZ - renderPosZ)
         }
 
         GL11.glColor4d(1.0, 1.0, 1.0, 1.0)
@@ -335,7 +338,6 @@ object Pathfinder : Listener {
         GL11.glEnable(GL11.GL_DEPTH_TEST)
         GL11.glDisable(GL11.GL_LINE_SMOOTH)
         GL11.glEnable(GL11.GL_TEXTURE_2D)
-        GL11.glPopMatrix()
     }
 
     @Listen
@@ -504,7 +506,6 @@ object Pathfinder : Listener {
         } else {
             mc.gameSettings.keyBindForward.pressed = false
             mc.gameSettings.keyBindSprint.pressed = false
-            mc.gameSettings.keyBindSneak.pressed = true
         }
 
         // check for futility

@@ -4,7 +4,6 @@ import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
-import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
@@ -12,7 +11,7 @@ import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
-import me.liuli.fluidity.util.world.raycastEntity
+import me.liuli.fluidity.util.world.rayTraceEntity
 import net.minecraft.entity.EntityLivingBase
 import kotlin.math.floor
 
@@ -70,7 +69,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         if (lockValue.get()) return correctAim
 
         // simple searching
-        return if (raycastEntity(Reach.reach, correctAim.first, mc.thePlayer.rotationPitch) { it == entity } != null) {
+        return if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.rotationPitch) { it == entity } != null) {
             Pair(correctAim.first, mc.thePlayer.rotationPitch)
         } else correctAim
     }

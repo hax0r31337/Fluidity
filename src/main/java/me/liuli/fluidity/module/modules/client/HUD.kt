@@ -5,6 +5,7 @@ import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render2DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.render.EaseUtils
 import me.liuli.fluidity.util.render.glColor
@@ -15,6 +16,9 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, defaultOn = true) {
+
+    private val noRenderModulesValue = BoolValue("NoRenderModules", true)
+
     private var lastUpdate = System.currentTimeMillis()
 
     @Listen
@@ -28,7 +32,7 @@ class HUD : Module("HUD", "Display hud of the client", ModuleCategory.CLIENT, de
         fontRenderer.drawString(Fluidity.NAME.substring(0, 1), 10, 10, rainbow(1).rgb)
         fontRenderer.drawString(Fluidity.NAME.substring(1), 10 + fontRenderer.getStringWidth(Fluidity.NAME.substring(0, 1)), 10, Color.WHITE.rgb)
 
-        val modules = Fluidity.moduleManager.modules.filter { (it.state || it.animate != 0.0) && it.array }
+        val modules = Fluidity.moduleManager.modules.filter { (it.state || it.animate != 0.0) && it.array && (!noRenderModulesValue.get() || it.category != ModuleCategory.RENDER) }
             .sortedBy { -fontRenderer.getStringWidth(it.name) }
         if (modules.isEmpty())
             return

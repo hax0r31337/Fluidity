@@ -5,18 +5,22 @@ import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.FloatValue
+import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.timing.TheTimer
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 
 class AutoConsume : Module("AutoConsume", "Automatically consume items.", ModuleCategory.PLAYER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Soup", "Head"), "Soup")
+    private val modeValue = ListValue("Mode", arrayOf("Soup", "Head", "Wand"), "Soup")
     private val healthValue = FloatValue("Health", 10F, 1F, 20F)
+    private val delayValue = IntValue("Delay", 1000, 0, 10000)
 
     private var consumed = false
     private var prevSlot = -1
+    private val timer = TheTimer()
 
     override fun onDisable() {
         consumed = false
@@ -25,10 +29,15 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
+        if (!timer.hasTimePassed(delayValue.get())) {
+            return
+        }
+
         if (consumed && prevSlot != -1) { // recover
             mc.thePlayer.inventory.currentItem = prevSlot
             prevSlot = -1
             consumed = false
+            timer.reset()
         } else if (!consumed && prevSlot == -1) { // not eat
             if (mc.thePlayer.health > healthValue.get()) {
                 return
@@ -47,7 +56,8 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
         for (i in 36 until 45) {
             val stack = mc.thePlayer.inventoryContainer.getSlot(i).stack
             if (stack != null && ((modeValue.get() == "Soup" && stack.item === Items.mushroom_stew)
-                        || (modeValue.get() == "Head" && stack.item === Items.skull))) {
+                        || (modeValue.get() == "Head" && stack.item === Items.skull
+                        || (modeValue.get() == "Wand" && stack.displayName.contains("Wand of", true))))) {
                 return i - 36
             }
         }
