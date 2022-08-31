@@ -11,7 +11,6 @@ import me.liuli.fluidity.util.render.EaseUtils
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.rainbow
 import me.liuli.fluidity.util.render.reAlpha
-import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 

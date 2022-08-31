@@ -83,7 +83,7 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
         get() =
             when(antibotValue.get()) {
                 "SkyBlockDungeon" -> {
-                    if (DungeonAssist.state) {
+                    if (DungeonAssist.inDungeon) {
                         !DungeonAssist.getName(this.entityId).contains("✯")
                     } else false
                 }

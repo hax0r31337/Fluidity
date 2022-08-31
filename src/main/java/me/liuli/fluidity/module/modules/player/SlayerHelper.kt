@@ -12,7 +12,6 @@ import me.liuli.fluidity.util.render.stripColor
 import me.liuli.fluidity.util.world.getScoreboardCollection
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.event.ClickEvent
-import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement

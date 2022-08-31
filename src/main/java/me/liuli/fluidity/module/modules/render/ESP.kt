@@ -4,7 +4,6 @@ import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
-import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.ColorValue
@@ -14,7 +13,6 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.quickDrawRect
 import me.liuli.fluidity.util.world.*
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import org.lwjgl.opengl.GL11

@@ -1,6 +1,5 @@
 package me.liuli.fluidity.module.modules.player
 
-import me.liuli.fluidity.event.AttackEvent
 import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.event.UpdateEvent
@@ -12,7 +11,9 @@ import me.liuli.fluidity.pathfinder.PathfinderSimulator
 import me.liuli.fluidity.pathfinder.goals.GoalBlock
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
-import me.liuli.fluidity.util.move.*
+import me.liuli.fluidity.util.move.floorPosition
+import me.liuli.fluidity.util.move.setClientRotation
+import me.liuli.fluidity.util.move.toRotation
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -23,12 +24,9 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
-import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import java.util.*
-import kotlin.concurrent.schedule
 
 class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYER) {
 

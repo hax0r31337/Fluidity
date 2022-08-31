@@ -13,17 +13,26 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.Vec3d
 import me.liuli.fluidity.util.move.distanceXZ
 import me.liuli.fluidity.util.move.floorPosition
-import me.liuli.fluidity.util.move.lookAt
+import me.liuli.fluidity.util.skyblock.MiniMaxUtils
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.stripColor
-import me.liuli.fluidity.util.world.*
+import me.liuli.fluidity.util.world.getBlock
+import me.liuli.fluidity.util.world.renderPosX
+import me.liuli.fluidity.util.world.renderPosY
+import me.liuli.fluidity.util.world.renderPosZ
 import net.minecraft.block.Block
+import net.minecraft.block.BlockDirectional
+import net.minecraft.block.BlockStone
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityCreeper
+import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
+import net.minecraft.item.ItemMap
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.AxisAlignedBB
@@ -31,6 +40,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import kotlin.experimental.and
 
 object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you play Hypixel SkyBlock Dungeon", ModuleCategory.MISC) {
 
@@ -48,13 +58,55 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
         "My chest has the reward and I'm telling the truth!",
         "The reward isn't in any of our chests.",
         "Both of them are telling the truth. Also, ")
-    private var selectedEntity: Vec3d? = null
+    private val triviaQuizSolutions = mutableMapOf<String, Array<String>>().also {
+        it["What SkyBlock year is it?"] = arrayOf("Year ${(System.currentTimeMillis() / 1000L - 1560276000).toInt() / 446400 + 1}")
+        it["What is the status of The Watcher?"] = arrayOf("Stalker")
+        it["What is the status of Bonzo?"] = arrayOf("New Necromancer")
+        it["What is the status of Scarf?"] = arrayOf("Apprentice Necromancer")
+        it["What is the status of The Professor?"] = arrayOf("Professor")
+        it["What is the status of Thorn?"] = arrayOf("Shaman Necromancer")
+        it["What is the status of Livid?"] = arrayOf("Master Necromancer")
+        it["What is the status of Sadan?"] = arrayOf("Necromancer Lord")
+        it["What is the status of Maxor?"] = arrayOf("Young Wither")
+        it["What is the status of Goldor?"] = arrayOf("Wither Soldier")
+        it["What is the status of Storm?"] = arrayOf("Elementalist")
+        it["What is the status of Necron?"] = arrayOf("Wither Lord")
+        it["What is the status of Maxor, Storm, Goldor and Necron?"] = arrayOf("Wither Lord")
+        it["How many total Fairy Souls are there?"] = arrayOf("238 Fairy Souls")
+        it["How many Fairy Souls are there in Spider's Den?"] = arrayOf("19 Fairy Souls")
+        it["How many Fairy Souls are there in The End?"] = arrayOf("12 Fairy Souls")
+        it["How many Fairy Souls are there in The Farming Islands?"] = arrayOf("20 Fairy Souls")
+        it["How many Fairy Souls are there in Crimson Isle?"] = arrayOf("29 Fairy Souls")
+        it["How many Fairy Souls are there in The Park?"] = arrayOf("11 Fairy Souls")
+        it["How many Fairy Souls are there in Jerry's Workshop?"] = arrayOf("5 Fairy Souls")
+        it["How many Fairy Souls are there in Hub?"] = arrayOf("79 Fairy Souls")
+        it["How many Fairy Souls are there in The Hub?"] = arrayOf("79 Fairy Souls")
+        it["How many Fairy Souls are there in Deep Caverns?"] = arrayOf("21 Fairy Souls")
+        it["How many Fairy Souls are there in Gold Mine?"] = arrayOf("12 Fairy Souls")
+        it["How many Fairy Souls are there in Dungeon Hub?"] = arrayOf("7 Fairy Souls")
+        it["Which brother is on the Spider's Den?"] = arrayOf("Rick")
+        it["What is the name of Rick's brother?"] = arrayOf("Pat")
+        it["What is the name of the Painter in the Hub?"] = arrayOf("Marco")
+        it["What is the name of the person that upgrades pets?"] = arrayOf("Kat")
+        it["What is the name of the lady of the Nether?"] = arrayOf("Elle")
+        it["Which villager in the Village gives you a Rogue Sword?"] = arrayOf("Jamie")
+        it["How many unique minions are there?"] = arrayOf("55 Minions")
+        it["Which of these enemies does not spawn in the Spider's Den?"] = arrayOf("Zombie Spider", "Cave Spider", "Wither Skeleton", "Dashing Spooder", "Broodfather", "Night Spider")
+        it["Which of these monsters only spawns at night?"] = arrayOf("Zombie Villager", "Ghast")
+        it["Which of these is not a dragon in The End?"] = arrayOf("Zoomer Dragon", "Weak Dragon", "Stonk Dragon", "Holy Dragon", "Boomer Dragon", "Booger Dragon", "Older Dragon", "Elder Dragon", "Stable Dragon", "Professor Dragon")
+    }
+    private var selectedEntity: AxisAlignedBB? = null
     private val lines = mutableListOf<Pair<Vec3, Vec3>>()
+    private var triviaQuestion = ""
+    var inDungeon = false
+        private set
 
     override fun onDisable() {
         nametags.clear()
         lines.clear()
         selectedEntity = null
+        inDungeon = false
+        triviaQuestion = ""
     }
 
     fun getName(entityId: Int): String {
@@ -65,13 +117,13 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
     fun onUpdate(event: UpdateEvent) {
         val lastItem = mc.thePlayer.inventoryContainer.getSlot(44).stack
         if (lastItem != null && stripColor(lastItem.displayName).contains("Map", true)) {
-//            displayAlert("IN DUNGEON")
+            inDungeon = true
         } else {
-            nametags.clear()
+            onDisable()
             return
         }
 
-        if (mc.thePlayer.ticksExisted % 10 != 0) return
+        if (mc.thePlayer.ticksExisted % 20 != 0) return
 
         val armorStands = mc.theWorld.loadedEntityList.filter { it is EntityArmorStand && it.hasCustomName() }
         nametags.keys.map { it }.forEach {
@@ -81,49 +133,139 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
         }
         var hasBlaze = false
         var hasCreeper: EntityCreeper? = null
+        var hasSilverfish: EntitySilverfish? = null
         mc.theWorld.loadedEntityList.filter { it is EntityLivingBase && it !is EntityArmorStand && it != mc.thePlayer }.forEach { entity ->
             if (higherOrLowerValue.get() && entity is EntityBlaze) {
                 hasBlaze = true
             } else if (creeperBeamValue.get() && entity is EntityCreeper) {
                 hasCreeper = entity
+            } else if (entity is EntitySilverfish && entity.getDistanceSqToEntity(mc.thePlayer) < 900) {
+                hasSilverfish = entity
             }
             val nearest = armorStands.minByOrNull { distanceXZ(entity.posX - it.posX, entity.posZ - it.posZ) } ?: return@forEach
             if (distanceXZ(entity.posX - nearest.posX, entity.posZ - nearest.posZ) > 3) return@forEach
             nametags[entity.entityId] = nearest.name
         }
-        if (hasBlaze) {
-            val regex = Regex("\\[Lv\\w{2}] Blaze \\w{2,4}/\\w{2,4}❤")
-            val blazes = armorStands.filter { regex.matches(stripColor(it.name)) }
-            val targetId = Block.getIdFromBlock(Blocks.iron_bars)
-            val theChest = mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest }.firstOrNull {
-                val upBlock = it.pos.up().getBlock()?.let { Block.getIdFromBlock(it) } ?: -1
-                val downBlock = it.pos.down().getBlock()?.let { Block.getIdFromBlock(it) } ?: -1
-                upBlock == targetId
-            }
-            if (theChest == null) {
-                selectedEntity = null
-            } else {
-                val isLower = theChest.pos.up().getBlock()?.let { Block.getIdFromBlock(it) == targetId } ?: false
-                val blaze = if(isLower) {
-                    blazes.minByOrNull {
-                        val str = stripColor(it.name)
-                        str.substring(str.indexOf("/")+1, str.indexOf("❤")).toInt()
-                    }
-                } else {
-                    blazes.maxByOrNull {
-                        val str = stripColor(it.name)
-                        str.substring(str.indexOf("/")+1, str.indexOf("❤")).toInt()
-                    }
-                }
 
-                if (blaze != null) {
-                    selectedEntity = Vec3d(blaze.posX, blaze.posY - 1.7, blaze.posZ)
-                } else {
-                    selectedEntity = null
+        if (hasBlaze) {
+            solveBlaze(armorStands)
+        } else if (!solveCreeper(hasCreeper) && !solveTicTacToe()/* && !solveWaterBoard() && !solveIcePath(hasSilverfish)*/) {
+            lines.clear()
+            selectedEntity = null
+        }
+    }
+
+    private fun solveWaterBoard(): Boolean {
+//        val chest = mc.theWorld.loadedTileEntityList.firstOrNull {
+//            it is TileEntityChest && it.pos.down().getBlock() == Blocks.stone && mc.theWorld.getBlockState(it.pos.down())?.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE &&
+//                    (it.pos.add(1, 0, 0).getBlock() == Blocks.carpet || it.pos.add(0, 0, 1).getBlock() == Blocks.carpet)
+//        } ?: return false
+//        val face = mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return
+//        println(chest.pos)
+        return false
+    }
+
+    private fun solveIcePath(silverfish: EntitySilverfish?): Boolean {
+//        if (silverfish != null && silverfish!!.floorPosition.down().getBlock() == Blocks.packed_ice) {
+//            val pos = silverfish!!.floorPosition
+//            val chest = mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest && it.pos.y == pos.y }
+//                .minByOrNull { it.pos.distanceSq(pos) } ?: return false
+//            val chestFacing =
+//                mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return false
+//            var pos1 = chest.pos
+//            while (pos1.getBlock() != Blocks.cobblestone) {
+//                pos1 = pos1.add(chestFacing.directionVec)
+//            }
+//            pos1 = pos1.add(-chestFacing.directionVec.x, 0, -chestFacing.directionVec.z)
+//            val xChange = chestFacing.directionVec.z != 0
+//            while (mc.theWorld.getBlockState(pos1)
+//                    .getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE_SMOOTH
+//            ) {
+//                pos1 = if (xChange) {
+//                    pos1.add(-1, 0, 0)
+//                } else {
+//                    pos1.add(0, 0, -1)
+//                }
+//            }
+//            pos1 = if (xChange) {
+//                pos1.add(1, 0, 0)
+//            } else {
+//                pos1.add(0, 0, 1)
+//            }
+//            val endX = if (!xChange) {
+//                if (abs(chestFacing.directionVec.x) == chestFacing.directionVec.x) pos1.x - 17 else pos1.x + 17
+//            } else {
+//                pos1.x + 17
+//            }
+//            val endZ = if (xChange) {
+//                if (abs(chestFacing.directionVec.z) == chestFacing.directionVec.z) pos1.z - 17 else pos1.z + 17
+//            } else {
+//                pos1.z + 17
+//            }
+//            val startX = if (endX < pos1.x) pos1.x - 1 else pos1.x + 1
+//            val startZ = if (endZ < pos1.z) pos1.z - 1 else pos1.z + 1
+//            println(pos1)
+//            var var1 = startX
+//            while (var1 != endX) {
+//                var var2 = startZ
+//                while (var2 != endZ) {
+//                    if (var1 == pos.x && var2 == pos.z) {
+//                        print('F')
+//                    } else {
+//                        print(if (BlockPos(var1, pos1.y, var2).getBlock() == Blocks.air) ' ' else 'x')
+//                    }
+//                    if (var2 < endZ) var2++ else var2--
+//                }
+//                println()
+//                if (var1 < endX) var1++ else var1--
+//            }
+//            displayAlert("[$startX, $startZ] -> [$endX, $endZ]")
+//        }
+        return false
+    }
+
+    private fun solveBlaze(armorStands: List<Entity>) {
+        val regex = Regex("\\[Lv\\w{2}] Blaze \\w{2,4}/\\w{2,4}❤")
+        val blazes = armorStands.filter { regex.matches(stripColor(it.name)) }
+        val targetId = Block.getIdFromBlock(Blocks.iron_bars)
+        val theChest = mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest }.firstOrNull {
+            val upBlock = it.pos.up().getBlock()?.let { Block.getIdFromBlock(it) } ?: -1
+            upBlock == targetId
+        }
+        if (theChest == null) {
+            selectedEntity = null
+        } else {
+            var iter = theChest.pos.up()
+            while (Block.getIdFromBlock(iter.add(1, 0, 0).getBlock()) == 0) {
+                iter = iter.up()
+            }
+            iter = iter.add(1, 0, 0)
+            val blaze = if(Block.getIdFromBlock(iter.getBlock()) == Block.getIdFromBlock(Blocks.cobblestone)) {
+                blazes.minByOrNull {
+                    val str = stripColor(it.name)
+                    str.substring(str.indexOf("/")+1, str.indexOf("❤")).toInt()
+                }
+            } else {
+                blazes.maxByOrNull {
+                    val str = stripColor(it.name)
+                    str.substring(str.indexOf("/")+1, str.indexOf("❤")).toInt()
                 }
             }
-        } else if (hasCreeper != null && mc.thePlayer.getDistanceSqToEntity(hasCreeper) < 225) {
-            val floorPos = hasCreeper!!.floorPosition
+
+            if (blaze != null) {
+                selectedEntity = Vec3d(blaze.posX, blaze.posY - 1.7, blaze.posZ).let {
+                    AxisAlignedBB(it.x - 0.5, it.y, it.z - 0.5,
+                        it.x + 0.5, it.y + 1.8, it.z + 0.5)
+                }
+            } else {
+                selectedEntity = null
+            }
+        }
+    }
+
+    private fun solveCreeper(creeper: EntityCreeper?): Boolean {
+        if (creeper != null && mc.thePlayer.getDistanceSqToEntity(creeper) < 225) {
+            val floorPos = creeper.floorPosition
             var offsetY = floorPos.y
             val targetId = Block.getIdFromBlock(Blocks.sea_lantern)
 
@@ -159,9 +301,67 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                 }
             }
         } else {
-            lines.clear()
-            selectedEntity = null
+            return false
         }
+        return true
+    }
+
+    private fun solveTicTacToe(): Boolean {
+        val itemFrames = mc.theWorld.loadedEntityList.filter { it is EntityItemFrame && it.getDistanceSqToEntity(mc.thePlayer) < 100 && it.displayedItem?.item is ItemMap }
+        if (itemFrames.size != 9 && itemFrames.size % 2 == 1) {
+            val game = Array(3) { charArrayOf('_', '_', '_') }
+            var offset: BlockPos? = null
+            var horizonOffset: BlockPos? = null
+            itemFrames.forEach {
+                val facing = (it as EntityItemFrame).facingDirection
+                val backBlock = it.floorPosition.subtract(facing.directionVec)
+                if (backBlock.getBlock() != Blocks.iron_block) return@forEach
+                val upBlock = backBlock.up().getBlock()
+                val downBlock = backBlock.down().getBlock()
+                val col = if(upBlock == Blocks.iron_block && downBlock == Blocks.iron_block) {
+                    1
+                } else if (upBlock == Blocks.iron_block) {
+                    2
+                } else if (downBlock == Blocks.iron_block) {
+                    0
+                } else return@forEach
+                val leftBlock = backBlock.add(facing.directionVec.z, 0, facing.directionVec.x).getBlock()
+                val rightBlock = backBlock.add(-facing.directionVec.z, 0, -facing.directionVec.x).getBlock()
+                val row = if(leftBlock == Blocks.iron_block && rightBlock == Blocks.iron_block) {
+                    1
+                } else if (leftBlock == Blocks.iron_block) {
+                    2
+                } else if (rightBlock == Blocks.iron_block) {
+                    0
+                } else return@forEach
+                if (offset == null) {
+                    horizonOffset = BlockPos(facing.directionVec.z, 0, facing.directionVec.x)
+                    offset = backBlock.add(facing.directionVec.z * row, col, facing.directionVec.x * row)
+                }
+
+                val mapData = (it.displayedItem.item as ItemMap).getMapData(it.displayedItem, mc.theWorld)
+                val status = (mapData.colors[8256] and (0xff).toByte()).let { if (it.toInt() == 0x72) 'x' else 'o' }
+                game[col][row] = status
+            }
+            if (offset == null) {
+                return false
+            }
+            for (a in game) {
+                for (b in a) {
+                    print(b)
+                }
+                println()
+            }
+            val bestMove = MiniMaxUtils.findBestMove(game)
+            println(bestMove)
+            selectedEntity = offset!!.let {
+                val offset = it.add(horizonOffset!!.x * bestMove.row, -bestMove.col, horizonOffset!!.z * bestMove.row)
+                AxisAlignedBB(offset.x + 0.0, offset.y + 0.0, offset.z + 0.0, offset.x + 1.0, offset.y + 1.0, offset.z + 1.0)
+            }
+        } else {
+            return false
+        }
+        return true
     }
 
     @Listen
@@ -190,14 +390,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             }
         }
         if (selectedEntity != null) {
-            val renderPosX = mc.renderManager.viewerPosX
-            val renderPosY = mc.renderManager.viewerPosY
-            val renderPosZ = mc.renderManager.viewerPosZ
-
-            val axisAlignedBB = selectedEntity!!.let {
-                AxisAlignedBB(it.x - 0.5 - renderPosX, it.y - renderPosY, it.z - 0.5 - renderPosZ,
-                    it.x + 0.5 - renderPosX, it.y + 1.8 - renderPosY, it.z + 0.5 - renderPosZ)
-            }
+            val axisAlignedBB = selectedEntity!!.offset(-mc.renderManager.viewerPosX, -mc.renderManager.viewerPosY, -mc.renderManager.viewerPosZ)
             drawAxisAlignedBB(axisAlignedBB, higherOrLowerColorValue.get(), 0f, 0, higherOrLowerColorValue.get() shr 24 and 255)
         }
         if (lines.isNotEmpty()) {
@@ -231,6 +424,18 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             if (msg.startsWith("[NPC]") && threeWeirdosConditions.any { msg.contains(it) }) {
                 val name = msg.substring(6, msg.indexOf(":"))
                 displayAlert("The reward is in §c$name§f's chest!")
+            } else if (triviaQuestion.isNotEmpty() && (msg.contains("ⓐ") || msg.contains("ⓑ") || msg.contains("ⓒ"))) {
+                val answers = triviaQuizSolutions[triviaQuestion] ?: throw NullPointerException("Solution not found")
+                if (!answers.any { msg.contains(it) }) {
+                    event.cancel()
+                }
+            } else {
+                triviaQuizSolutions.keys.forEach {
+                    if (msg.contains(it)) {
+                        triviaQuestion = it
+                        return
+                    }
+                }
             }
         }
     }

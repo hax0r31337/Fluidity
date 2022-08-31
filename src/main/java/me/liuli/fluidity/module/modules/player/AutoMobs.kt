@@ -11,9 +11,7 @@ import me.liuli.fluidity.pathfinder.goals.GoalFollow
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.distanceXZ
 import me.liuli.fluidity.util.move.floorPosition
-import net.minecraft.entity.monster.EntityEnderman
 import kotlin.math.abs
-import kotlin.math.sqrt
 
 class AutoMobs : Module("AutoMobs", "Move to mobs automatically", ModuleCategory.PLAYER) {
 

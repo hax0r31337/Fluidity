@@ -4,7 +4,6 @@ import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
-import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.IntValue

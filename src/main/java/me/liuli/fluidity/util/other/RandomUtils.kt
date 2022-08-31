@@ -1,6 +1,7 @@
 package me.liuli.fluidity.util.other
 
 import java.util.*
+import kotlin.streams.asSequence
 
 val random = Random()
 
@@ -8,14 +9,11 @@ fun randomString(length: Int): String {
     return randomString(length, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 }
 
-fun randomString(length: Int, chars: String): String {
-    return randomString(length, chars.toCharArray())
-}
-
-fun randomString(length: Int, chars: CharArray): String {
-    val stringBuilder = StringBuilder()
-    for (i in 0 until length) stringBuilder.append(chars[random.nextInt(chars.size)])
-    return stringBuilder.toString()
+fun randomString(length: Int, source: String): String {
+    return random.ints(length.toLong(), 0, source.length)
+        .asSequence()
+        .map(source::get)
+        .joinToString("")
 }
 
 fun nextInt(startInclusive: Int, endExclusive: Int): Int {
