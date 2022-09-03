@@ -37,7 +37,7 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
     @Listen
     fun onRender(event: Render3DEvent) {
         // Left click
-        if (mc.gameSettings.keyBindAttack.isKeyDown && leftValue.get() && (!leftSwordOnlyValue.get() || mc.thePlayer.heldItem?.item is ItemSword) &&
+        if (mc.gameSettings.keyBindAttack.pressed && leftValue.get() && (!leftSwordOnlyValue.get() || mc.thePlayer.heldItem?.item is ItemSword) &&
             leftClickTimer.canClick() && mc.playerController.curBlockDamageMP == 0F) {
             KeyBinding.onTick(mc.gameSettings.keyBindAttack.keyCode) // Minecraft Click Handling
 
@@ -45,7 +45,7 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
         }
 
         // Right click
-        if (mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer!!.isUsingItem &&
+        if (mc.gameSettings.keyBindUseItem.pressed && !mc.thePlayer!!.isUsingItem &&
             (!rightBlockOnlyValue.get() || mc.thePlayer.heldItem?.item is ItemBlock) && rightValue.get() && rightClickTimer.canClick()) {
             KeyBinding.onTick(mc.gameSettings.keyBindUseItem.keyCode) // Minecraft Click Handling
 
@@ -55,8 +55,8 @@ class AutoClicker : Module("AutoClicker", "Constantly clicks when holding down a
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        if (jitterValue.get() != 0f && (leftValue.get() && mc.gameSettings.keyBindAttack.isKeyDown && mc.playerController.curBlockDamageMP == 0F
-                    || rightValue.get() && mc.gameSettings.keyBindUseItem.isKeyDown && !mc.thePlayer.isUsingItem)) {
+        if (jitterValue.get() != 0f && (leftValue.get() && mc.gameSettings.keyBindAttack.pressed && mc.playerController.curBlockDamageMP == 0F
+                    || rightValue.get() && mc.gameSettings.keyBindUseItem.pressed && !mc.thePlayer.isUsingItem)) {
             val jitter = jitterRotation(jitterValue.get(), mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
             mc.thePlayer.rotationYaw = jitter.first
             mc.thePlayer.rotationPitch = jitter.second

@@ -13,10 +13,11 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.Vec3d
 import me.liuli.fluidity.util.move.distanceXZ
 import me.liuli.fluidity.util.move.floorPosition
-import me.liuli.fluidity.util.skyblock.MiniMaxUtils
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.stripColor
+import me.liuli.fluidity.util.skyblock.IcePathUtils
+import me.liuli.fluidity.util.skyblock.MiniMaxUtils
 import me.liuli.fluidity.util.world.getBlock
 import me.liuli.fluidity.util.world.renderPosX
 import me.liuli.fluidity.util.world.renderPosY
@@ -41,6 +42,8 @@ import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.experimental.and
+import kotlin.math.abs
+
 
 object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you play Hypixel SkyBlock Dungeon", ModuleCategory.MISC) {
 
@@ -149,7 +152,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
 
         if (hasBlaze) {
             solveBlaze(armorStands)
-        } else if (!solveCreeper(hasCreeper) && !solveTicTacToe()/* && !solveWaterBoard() && !solveIcePath(hasSilverfish)*/) {
+        } else if (!solveCreeper(hasCreeper) && !solveTicTacToe() && !solveWaterBoard() && !solveIcePath(hasSilverfish)) {
             lines.clear()
             selectedEntity = null
         }
@@ -166,61 +169,84 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
     }
 
     private fun solveIcePath(silverfish: EntitySilverfish?): Boolean {
-//        if (silverfish != null && silverfish!!.floorPosition.down().getBlock() == Blocks.packed_ice) {
-//            val pos = silverfish!!.floorPosition
-//            val chest = mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest && it.pos.y == pos.y }
-//                .minByOrNull { it.pos.distanceSq(pos) } ?: return false
-//            val chestFacing =
-//                mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return false
-//            var pos1 = chest.pos
-//            while (pos1.getBlock() != Blocks.cobblestone) {
-//                pos1 = pos1.add(chestFacing.directionVec)
-//            }
-//            pos1 = pos1.add(-chestFacing.directionVec.x, 0, -chestFacing.directionVec.z)
-//            val xChange = chestFacing.directionVec.z != 0
-//            while (mc.theWorld.getBlockState(pos1)
-//                    .getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE_SMOOTH
-//            ) {
-//                pos1 = if (xChange) {
-//                    pos1.add(-1, 0, 0)
-//                } else {
-//                    pos1.add(0, 0, -1)
-//                }
-//            }
-//            pos1 = if (xChange) {
-//                pos1.add(1, 0, 0)
-//            } else {
-//                pos1.add(0, 0, 1)
-//            }
-//            val endX = if (!xChange) {
-//                if (abs(chestFacing.directionVec.x) == chestFacing.directionVec.x) pos1.x - 17 else pos1.x + 17
-//            } else {
-//                pos1.x + 17
-//            }
-//            val endZ = if (xChange) {
-//                if (abs(chestFacing.directionVec.z) == chestFacing.directionVec.z) pos1.z - 17 else pos1.z + 17
-//            } else {
-//                pos1.z + 17
-//            }
-//            val startX = if (endX < pos1.x) pos1.x - 1 else pos1.x + 1
-//            val startZ = if (endZ < pos1.z) pos1.z - 1 else pos1.z + 1
-//            println(pos1)
-//            var var1 = startX
-//            while (var1 != endX) {
-//                var var2 = startZ
-//                while (var2 != endZ) {
-//                    if (var1 == pos.x && var2 == pos.z) {
-//                        print('F')
-//                    } else {
-//                        print(if (BlockPos(var1, pos1.y, var2).getBlock() == Blocks.air) ' ' else 'x')
-//                    }
-//                    if (var2 < endZ) var2++ else var2--
-//                }
-//                println()
-//                if (var1 < endX) var1++ else var1--
-//            }
-//            displayAlert("[$startX, $startZ] -> [$endX, $endZ]")
-//        }
+        if (silverfish != null && silverfish!!.floorPosition.down().getBlock() == Blocks.packed_ice) {
+            val pos = silverfish!!.floorPosition
+            val chest = mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest && it.pos.y == pos.y }
+                .minByOrNull { it.pos.distanceSq(pos) } ?: return false
+            val chestFacing =
+                mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return false
+            var pos1 = chest.pos
+            while (pos1.getBlock() != Blocks.cobblestone) {
+                pos1 = pos1.add(chestFacing.directionVec)
+            }
+            pos1 = pos1.add(-chestFacing.directionVec.x, 0, -chestFacing.directionVec.z)
+            val xChange = chestFacing.directionVec.z != 0
+            while (mc.theWorld.getBlockState(pos1)
+                    .getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE_SMOOTH
+            ) {
+                pos1 = if (xChange) {
+                    pos1.add(-1, 0, 0)
+                } else {
+                    pos1.add(0, 0, -1)
+                }
+            }
+            pos1 = if (xChange) {
+                pos1.add(1, 0, 0)
+            } else {
+                pos1.add(0, 0, 1)
+            }
+            val endX = if (!xChange) {
+                if (abs(chestFacing.directionVec.x) == chestFacing.directionVec.x) pos1.x - 20 else pos1.x + 20
+            } else {
+                pos1.x + 20
+            }
+            val endZ = if (xChange) {
+                if (abs(chestFacing.directionVec.z) == chestFacing.directionVec.z) pos1.z - 20 else pos1.z + 20
+            } else {
+                pos1.z + 20
+            }
+            val startX = if (endX < pos1.x) pos1.x - 1 else pos1.x + 1
+            val startZ = if (endZ < pos1.z) pos1.z - 1 else pos1.z + 1
+            val board = Array(19) { CharArray(19) }
+            var boardX = 0
+            var boardZ = 0
+            var var1 = startX
+            val fishPos = IcePathUtils.Point(0, 0)
+            while (var1 != endX) {
+                var var2 = startZ
+                boardZ = 0
+                while (var2 != endZ) {
+                    if (var1 == pos.x && var2 == pos.z) {
+                        fishPos.row = boardX
+                        fishPos.column = boardZ
+                    } else if (BlockPos(var1, pos1.y, var2).getBlock() != Blocks.air) {
+                        board[boardX][boardZ] = 'X'
+                    }
+                    boardZ++
+                    if (var2 < endZ) var2++ else var2--
+                }
+                boardX++
+                if (var1 < endX) var1++ else var1--
+            }
+
+            val endPoints = mutableListOf<IcePathUtils.Point>()
+            for (column in 0..18) {
+                if (board[0][column] != 'X') endPoints.add(IcePathUtils.Point(18, column))
+            }
+            val route = IcePathUtils.solve(board, fishPos, endPoints)
+            val posY = chest.pos.y.toDouble() + 0.1
+            lines.clear()
+            route.forEachIndexed { index, point ->
+                val nextPos = if (index + 1 == route.size) {
+                    Vec3(chest.pos.x + 0.5, posY, chest.pos.z + 0.5)
+                } else {
+                    val n = route[index + 1]
+                    Vec3(endX + (18 - n.row) + 1.5, posY, startZ + n.column + 0.5)
+                }
+                lines.add(Pair(Vec3(endX + (18 - point.row) + 1.5, posY, startZ + point.column + 0.5), nextPos))
+            }
+            return true
+        }
         return false
     }
 
@@ -252,13 +278,13 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                 }
             }
 
-            if (blaze != null) {
-                selectedEntity = Vec3d(blaze.posX, blaze.posY - 1.7, blaze.posZ).let {
+            selectedEntity = if (blaze != null) {
+                Vec3d(blaze.posX, blaze.posY - 1.7, blaze.posZ).let {
                     AxisAlignedBB(it.x - 0.5, it.y, it.z - 0.5,
                         it.x + 0.5, it.y + 1.8, it.z + 0.5)
                 }
             } else {
-                selectedEntity = null
+                null
             }
         }
     }
@@ -346,16 +372,9 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             if (offset == null) {
                 return false
             }
-            for (a in game) {
-                for (b in a) {
-                    print(b)
-                }
-                println()
-            }
             val bestMove = MiniMaxUtils.findBestMove(game)
-            println(bestMove)
             selectedEntity = offset!!.let {
-                val offset = it.add(horizonOffset!!.x * bestMove.row, -bestMove.col, horizonOffset!!.z * bestMove.row)
+                val offset = it.add(horizonOffset!!.x * -bestMove.col, -bestMove.row, horizonOffset!!.z * -bestMove.col)
                 AxisAlignedBB(offset.x + 0.0, offset.y + 0.0, offset.z + 0.0, offset.x + 1.0, offset.y + 1.0, offset.z + 1.0)
             }
         } else {
@@ -397,6 +416,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             GL11.glDisable(GL11.GL_TEXTURE_2D)
             glColor(creeperBeamColorValue.get())
             GL11.glEnable(GL11.GL_LINE_SMOOTH)
+            GL11.glLineWidth(4f)
             GL11.glBegin(GL11.GL_LINES)
 
             val renderPosX = mc.renderManager.viewerPosX

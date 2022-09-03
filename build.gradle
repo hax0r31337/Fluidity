@@ -54,7 +54,6 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
 
     include "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    include "com.jagrosh:DiscordIPC:0.4"
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }
@@ -64,14 +63,9 @@ shadowJar {
     configurations = [project.configurations.include]
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
 
-    exclude "LICENSE.txt"
-
-    exclude "com/sun/jna/**"
-    exclude "org/apache/**"
-    exclude "org/slf4j/**"
-
     exclude "META-INF/maven/**"
     exclude "META-INF/versions/**"
+    exclude "META-INF/*.kotlin_module"
 }
 
 processResources {

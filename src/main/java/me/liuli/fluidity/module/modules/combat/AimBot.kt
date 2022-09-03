@@ -42,7 +42,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private fun getRotation(): Pair<Float, Float>{
         hasTarget = false
 
-        if (onlyHoldMouseValue.get() && !mc.gameSettings.keyBindAttack.isKeyDown) return playerRotation
+        if (onlyHoldMouseValue.get() && !mc.gameSettings.keyBindAttack.pressed) return playerRotation
 
         val entity = mc.theWorld.loadedEntityList
             .filter {

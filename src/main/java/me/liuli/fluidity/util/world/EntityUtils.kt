@@ -55,6 +55,20 @@ private fun getNearestPointBB(eye: Vec3, box: AxisAlignedBB): Vec3 {
     return Vec3(origin[0], origin[1], origin[2])
 }
 
+fun Entity.getEyePositionExpand(length: Float, yaw: Float = this.rotationYaw, pitch: Float = this.rotationPitch): Vec3 {
+    val eyePosition = this.getPositionEyes(1f)
+    val yawCos = MathHelper.cos(-yaw * 0.017453292f - Math.PI.toFloat())
+    val yawSin = MathHelper.sin(-yaw * 0.017453292f - Math.PI.toFloat())
+    val pitchCos = -MathHelper.cos(-pitch * 0.017453292f)
+    val pitchSin = MathHelper.sin(-pitch * 0.017453292f)
+    val entityLook = Vec3((yawSin * pitchCos).toDouble(), pitchSin.toDouble(), (yawCos * pitchCos).toDouble())
+    return eyePosition.addVector(
+        entityLook.xCoord * length,
+        entityLook.yCoord * length,
+        entityLook.zCoord * length
+    )
+}
+
 fun rayTraceEntity(range: Double, entity: Entity = mc.thePlayer, yaw: Float = lastReportedYaw, pitch: Float = lastReportedPitch, entityFilter: (Entity) -> Boolean = { true }): Entity? {
     mc.theWorld ?: return null
 

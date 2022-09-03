@@ -9,6 +9,7 @@ import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.*
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.floorPosition
 import me.liuli.fluidity.util.move.setClientRotation
 import me.liuli.fluidity.util.move.setServerRotation
 import me.liuli.fluidity.util.move.toRotation
@@ -164,8 +165,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
     }
 
     private fun find(targetID: Int): BlockPos? {
-        val thePlayer = mc.thePlayer ?: return null
-
+        val floorPos = mc.thePlayer.floorPosition
         val radius = rangeValue.get().toInt() + 1
 
         var nearestBlockDistance = Double.MAX_VALUE
@@ -174,8 +174,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
         for (x in radius downTo -radius + 1) {
             for (y in radius downTo -radius + 1) {
                 for (z in radius downTo -radius + 1) {
-                    val blockPos = BlockPos(thePlayer.posX.toInt() + x, thePlayer.posY.toInt() + y,
-                        thePlayer.posZ.toInt() + z)
+                    val blockPos = BlockPos(floorPos.x + x, floorPos.y + y, floorPos.z + z)
                     val block = blockPos.getBlock() ?: continue
 
                     if (Block.getIdFromBlock(block) != targetID) continue
