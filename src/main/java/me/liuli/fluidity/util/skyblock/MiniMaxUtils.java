@@ -1,5 +1,7 @@
 package me.liuli.fluidity.util.skyblock;
 
+import me.liuli.fluidity.util.move.Vec2i;
+
 /**
  * <a href="https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-3-tic-tac-toe-ai-finding-optimal-move/">original code</a>
  */
@@ -145,9 +147,9 @@ public class MiniMaxUtils {
      * This will return the best possible
      * move for the player
      */
-    public static Move findBestMove(char[][] board) {
+    public static Vec2i findBestMove(char[][] board) {
         int bestVal = -1000;
-        Move bestMove = new Move();
+        Vec2i bestMove = new Vec2i();
         bestMove.row = -1;
         bestMove.col = -1;
 
@@ -181,14 +183,5 @@ public class MiniMaxUtils {
         }
 
         return bestMove;
-    }
-
-    public static class Move {
-        public int row, col;
-
-        @Override
-        public String toString() {
-            return "Move["+row+", "+col+"]";
-        }
     }
 }

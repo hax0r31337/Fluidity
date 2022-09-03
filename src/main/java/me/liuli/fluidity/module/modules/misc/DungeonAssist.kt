@@ -10,6 +10,7 @@ import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.ColorValue
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.Vec2i
 import me.liuli.fluidity.util.move.Vec3d
 import me.liuli.fluidity.util.move.distanceXZ
 import me.liuli.fluidity.util.move.floorPosition
@@ -23,6 +24,7 @@ import me.liuli.fluidity.util.world.renderPosX
 import me.liuli.fluidity.util.world.renderPosY
 import me.liuli.fluidity.util.world.renderPosZ
 import net.minecraft.block.Block
+import net.minecraft.block.BlockColored
 import net.minecraft.block.BlockDirectional
 import net.minecraft.block.BlockStone
 import net.minecraft.entity.Entity
@@ -33,6 +35,7 @@ import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemMap
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.tileentity.TileEntityChest
@@ -44,7 +47,10 @@ import java.awt.Color
 import kotlin.experimental.and
 import kotlin.math.abs
 
-
+/**
+ * TODO: water board, Ice Fill
+ * NOT NECESSARY: boulder(use freecam to click the chest), teleport maze(just walk diagonally)
+ */
 object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you play Hypixel SkyBlock Dungeon", ModuleCategory.MISC) {
 
     private val espValue = BoolValue("ESP", true)
@@ -163,14 +169,35 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
 //            it is TileEntityChest && it.pos.down().getBlock() == Blocks.stone && mc.theWorld.getBlockState(it.pos.down())?.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE &&
 //                    (it.pos.add(1, 0, 0).getBlock() == Blocks.carpet || it.pos.add(0, 0, 1).getBlock() == Blocks.carpet)
 //        } ?: return false
-//        val face = mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return
-//        println(chest.pos)
+//        val face = mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return false
+//        val wools = mutableListOf<EnumDyeColor>()
+//        var pos1 = chest.pos
+//        while(pos1.getBlock() != Blocks.stone_brick_stairs) {
+//            pos1 = pos1.add(face.directionVec)
+//            val block = mc.theWorld.getBlockState(pos1)
+//            if (block?.block is BlockColored) {
+//                wools.add(block.getValue(BlockColored.COLOR) ?: continue)
+//            }
+//        }
+//        pos1 = chest.pos.add(0, 7, 0)
+//        while(pos1.getBlock() != Blocks.glass) {
+//            pos1 = pos1.subtract(face.directionVec)
+//        }
+//        // the chest must in center in the board
+//        val xChange = face.directionVec.z != 0
+//        var pos2 = pos1
+//        while(pos2.getBlock() == Blocks.glass) {
+//            pos2 = if (xChange) pos2.add(1, 0, 0) else pos2.add(0, 0, 1)
+//        }
+//        println(pos1)
+//        println(pos2)
+
         return false
     }
 
     private fun solveIcePath(silverfish: EntitySilverfish?): Boolean {
-        if (silverfish != null && silverfish!!.floorPosition.down().getBlock() == Blocks.packed_ice) {
-            val pos = silverfish!!.floorPosition
+        if (silverfish != null && silverfish.floorPosition.down().getBlock() == Blocks.packed_ice) {
+            val pos = silverfish.floorPosition
             val chest = mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest && it.pos.y == pos.y }
                 .minByOrNull { it.pos.distanceSq(pos) } ?: return false
             val chestFacing =
@@ -182,8 +209,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             pos1 = pos1.add(-chestFacing.directionVec.x, 0, -chestFacing.directionVec.z)
             val xChange = chestFacing.directionVec.z != 0
             while (mc.theWorld.getBlockState(pos1)
-                    .getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE_SMOOTH
-            ) {
+                    .getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE_SMOOTH) {
                 pos1 = if (xChange) {
                     pos1.add(-1, 0, 0)
                 } else {
@@ -205,22 +231,35 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             } else {
                 pos1.z + 20
             }
+            val endPoints = mutableListOf<Vec2i>().also {
+                val pos2 = chest.pos.add(chestFacing.directionVec.x * 2, 0, chestFacing.directionVec.z * 2)
+                it.add(Vec2i(pos2.x, pos2.z))
+                it.add(Vec2i(pos2.x + chestFacing.directionVec.z, pos2.z + chestFacing.directionVec.x))
+                it.add(Vec2i(pos2.x - chestFacing.directionVec.z, pos2.z - chestFacing.directionVec.x))
+            }
             val startX = if (endX < pos1.x) pos1.x - 1 else pos1.x + 1
             val startZ = if (endZ < pos1.z) pos1.z - 1 else pos1.z + 1
             val board = Array(19) { CharArray(19) }
             var boardX = 0
-            var boardZ = 0
+            var boardZ: Int
             var var1 = startX
-            val fishPos = IcePathUtils.Point(0, 0)
+            val fishPos = Vec2i(0, 0)
             while (var1 != endX) {
                 var var2 = startZ
                 boardZ = 0
                 while (var2 != endZ) {
                     if (var1 == pos.x && var2 == pos.z) {
                         fishPos.row = boardX
-                        fishPos.column = boardZ
+                        fishPos.col = boardZ
                     } else if (BlockPos(var1, pos1.y, var2).getBlock() != Blocks.air) {
                         board[boardX][boardZ] = 'X'
+                    } else {
+                        endPoints.forEach {
+                            if (it.row == var1 && it.col == var2) {
+                                it.row = boardX
+                                it.col = boardZ
+                            }
+                        }
                     }
                     boardZ++
                     if (var2 < endZ) var2++ else var2--
@@ -229,21 +268,17 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                 if (var1 < endX) var1++ else var1--
             }
 
-            val endPoints = mutableListOf<IcePathUtils.Point>()
-            for (column in 0..18) {
-                if (board[0][column] != 'X') endPoints.add(IcePathUtils.Point(18, column))
-            }
             val route = IcePathUtils.solve(board, fishPos, endPoints)
             val posY = chest.pos.y.toDouble() + 0.1
             lines.clear()
             route.forEachIndexed { index, point ->
                 val nextPos = if (index + 1 == route.size) {
-                    Vec3(chest.pos.x + 0.5, posY, chest.pos.z + 0.5)
+                    return@forEachIndexed
                 } else {
                     val n = route[index + 1]
-                    Vec3(endX + (18 - n.row) + 1.5, posY, startZ + n.column + 0.5)
+                    Vec3((if (endX > startX) startX + n.row else endX + (18 - n.row) + 1) + 0.5, posY, (if (endZ > startZ) startZ + n.col else endZ + (18 - n.col) + 1) + 0.5)
                 }
-                lines.add(Pair(Vec3(endX + (18 - point.row) + 1.5, posY, startZ + point.column + 0.5), nextPos))
+                lines.add(Pair(Vec3((if (endX > startX) startX + point.row else endX + (18 - point.row) + 1) + 0.5, posY, (if (endZ > startZ) startZ + point.col else endZ + (18 - point.col) + 1) + 0.5), nextPos))
             }
             return true
         }
@@ -417,6 +452,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             glColor(creeperBeamColorValue.get())
             GL11.glEnable(GL11.GL_LINE_SMOOTH)
             GL11.glLineWidth(4f)
+            GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glBegin(GL11.GL_LINES)
 
             val renderPosX = mc.renderManager.viewerPosX
@@ -429,6 +465,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             }
 
             GL11.glEnd()
+            GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glColor4d(1.0, 1.0, 1.0, 1.0)
             GL11.glDisable(GL11.GL_LINE_SMOOTH)
             GL11.glEnable(GL11.GL_TEXTURE_2D)

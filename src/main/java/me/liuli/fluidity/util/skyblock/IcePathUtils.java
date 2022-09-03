@@ -1,5 +1,7 @@
 package me.liuli.fluidity.util.skyblock;
 
+import me.liuli.fluidity.util.move.Vec2i;
+
 import java.util.*;
 
 /**
@@ -8,23 +10,23 @@ import java.util.*;
 public class IcePathUtils {
 
     // bfs
-    public static List<Point> solve(char[][] board, Point startPos, List<Point> endColumns) {
-        LinkedList<Point> queue = new LinkedList<>();
-        Map<Point, Point> visited = new HashMap<>();
+    public static List<Vec2i> solve(char[][] board, Vec2i startPos, List<Vec2i> endColumns) {
+        LinkedList<Vec2i> queue = new LinkedList<>();
+        Map<Vec2i, Vec2i> visited = new HashMap<>();
         queue.add(startPos);
         visited.put(startPos, null);
         while (!queue.isEmpty()) {
             if (queue.size() > 1000000) break;
-            Point position = queue.pollFirst();
+            Vec2i position = queue.pollFirst();
             for (Direction direction : Direction.values()) {
-                Point pushedPoint = push(board, position, direction);
+                Vec2i pushedPoint = push(board, position, direction);
                 if (visited.containsKey(pushedPoint)) continue;
                 queue.add(pushedPoint);
                 visited.put(pushedPoint, position);
-                for (Point endColumn : endColumns) {
-                    if (pushedPoint.equals(endColumn)) {
-                        List<Point> route = new ArrayList<>();
-                        Point lastPoint = pushedPoint;
+                for (Vec2i endColumn : endColumns) {
+                    if (pushedPoint != null && pushedPoint.equals(endColumn)) {
+                        List<Vec2i> route = new ArrayList<>();
+                        Vec2i lastPoint = pushedPoint;
                         while (lastPoint != null) {
                             route.add(0, lastPoint);
                             lastPoint = visited.get(lastPoint);
@@ -37,64 +39,38 @@ public class IcePathUtils {
         return new ArrayList<>();
     }
 
-    public static Point push(char[][] board, Point pos, Direction direction) {
+    public static Vec2i push(char[][] board, Vec2i pos, Direction direction) {
         switch (direction) {
             case UP:
                 for (int row = pos.row; row >= 0; row--) {
-                    if (board[row][pos.column] == 'X') {
-                        return new Point(row + 1, pos.column);
+                    if (board[row][pos.col] == 'X') {
+                        return new Vec2i(row + 1, pos.col);
                     }
                 }
-                return new Point(0, pos.column);
+                return new Vec2i(0, pos.col);
             case DOWN:
                 for (int row = pos.row; row <= 18; row++) {
-                    if (board[row][pos.column] == 'X') {
-                        return new Point(row - 1, pos.column);
+                    if (board[row][pos.col] == 'X') {
+                        return new Vec2i(row - 1, pos.col);
                     }
                 }
-                return new Point(18, pos.column);
+                return new Vec2i(18, pos.col);
             case LEFT:
-                for (int column = pos.column; column >= 0; column--) {
+                for (int column = pos.col; column >= 0; column--) {
                     if (board[pos.row][column] == 'X') {
-                        return new Point(pos.row, column + 1);
+                        return new Vec2i(pos.row, column + 1);
                     }
                 }
-                return new Point(pos.row, 0);
+                return new Vec2i(pos.row, 0);
             case RIGHT:
-                for (int column = pos.column; column <= 18; column++) {
+                for (int column = pos.col; column <= 18; column++) {
                     if (board[pos.row][column] == 'X') {
-                        return new Point(pos.row, column - 1);
+                        return new Vec2i(pos.row, column - 1);
                     }
                 }
-                return new Point(pos.row, 18);
+                return new Vec2i(pos.row, 18);
         }
         return null;
-    }
-
-    public static class Point {
-
-        public int row;
-        public int column;
-
-        public Point(int row, int column) {
-            this.row = row;
-            this.column = column;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(row, column);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Point) {
-                Point point = (Point) obj;
-                return row == point.row && column == point.column;
-            }
-            return false;
-        }
-
     }
 
     enum Direction {
