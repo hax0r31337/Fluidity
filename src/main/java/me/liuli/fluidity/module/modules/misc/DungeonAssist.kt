@@ -17,6 +17,7 @@ import me.liuli.fluidity.util.move.floorPosition
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.stripColor
+import me.liuli.fluidity.util.skyblock.IceFillUtils
 import me.liuli.fluidity.util.skyblock.IcePathUtils
 import me.liuli.fluidity.util.skyblock.MiniMaxUtils
 import me.liuli.fluidity.util.world.getBlock
@@ -24,7 +25,6 @@ import me.liuli.fluidity.util.world.renderPosX
 import me.liuli.fluidity.util.world.renderPosY
 import me.liuli.fluidity.util.world.renderPosZ
 import net.minecraft.block.Block
-import net.minecraft.block.BlockColored
 import net.minecraft.block.BlockDirectional
 import net.minecraft.block.BlockStone
 import net.minecraft.entity.Entity
@@ -35,7 +35,6 @@ import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemMap
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.tileentity.TileEntityChest
@@ -44,13 +43,10 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import kotlin.concurrent.thread
 import kotlin.experimental.and
 import kotlin.math.abs
 
-/**
- * TODO: water board, Ice Fill
- * NOT NECESSARY: boulder(use freecam to click the chest), teleport maze(just walk diagonally)
- */
 object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you play Hypixel SkyBlock Dungeon", ModuleCategory.MISC) {
 
     private val espValue = BoolValue("ESP", true)
@@ -158,13 +154,80 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
 
         if (hasBlaze) {
             solveBlaze(armorStands)
-        } else if (!solveCreeper(hasCreeper) && !solveTicTacToe() && !solveWaterBoard() && !solveIcePath(hasSilverfish)) {
+        } else if (!solveCreeper(hasCreeper) && !solveTicTacToe() && !solveIcePath(hasSilverfish) && !solveIceFill()) {
             lines.clear()
             selectedEntity = null
         }
     }
 
+    private fun solveIceFill(): Boolean {
+        val floorPos = mc.thePlayer.floorPosition
+        var pos = floorPos.down()
+        if (pos.getBlock()?.let { it == Blocks.ice || it == Blocks.packed_ice } != true) {
+            return false
+        }
+        var pos1 = pos
+        var pos2 = pos
+        var pos3 = pos
+        while(pos.getBlock()?.let { it == Blocks.ice || it == Blocks.packed_ice } == true) {
+            pos = pos.add(1, 0, 0)
+        }
+        while(pos1.getBlock()?.let { it == Blocks.ice || it == Blocks.packed_ice } == true) {
+            pos1 = pos1.add(-1, 0, 0)
+        }
+        while(pos2.getBlock()?.let { it == Blocks.ice || it == Blocks.packed_ice } == true) {
+            pos2 = pos2.add(0, 0, 1)
+        }
+        while(pos3.getBlock()?.let { it == Blocks.ice || it == Blocks.packed_ice } == true) {
+            pos3 = pos3.add(0, 0, -1)
+        }
+        val columns = Array(pos.x - pos1.x + 1) { BooleanArray(pos2.z - pos3.z + 1) }
+        for ((var1, x) in (pos1.x..pos.x).withIndex()) {
+            for ((idx, z) in (pos3.z..pos2.z).withIndex()) {
+                columns[var1][idx] = BlockPos(x, pos.y + 1, z).getBlock() != Blocks.air || BlockPos(x, pos.y, z).getBlock() != Blocks.ice
+            }
+        }
+        val route = mutableListOf<Vec2i>()
+        val startPos = Vec2i(floorPos.x - pos1.x, floorPos.z - pos3.z)
+        route.add(Vec2i(floorPos.x - pos1.x, floorPos.z - pos3.z))
+
+        val chest = mc.theWorld.loadedTileEntityList.firstOrNull {
+            it is TileEntityChest && it.pos.down().getBlock() == Blocks.stone && mc.theWorld.getBlockState(it.pos.down())?.getValue(BlockStone.VARIANT) == BlockStone.EnumType.ANDESITE_SMOOTH
+        } ?: return false
+        val face = mc.theWorld.getBlockState(chest.pos)?.let { it.getValue(BlockDirectional.FACING) } ?: return false
+        var cpos = chest.pos
+        var i = 0
+        var endPos: Vec2i? = null
+        while(i < 50) {
+            cpos = cpos.add(face.directionVec)
+            val v = Vec2i(cpos.x - pos1.x, cpos.z - pos3.z)
+            if (v.row >= 0 && v.col >= 0 && v.row < columns.size && v.col < columns[0].size && !columns[v.row][v.col]) {
+                endPos = v
+                break
+            }
+            i++
+        }
+        endPos ?: return false
+        columns[startPos.row][startPos.col] = false
+        thread {
+            val result = IceFillUtils.findSolution(columns, startPos, endPos, route) ?: return@thread
+            lines.clear()
+            result.forEachIndexed { i, v ->
+                val nextPos = if (i + 1 == result.size) {
+                    return@forEachIndexed
+                } else {
+                    val n = result[i+1]
+                    Vec3(pos1.x + n.row + 0.5, floorPos.y + 0.1, pos3.z + n.col + 0.5)
+                }
+                lines.add(Pair(nextPos, Vec3(pos1.x + v.row + 0.5, floorPos.y + 0.1, pos3.z + v.col + 0.5)))
+            }
+        }
+
+        return true
+    }
+
     private fun solveWaterBoard(): Boolean {
+        // TODO
 //        val chest = mc.theWorld.loadedTileEntityList.firstOrNull {
 //            it is TileEntityChest && it.pos.down().getBlock() == Blocks.stone && mc.theWorld.getBlockState(it.pos.down())?.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE &&
 //                    (it.pos.add(1, 0, 0).getBlock() == Blocks.carpet || it.pos.add(0, 0, 1).getBlock() == Blocks.carpet)
@@ -239,7 +302,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             }
             val startX = if (endX < pos1.x) pos1.x - 1 else pos1.x + 1
             val startZ = if (endZ < pos1.z) pos1.z - 1 else pos1.z + 1
-            val board = Array(19) { CharArray(19) }
+            val board = Array(19) { BooleanArray(19) }
             var boardX = 0
             var boardZ: Int
             var var1 = startX
@@ -252,7 +315,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                         fishPos.row = boardX
                         fishPos.col = boardZ
                     } else if (BlockPos(var1, pos1.y, var2).getBlock() != Blocks.air) {
-                        board[boardX][boardZ] = 'X'
+                        board[boardX][boardZ] = true
                     } else {
                         endPoints.forEach {
                             if (it.row == var1 && it.col == var2) {
@@ -345,7 +408,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                     for (z in 15 downTo -15) {
                         val blockPos = BlockPos(floorPos.x + x, offsetY + y, floorPos.z + z)
                         val block = blockPos.getBlock() ?: continue
-                        if (Block.getIdFromBlock(block) == targetId) dots.add(Vec3(blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5))
+                        if (Block.getIdFromBlock(block) == targetId) dots.add(Vec3(blockPos.x + 0.5, blockPos.y + 0.5, blockPos.z + 0.5))
                     }
                 }
             }
@@ -452,7 +515,6 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             glColor(creeperBeamColorValue.get())
             GL11.glEnable(GL11.GL_LINE_SMOOTH)
             GL11.glLineWidth(4f)
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glBegin(GL11.GL_LINES)
 
             val renderPosX = mc.renderManager.viewerPosX
@@ -465,7 +527,6 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             }
 
             GL11.glEnd()
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glColor4d(1.0, 1.0, 1.0, 1.0)
             GL11.glDisable(GL11.GL_LINE_SMOOTH)
             GL11.glEnable(GL11.GL_TEXTURE_2D)

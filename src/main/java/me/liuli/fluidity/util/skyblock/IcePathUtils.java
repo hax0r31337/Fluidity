@@ -9,8 +9,10 @@ import java.util.*;
  */
 public class IcePathUtils {
 
+    public static final Direction[] directions = Direction.values();
+
     // bfs
-    public static List<Vec2i> solve(char[][] board, Vec2i startPos, List<Vec2i> endColumns) {
+    public static List<Vec2i> solve(boolean[][] board, Vec2i startPos, List<Vec2i> endColumns) {
         LinkedList<Vec2i> queue = new LinkedList<>();
         Map<Vec2i, Vec2i> visited = new HashMap<>();
         queue.add(startPos);
@@ -18,7 +20,7 @@ public class IcePathUtils {
         while (!queue.isEmpty()) {
             if (queue.size() > 1000000) break;
             Vec2i position = queue.pollFirst();
-            for (Direction direction : Direction.values()) {
+            for (Direction direction : directions) {
                 Vec2i pushedPoint = push(board, position, direction);
                 if (visited.containsKey(pushedPoint)) continue;
                 queue.add(pushedPoint);
@@ -39,32 +41,32 @@ public class IcePathUtils {
         return new ArrayList<>();
     }
 
-    public static Vec2i push(char[][] board, Vec2i pos, Direction direction) {
+    public static Vec2i push(boolean[][] board, Vec2i pos, Direction direction) {
         switch (direction) {
             case UP:
                 for (int row = pos.row; row >= 0; row--) {
-                    if (board[row][pos.col] == 'X') {
+                    if (board[row][pos.col]) {
                         return new Vec2i(row + 1, pos.col);
                     }
                 }
                 return new Vec2i(0, pos.col);
             case DOWN:
                 for (int row = pos.row; row <= 18; row++) {
-                    if (board[row][pos.col] == 'X') {
+                    if (board[row][pos.col]) {
                         return new Vec2i(row - 1, pos.col);
                     }
                 }
                 return new Vec2i(18, pos.col);
             case LEFT:
                 for (int column = pos.col; column >= 0; column--) {
-                    if (board[pos.row][column] == 'X') {
+                    if (board[pos.row][column]) {
                         return new Vec2i(pos.row, column + 1);
                     }
                 }
                 return new Vec2i(pos.row, 0);
             case RIGHT:
                 for (int column = pos.col; column <= 18; column++) {
-                    if (board[pos.row][column] == 'X') {
+                    if (board[pos.row][column]) {
                         return new Vec2i(pos.row, column - 1);
                     }
                 }
@@ -73,7 +75,7 @@ public class IcePathUtils {
         return null;
     }
 
-    enum Direction {
+    public enum Direction {
         UP,
         DOWN,
         LEFT,
