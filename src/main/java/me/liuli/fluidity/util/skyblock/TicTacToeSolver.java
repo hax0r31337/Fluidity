@@ -5,7 +5,7 @@ import me.liuli.fluidity.util.move.Vec2i;
 /**
  * <a href="https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-3-tic-tac-toe-ai-finding-optimal-move/">original code</a>
  */
-public class MiniMaxUtils {
+public class TicTacToeSolver {
     public static char player = 'o', opponent = 'x';
 
     /**

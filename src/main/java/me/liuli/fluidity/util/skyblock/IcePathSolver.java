@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * <a href="https://github.com/bowser0000/SkyblockMod/blob/master/src/main/java/me/Danker/utils/SilverfishUtils.java">original code</a>
  */
-public class IcePathUtils {
+public class IcePathSolver {
 
     public static final Direction[] directions = Direction.values();
 

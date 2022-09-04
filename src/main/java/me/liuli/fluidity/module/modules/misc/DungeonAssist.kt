@@ -17,9 +17,9 @@ import me.liuli.fluidity.util.move.floorPosition
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.stripColor
-import me.liuli.fluidity.util.skyblock.IceFillUtils
-import me.liuli.fluidity.util.skyblock.IcePathUtils
-import me.liuli.fluidity.util.skyblock.MiniMaxUtils
+import me.liuli.fluidity.util.skyblock.IceFillSolver
+import me.liuli.fluidity.util.skyblock.IcePathSolver
+import me.liuli.fluidity.util.skyblock.TicTacToeSolver
 import me.liuli.fluidity.util.world.getBlock
 import me.liuli.fluidity.util.world.renderPosX
 import me.liuli.fluidity.util.world.renderPosY
@@ -210,7 +210,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
         endPos ?: return false
         columns[startPos.row][startPos.col] = false
         thread {
-            val result = IceFillUtils.findSolution(columns, startPos, endPos, route) ?: return@thread
+            val result = IceFillSolver.findSolution(columns, startPos, endPos, route) ?: return@thread
             lines.clear()
             result.forEachIndexed { i, v ->
                 val nextPos = if (i + 1 == result.size) {
@@ -331,7 +331,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                 if (var1 < endX) var1++ else var1--
             }
 
-            val route = IcePathUtils.solve(board, fishPos, endPoints)
+            val route = IcePathSolver.solve(board, fishPos, endPoints)
             val posY = chest.pos.y.toDouble() + 0.1
             lines.clear()
             route.forEachIndexed { index, point ->
@@ -470,7 +470,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
             if (offset == null) {
                 return false
             }
-            val bestMove = MiniMaxUtils.findBestMove(game)
+            val bestMove = TicTacToeSolver.findBestMove(game)
             selectedEntity = offset!!.let {
                 val offset = it.add(horizonOffset!!.x * -bestMove.col, -bestMove.row, horizonOffset!!.z * -bestMove.col)
                 AxisAlignedBB(offset.x + 0.0, offset.y + 0.0, offset.z + 0.0, offset.x + 1.0, offset.y + 1.0, offset.z + 1.0)

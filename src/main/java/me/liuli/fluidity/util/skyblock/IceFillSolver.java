@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * <a href="https://github.com/bowser0000/SkyblockMod/blob/master/src/main/java/me/Danker/utils/IceWalkUtils.java">original code</a>
  */
-public class IceFillUtils {
+public class IceFillSolver {
 
 //    public static List<Vec2i> solve(boolean[][] board) {
 //        Vec2i startPos = new Vec2i(board.length - 1, board[0].length / 2);
@@ -19,7 +19,7 @@ public class IceFillUtils {
 //    }
 
     public static List<Vec2i> findSolution(boolean[][] board, Vec2i startPos, Vec2i endPos, List<Vec2i> route) {
-        for (IcePathUtils.Direction direction : IcePathUtils.directions) {
+        for (IcePathSolver.Direction direction : IcePathSolver.directions) {
             Vec2i nextPoint = move(board, startPos, direction);
             if (nextPoint == null || route.contains(nextPoint)) continue;
             List<Vec2i> newRoute = new ArrayList<>(route);
@@ -32,7 +32,7 @@ public class IceFillUtils {
         return null;
     }
 
-    public static Vec2i move(boolean[][] board, Vec2i pos, IcePathUtils.Direction direction) {
+    public static Vec2i move(boolean[][] board, Vec2i pos, IcePathSolver.Direction direction) {
         switch (direction) {
             case UP:
                 if (pos.row != 0 && !board[pos.row - 1][pos.col]) {
