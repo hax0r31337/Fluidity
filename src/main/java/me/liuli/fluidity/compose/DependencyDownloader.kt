@@ -98,6 +98,7 @@ object DependencyDownloader {
 
         while (!loaded) {
             label.text = "Downloading: ${((downloadedSize / totalSize.toFloat()) * 100).toInt()}% ($downloadedSize/$totalSize)"
+            Thread.sleep(50)
         }
 
         frame.isVisible = false

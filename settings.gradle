@@ -5,7 +5,7 @@ pluginManagement {
 		maven { url = "https://jitpack.io/" }
 		maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
 		maven { url = "https://maven.minecraftforge.net/" }
-//		maven { url = "http://127.0.0.1:8080/" }
+		maven { url = "http://127.0.0.1:8080/" }
 	}
 	resolutionStrategy {
 		eachPlugin {
@@ -16,9 +16,9 @@ pluginManagement {
 				case "org.spongepowered.mixin":
 					useModule("com.github.xcfrg:mixingradle:${mixingradle_version}")
 					break
-//				case "org.jetbrains.compose":
-//					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}")
-//					break
+				case "org.jetbrains.compose":
+					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}")
+					break
 			}
 		}
 	}

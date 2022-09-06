@@ -6,14 +6,14 @@ plugins {
     id "net.minecraftforge.gradle.forge"
     id "org.spongepowered.mixin"
     id "com.gorylenko.gradle-git-properties" version "2.4.0"
-//    id "org.jetbrains.compose"
+    id "org.jetbrains.compose"
 }
 
 repositories {
     mavenCentral()
     maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url = "https://jitpack.io/" }
-//    maven { url = "http://127.0.0.1:8080/" }
+    maven { url = "http://127.0.0.1:8080/" } // 魔改完成后上载广域网路
 }
 
 version = "1.0.0"
@@ -62,16 +62,16 @@ dependencies {
 
     include "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     include "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
-    include "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 
     // compose
     implementation "org.jetbrains.skiko:skiko-awt:0.7.20"
-//    include("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
-//        exclude module: "kotlin-stdlib"
-//        exclude module: "kotlin-stdlib-common"
-//        exclude module: "kotlin-stdlib-jdk8"
-////        exclude module: "kotlinx-coroutines-core"
-//    }
+    include("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
+        exclude module: "kotlin-stdlib"
+        exclude module: "kotlin-stdlib-common"
+        exclude module: "kotlin-stdlib-jdk8"
+        exclude module: "skiko"
+//        exclude module: "kotlinx-coroutines-core"
+    }
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }
