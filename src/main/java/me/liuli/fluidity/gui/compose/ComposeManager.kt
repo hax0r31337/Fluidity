@@ -1,8 +1,12 @@
 package me.liuli.fluidity.gui.compose
 
+import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.unit.Constraints
 import kotlinx.coroutines.asCoroutineDispatcher
+import me.liuli.fluidity.util.mc
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Color
 import org.lwjgl.opengl.Display
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL44
@@ -10,16 +14,13 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 
-object ComposeManager {
+class ComposeManager(private var width: Int, private var height: Int) {
 
-    var width = Display.getWidth()
-        private set
-    var height = Display.getHeight()
-        private set
+    val scene = ComposeScene(coroutineContext) { hasRenderUpdate = true }
     lateinit var bitmap: Bitmap
-    var canvas = createCanvas()
+    var canvas = createCanvas(width, height)
         private set
-    val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private var hasRenderUpdate = false
 
     val texId: Int
 
@@ -27,22 +28,28 @@ object ComposeManager {
         texId = GL11.glGenTextures()
     }
 
-    private fun createCanvas(): Canvas {
+    fun finalize() {
+        scene.close()
+        mc.addScheduledTask {
+            GL11.glDeleteTextures(texId)
+        }
+    }
+
+    private fun createCanvas(width: Int, height: Int): Canvas {
         bitmap = Bitmap().also {
-            if (!it.allocN32Pixels(Display.getWidth(), Display.getHeight(), false))
+            if (!it.allocN32Pixels(width, height, false))
                 error("Could not allocate the required resources for rendering the compose gui!")
         }
         return Canvas(bitmap)
     }
 
-    fun refreshCanvas() {
-        if (Display.getWidth() != width || Display.getHeight() != height) {
+    fun resizeCanvas(widthNow: Int, heightNow: Int) {
+        if (widthNow != width || heightNow != height) {
             bitmap.close()
             canvas.close()
-            canvas = createCanvas()
-            width = Display.getWidth()
-            height = Display.getHeight()
-            println("REFRESH CANVAS")
+            canvas = createCanvas(widthNow, heightNow)
+            width = widthNow
+            height = heightNow
         }
     }
 
@@ -69,5 +76,20 @@ object ComposeManager {
         }
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
+    }
+
+    fun updateCanvas(widthNow: Int, heightNow: Int) {
+        if (hasRenderUpdate) {
+            scene.constraints = Constraints(maxWidth = widthNow, maxHeight = heightNow)
+            resizeCanvas(widthNow, heightNow)
+            canvas.clear(Color.WHITE)
+            scene.render(canvas, System.nanoTime())
+            printCanvas()
+            hasRenderUpdate = false
+        }
+    }
+
+    companion object {
+        val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     }
 }

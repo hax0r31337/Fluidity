@@ -1,15 +1,12 @@
 package me.liuli.fluidity.gui.compose.gui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.unit.Constraints
 import me.liuli.fluidity.gui.compose.ComposeManager
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.ChatAllowedCharacters
-import org.jetbrains.skia.Color
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
@@ -21,45 +18,31 @@ import java.awt.event.KeyEvent as AwtKeyEvent
 
 abstract class AbstractGuiCompose : GuiScreen() {
 
-    lateinit var composeScene: ComposeScene
-    protected var hasFrameUpdate = false
+    lateinit var composeManager: ComposeManager
     protected var hasCompose = false
 
     // we need to store char data for key release event
     private val pressedKeyMap = mutableMapOf<Int, Char>()
 
     open fun initCompose(content: @Composable () -> Unit) {
-        composeScene = ComposeScene(ComposeManager.coroutineContext) {
-            hasFrameUpdate = true
-        }
-        composeScene.setContent(content)
+        composeManager = ComposeManager(Display.getWidth(), Display.getHeight())
+        composeManager.scene.setContent(content)
         hasCompose = true
     }
 
     open fun closeCompose() {
-        composeScene.close()
+        composeManager.finalize()
         hasCompose = false
         pressedKeyMap.clear()
     }
 
-    open fun onComposeFrame() {
-        composeScene.constraints = Constraints(maxWidth = Display.getWidth(), maxHeight = Display.getHeight())
-        ComposeManager.refreshCanvas()
-        ComposeManager.canvas.clear(Color.WHITE)
-        composeScene.render(ComposeManager.canvas, System.nanoTime())
-        ComposeManager.printCanvas()
-    }
-
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (hasCompose) {
-            if (hasFrameUpdate) {
-                onComposeFrame()
-                hasFrameUpdate = false
-            }
+            composeManager.updateCanvas(Display.getWidth(), Display.getHeight())
 
             GL11.glEnable(GL11.GL_TEXTURE_2D)
             GL11.glColor4f(1f, 1f, 1f, 1f)
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, ComposeManager.texId)
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, composeManager.texId)
 
             GL11.glBegin(GL11.GL_QUADS)
             GL11.glTexCoord2f(0f, 0f)
@@ -74,7 +57,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
 
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
 
-            composeScene.sendPointerEvent(
+            composeManager.scene.sendPointerEvent(
                 position = getMousePos(),
                 eventType = PointerEventType.Move,
                 nativeEvent = MouseEvent(mouseModifiers())
@@ -83,7 +66,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
             if (Mouse.hasWheel()) {
                 val wheel = Mouse.getDWheel()
                 if (wheel != 0) {
-                    composeScene.sendPointerEvent(
+                    composeManager.scene.sendPointerEvent(
                         eventType = PointerEventType.Scroll,
                         position = getMousePos(),
                         scrollDelta = Offset(0f, -(wheel / 60f)),
@@ -95,7 +78,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
             // key up
             pressedKeyMap.map { it }.forEach { (key, char) ->
                 if (!Keyboard.isKeyDown(key)) {
-                    composeScene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_RELEASED, System.nanoTime() / 1_000_000, keyModifiers(), remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
+                    composeManager.scene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_RELEASED, System.nanoTime() / 1_000_000, keyModifiers(), remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
                     pressedKeyMap.remove(key)
                 }
             }
@@ -106,7 +89,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, key: Int) {
         if (hasCompose) {
-            composeScene.sendPointerEvent(
+            composeManager.scene.sendPointerEvent(
                 position = getMousePos(),
                 eventType = PointerEventType.Press,
                 nativeEvent = MouseEvent(mouseModifiers())
@@ -117,7 +100,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, key: Int) {
         if (hasCompose) {
-            composeScene.sendPointerEvent(
+            composeManager.scene.sendPointerEvent(
                 position = getMousePos(),
                 eventType = PointerEventType.Release,
                 nativeEvent = MouseEvent(mouseModifiers())
@@ -136,10 +119,10 @@ abstract class AbstractGuiCompose : GuiScreen() {
 
                 // Note that we don't distinguish between Left/Right Shift, Del from numpad or not, etc.
                 // To distinguish we should change `location` parameter
-                composeScene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_PRESSED, time, kmod, remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
+                composeManager.scene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_PRESSED, time, kmod, remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
                 pressedKeyMap[key] = char
                 if (ChatAllowedCharacters.isAllowedCharacter(char)) {
-                    composeScene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_TYPED, time, kmod, 0, char, AwtKeyEvent.KEY_LOCATION_UNKNOWN))
+                    composeManager.scene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_TYPED, time, kmod, 0, char, AwtKeyEvent.KEY_LOCATION_UNKNOWN))
                 }
             }
             keyTyped(char, key) // this need to be handled to make window closeable

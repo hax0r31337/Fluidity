@@ -39,7 +39,7 @@ public class StaticStorage {
         return worldBlockLayers;
     }
 
-    public static void reachabilityFence​(Object ref) {
+    public static void reachabilityFence(Object ref) {
 
     }
 }

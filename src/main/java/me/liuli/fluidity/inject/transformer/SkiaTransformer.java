@@ -9,6 +9,9 @@ import org.objectweb.asm.tree.MethodInsnNode;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * This transformer removes the method call that not supported in java 8
+ */
 public class SkiaTransformer implements IClassTransformer {
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
