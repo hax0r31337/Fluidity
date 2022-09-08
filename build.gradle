@@ -16,6 +16,12 @@ repositories {
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
         }
     }
+    maven {
+        url = "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+        content {
+            includeGroupByRegex "org\\.jetbrains\\.skiko.*"
+        }
+    }
     mavenCentral()
     maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url = "https://jitpack.io/" }
@@ -69,13 +75,14 @@ dependencies {
     include "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 
     // compose
-    implementation "org.jetbrains.skiko:skiko-awt:0.7.20"
+    implementation "org.jetbrains.skiko:skiko-awt:0.7.32"
     include("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
         exclude module: "kotlin-stdlib"
         exclude module: "kotlin-stdlib-common"
         exclude module: "kotlin-stdlib-jdk8"
         exclude module: "skiko"
     }
+    include("org.jetbrains.compose.ui:ui-util:$compose_version")
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }

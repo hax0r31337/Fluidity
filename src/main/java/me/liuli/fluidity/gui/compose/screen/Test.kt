@@ -2,10 +2,8 @@ package me.liuli.fluidity.gui.compose.screen
 
 
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
@@ -15,6 +13,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -23,9 +22,21 @@ fun App() {
         var text by remember { mutableStateOf("Text") }
         TextField(text, { text = it })
 
-        Button({}) {
-            Text("Hello!")
+        @Composable
+        fun space() = Spacer(Modifier.height(5.dp))
+
+        Text("Hey, this is test :)")
+        Text("red background", Modifier.background(Color.Red))
+
+        var clickCounter by remember { mutableStateOf(0) }
+
+        Button(onClick = { clickCounter += 1 }) {
+            Text("Click me")
         }
+        space()
+        Text("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.")
+        space()
+        Text("Amount of clicks: $clickCounter")
 
         Box(Modifier.weight(1f)) {
             val state = rememberLazyListState()

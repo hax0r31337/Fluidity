@@ -40,7 +40,6 @@ object Fluidity {
         setTitle("LoadClient")
 
         DependencyDownloader.awaitLoad()
-        ComposeManager
 
         eventManager.registerListener(ConfigManager)
         CommandManager

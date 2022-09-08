@@ -38,7 +38,7 @@ object DependencyDownloader {
             "aarch64" -> "arm64"
             else -> error("Unsupported arch: ${System.getProperty("os.arch")}")
         }
-        dependencyList.add(Dependency("skiko-awt-runtime-$os-$arch", "0.7.20", "https://repo1.maven.org/maven2/org/jetbrains/skiko/skiko-awt-runtime-$os-$arch/0.7.20/skiko-awt-runtime-$os-$arch-0.7.20.jar"))
+        dependencyList.add(Dependency("skiko-awt-runtime-$os-$arch", "0.7.32", "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-$os-$arch/0.7.32/skiko-awt-runtime-$os-$arch-0.7.32.jar"))
     }
 
     fun asyncLoad() {
