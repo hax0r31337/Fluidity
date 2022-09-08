@@ -1,6 +1,7 @@
 package me.liuli.fluidity.module
 
 import me.liuli.fluidity.Fluidity
+import me.liuli.fluidity.command.CommandManager
 import me.liuli.fluidity.event.KeyEvent
 import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Listener
@@ -10,7 +11,7 @@ import me.liuli.fluidity.util.other.getObjectInstance
 import me.liuli.fluidity.util.other.resolvePackage
 import org.lwjgl.input.Keyboard
 
-class ModuleManager : Listener {
+object ModuleManager : Listener {
 
     val modules = mutableListOf<Module>()
 
@@ -37,7 +38,7 @@ class ModuleManager : Listener {
         // module command
         val values = module.getValues()
         if (module.command && values.isNotEmpty()) {
-            Fluidity.commandManager.registerCommand(ModuleCommand(module, values))
+            CommandManager.registerCommand(ModuleCommand(module, values))
         }
     }
 

@@ -3,7 +3,6 @@ package me.liuli.fluidity.util.world
 import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import me.liuli.fluidity.util.mc
-import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScoreObjective
 import net.minecraft.scoreboard.ScorePlayerTeam
 

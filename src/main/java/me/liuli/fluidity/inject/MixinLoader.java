@@ -1,6 +1,7 @@
 package me.liuli.fluidity.inject;
 
 import me.liuli.fluidity.inject.transformer.OptimizeTransformer;
+import me.liuli.fluidity.inject.transformer.SkiaTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
@@ -18,9 +19,7 @@ public class MixinLoader implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[]{
-            OptimizeTransformer.class.getName()
-        };
+        return new String[]{OptimizeTransformer.class.getName(), SkiaTransformer.class.getName()};
     }
 
     @Override

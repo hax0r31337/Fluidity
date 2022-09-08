@@ -1,11 +1,11 @@
 package me.liuli.fluidity.module.modules.player
 
-import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.ModuleManager
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.render.stripColor
@@ -26,13 +26,13 @@ class SlayerHelper : Module("SlayerHelper", "Auto purchase for slayer quest", Mo
 
     override fun onEnable() {
         moduleStateMap.clear()
-        Fluidity.moduleManager.getModule("TriggerBot")?.also {
+        ModuleManager.getModule("TriggerBot")?.also {
             moduleStateMap[it] = it.state
         }
-        Fluidity.moduleManager.getModule("AimBot")?.also {
+        ModuleManager.getModule("AimBot")?.also {
             moduleStateMap[it] = it.state
         }
-        Fluidity.moduleManager.getModule("AutoMobs")?.also {
+        ModuleManager.getModule("AutoMobs")?.also {
             moduleStateMap[it] = it.state
         }
         stage = 0

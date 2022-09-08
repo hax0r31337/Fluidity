@@ -1,6 +1,6 @@
 package me.liuli.fluidity.inject.mixins.gui;
 
-import me.liuli.fluidity.Fluidity;
+import me.liuli.fluidity.command.CommandManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
@@ -28,29 +28,29 @@ public abstract class MixinGuiChat {
 
     /**
      * only trust message in KeyTyped to anti some client click check (like old zqat.top)
-      */
+     */
     @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
     private void keyTyped(char typedChar, int keyCode, CallbackInfo callbackInfo) {
         String text=inputField.getText();
-        if(text.startsWith(Fluidity.commandManager.getPrefix())) {
+        if(text.startsWith(CommandManager.INSTANCE.getPrefix())) {
             if (keyCode == 28 || keyCode == 156) {
-                Fluidity.commandManager.handleCommand(text);
+                CommandManager.INSTANCE.handleCommand(text);
                 callbackInfo.cancel();
                 mc.ingameGUI.getChatGUI().addToSentMessages(text);
                 Minecraft.getMinecraft().displayGuiScreen(null);
             }else{
-                Fluidity.commandManager.autoComplete(text);
+                CommandManager.INSTANCE.autoComplete(text);
             }
         }
     }
 
     /**
      * bypass click command auth like kjy.pub
-      */
+     */
     @Inject(method = "setText", at = @At("HEAD"), cancellable = true)
     private void setText(String newChatText, boolean shouldOverwrite, CallbackInfo callbackInfo) {
-        if(shouldOverwrite&&newChatText.startsWith(Fluidity.commandManager.getPrefix())){
-            this.inputField.setText(Fluidity.commandManager.getPrefix()+"say "+newChatText);
+        if(shouldOverwrite&&newChatText.startsWith(CommandManager.INSTANCE.getPrefix())){
+            this.inputField.setText(CommandManager.INSTANCE.getPrefix()+"say "+newChatText);
             callbackInfo.cancel();
         }
     }
@@ -63,10 +63,10 @@ public abstract class MixinGuiChat {
      */
     @Inject(method = "sendAutocompleteRequest", at = @At("HEAD"), cancellable = true)
     private void handleClientCommandCompletion(String full, final String ignored, CallbackInfo callbackInfo) {
-        if (Fluidity.commandManager.autoComplete(full)) {
+        if (CommandManager.INSTANCE.autoComplete(full)) {
             waitingOnAutocomplete = true;
 
-            String[] latestAutoComplete = Fluidity.commandManager.getLatestAutoComplete();
+            String[] latestAutoComplete = CommandManager.INSTANCE.getLatestAutoComplete();
 
             if (full.toLowerCase().endsWith(latestAutoComplete[latestAutoComplete.length - 1].toLowerCase()))
                 return;
@@ -79,13 +79,13 @@ public abstract class MixinGuiChat {
 
     @Inject(method = "onAutocompleteResponse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiChat;autocompletePlayerNames(F)V", shift = At.Shift.BEFORE), cancellable = true)
     private void onAutocompleteResponse(String[] autoCompleteResponse, CallbackInfo callbackInfo) {
-        if (Fluidity.commandManager.getLatestAutoComplete().length != 0) callbackInfo.cancel();
+        if (CommandManager.INSTANCE.getLatestAutoComplete().length != 0) callbackInfo.cancel();
     }
 
     @Inject(method = "drawScreen", at = @At("RETURN"))
     public void drawScreen(int mouseX, int mouseY, float partialTicks, CallbackInfo callbackInfo) {
-        if (Fluidity.commandManager.getLatestAutoComplete().length > 0 && !inputField.getText().isEmpty() && inputField.getText().startsWith(Fluidity.commandManager.getPrefix())) {
-            String[] latestAutoComplete = Fluidity.commandManager.getLatestAutoComplete();
+        if (CommandManager.INSTANCE.getLatestAutoComplete().length > 0 && !inputField.getText().isEmpty() && inputField.getText().startsWith(CommandManager.INSTANCE.getPrefix())) {
+            String[] latestAutoComplete = CommandManager.INSTANCE.getLatestAutoComplete();
             String[] textArray = inputField.getText().split(" ");
             String text = textArray[textArray.length - 1];
             Object[] result = Arrays.stream(latestAutoComplete).filter((str) -> str.toLowerCase().startsWith(text.toLowerCase())).toArray();

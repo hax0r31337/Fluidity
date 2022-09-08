@@ -1,9 +1,9 @@
 package me.liuli.fluidity.config.sections
 
 import com.google.gson.JsonObject
-import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.config.ConfigSection
 import me.liuli.fluidity.module.Module
+import me.liuli.fluidity.module.ModuleManager
 
 class ModuleSection : ConfigSection("module") {
     override fun load(obj: JsonObject?) {
@@ -15,7 +15,7 @@ class ModuleSection : ConfigSection("module") {
                 continue
             }
 
-            val module = Fluidity.moduleManager.getModule(elementEntry.key) ?: continue
+            val module = ModuleManager.getModule(elementEntry.key) ?: continue
             settedModules.add(module)
             val moduleJson = elementEntry.value.asJsonObject
 
@@ -32,7 +32,7 @@ class ModuleSection : ConfigSection("module") {
             }
         }
 
-        Fluidity.moduleManager.modules.filter { !settedModules.contains(it) }
+        ModuleManager.modules.filter { !settedModules.contains(it) }
             .forEach { // reset module settings that dont contains in the config
                 it.state = it.defaultOn
                 it.keyBind = it.defaultKeyBind
@@ -43,7 +43,7 @@ class ModuleSection : ConfigSection("module") {
     override fun save(): JsonObject {
         val json = JsonObject()
 
-        Fluidity.moduleManager.modules.forEach {
+        ModuleManager.modules.forEach {
             val moduleJson = JsonObject()
             moduleJson.addProperty("toggle", it.state)
             moduleJson.addProperty("keybind", it.keyBind)

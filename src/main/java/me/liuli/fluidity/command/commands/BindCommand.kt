@@ -1,14 +1,14 @@
 package me.liuli.fluidity.command.commands
 
-import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.command.Command
+import me.liuli.fluidity.module.ModuleManager
 import org.lwjgl.input.Keyboard
 
 class BindCommand : Command("bind", "Manage your module binds", arrayOf("b")) {
     override fun exec(args: Array<String>) {
         if (args.isNotEmpty()) {
             // Get module by name
-            val module = Fluidity.moduleManager.getModule(args[0])
+            val module = ModuleManager.getModule(args[0])
 
             if (module == null) {
                 chat("Module §l" + args[0] + "§r not found.")
@@ -23,7 +23,7 @@ class BindCommand : Command("bind", "Manage your module binds", arrayOf("b")) {
                 // Response to user
                 chat("Bound module §l${module.name}§r to key §l${Keyboard.getKeyName(key)}§r.")
             } else {
-                Fluidity.moduleManager.pendKeyBind(module)
+                ModuleManager.pendKeyBind(module)
             }
 
             return
@@ -38,7 +38,7 @@ class BindCommand : Command("bind", "Manage your module binds", arrayOf("b")) {
         val moduleName = args[0]
 
         return when (args.size) {
-            1 -> Fluidity.moduleManager.modules
+            1 -> ModuleManager.modules
                 .map { it.name }
                 .filter { it.startsWith(moduleName, true) }
                 .toList()

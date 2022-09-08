@@ -1,5 +1,6 @@
 package me.liuli.fluidity.config
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -16,8 +17,9 @@ import me.liuli.fluidity.util.timing.TheTimer
 import java.io.*
 import java.nio.charset.StandardCharsets
 
-class ConfigManager : Listener {
-    val gson = GsonBuilder().setPrettyPrinting().create()
+object ConfigManager : Listener {
+
+    val gson: Gson = GsonBuilder().setPrettyPrinting().create()
     val rootPath = File(mc.mcDataDir, Fluidity.NAME)
     val configPath = File(rootPath, "configs")
     val configSetFile = File(rootPath, "config.json")
@@ -27,6 +29,8 @@ class ConfigManager : Listener {
 
     var nowConfig = "default"
     var configFile = File(configPath, "$nowConfig.json")
+
+    var antiForge = false
 
     init {
         resolvePackage("${this.javaClass.`package`.name}.sections", ConfigSection::class.java)
@@ -134,8 +138,4 @@ class ConfigManager : Listener {
     }
 
     override fun listen() = true
-
-    companion object {
-        var antiForge = false
-    }
 }

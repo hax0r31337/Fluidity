@@ -5,7 +5,7 @@ import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.other.getObjectInstance
 import me.liuli.fluidity.util.other.resolvePackage
 
-class CommandManager {
+object CommandManager {
     val defaultPrefix = "."
 
     var prefix = defaultPrefix

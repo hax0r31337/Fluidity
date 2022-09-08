@@ -1,20 +1,13 @@
 package me.liuli.fluidity.inject.mixins.net;
 
 import me.liuli.fluidity.module.modules.misc.NoRotateSet;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.PacketThreadUtil;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(NetHandlerPlayClient.class)

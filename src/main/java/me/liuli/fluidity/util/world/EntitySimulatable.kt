@@ -11,9 +11,8 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.init.Blocks
 import net.minecraft.potion.Potion
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.World
-import java.util.UUID
+import java.util.*
 import kotlin.math.*
 
 class EntitySimulatable(world: World) : EntityOtherPlayerMP(world, GameProfile(UUID.randomUUID(), "")) {

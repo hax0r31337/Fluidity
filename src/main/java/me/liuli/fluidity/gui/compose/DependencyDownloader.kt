@@ -1,7 +1,6 @@
-package me.liuli.fluidity.compose
+package me.liuli.fluidity.gui.compose
 
 import me.liuli.fluidity.util.mc
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.Loader
 import java.awt.BorderLayout
 import java.awt.Dimension

@@ -1,14 +1,14 @@
 package me.liuli.fluidity.config.sections
 
 import com.google.gson.JsonObject
-import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.config.ConfigSection
+import me.liuli.fluidity.module.ModuleManager
 
 class ValueSection : ConfigSection("value") {
     override fun load(obj: JsonObject?) {
         val json = obj ?: JsonObject()
 
-        Fluidity.moduleManager.modules.forEach { module ->
+        ModuleManager.modules.forEach { module ->
             val moduleJson = if (json.has(module.name)) { json.getAsJsonObject(module.name) } else { JsonObject() }
 
             module.getValues().forEach { value ->
@@ -24,7 +24,7 @@ class ValueSection : ConfigSection("value") {
     override fun save(): JsonObject {
         val json = JsonObject()
 
-        Fluidity.moduleManager.modules.forEach { module ->
+        ModuleManager.modules.forEach { module ->
             val values = module.getValues()
             if (values.isNotEmpty()) {
                 val moduleJson = JsonObject()

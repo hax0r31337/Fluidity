@@ -8,9 +8,6 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.timing.TheTimer
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemBlock
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot

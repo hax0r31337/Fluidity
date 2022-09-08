@@ -1,11 +1,16 @@
 pluginManagement {
 	repositories {
+		maven {
+			url = "https://ayanoyuugiri.github.io/compose-j8/"
+			content {
+				includeGroupByRegex "org\\.jetbrains\\.compose.*"
+			}
+		}
 		mavenCentral()
 		gradlePluginPortal()
 		maven { url = "https://jitpack.io/" }
 		maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
 		maven { url = "https://maven.minecraftforge.net/" }
-		maven { url = "http://127.0.0.1:8080/" }
 	}
 	resolutionStrategy {
 		eachPlugin {

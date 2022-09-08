@@ -10,6 +10,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.LoadingScreenRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -87,9 +88,12 @@ public abstract class MixinMinecraft {
         Fluidity.eventManager.call(new WorldEvent(p_loadWorld_1_));
     }
 
-    @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", shift = At.Shift.AFTER))
+    @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", shift = At.Shift.AFTER, ordinal = 1))
     private void displayGuiScreen(CallbackInfo callbackInfo) {
         Fluidity.eventManager.call(new ScreenEvent(currentScreen));
+        if (currentScreen instanceof GuiMainMenu) {
+            currentScreen = new me.liuli.fluidity.gui.screen.GuiMainMenu();
+        }
     }
 
     @Inject(method = "clickMouse", at = @At("HEAD"))

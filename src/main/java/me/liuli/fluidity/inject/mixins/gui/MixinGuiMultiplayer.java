@@ -16,7 +16,7 @@ public abstract class MixinGuiMultiplayer extends MixinGuiScreen {
     @Inject(method = "initGui", at = @At("RETURN"))
     private void initGui(CallbackInfo callbackInfo) {
         button = new GuiButton(996, 8, 8, 98, 20,
-                "AntiForge: " + (ConfigManager.Companion.getAntiForge() ? "§aON" : "§cOFF"));
+                "AntiForge: " + (ConfigManager.INSTANCE.getAntiForge() ? "§aON" : "§cOFF"));
         buttonList.add(button);
     }
 
@@ -24,8 +24,8 @@ public abstract class MixinGuiMultiplayer extends MixinGuiScreen {
     @Inject(method = "actionPerformed", at = @At("HEAD"), cancellable = true)
     private void actionPerformed(GuiButton button, CallbackInfo callbackInfo) {
         if (button.id == 996) {
-            ConfigManager.Companion.setAntiForge(!ConfigManager.Companion.getAntiForge());
-            button.displayString = "AntiForge: " + (ConfigManager.Companion.getAntiForge() ? "§aON" : "§cOFF");
+            ConfigManager.INSTANCE.setAntiForge(!ConfigManager.INSTANCE.getAntiForge());
+            button.displayString = "AntiForge: " + (ConfigManager.INSTANCE.getAntiForge() ? "§aON" : "§cOFF");
             callbackInfo.cancel();
         }
     }

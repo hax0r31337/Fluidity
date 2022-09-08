@@ -1,7 +1,7 @@
 package me.liuli.fluidity.command.commands
 
-import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.command.Command
+import me.liuli.fluidity.module.ModuleManager
 
 class ToggleCommand : Command("toggle", "Allow you toggle modules without open ClickGui", arrayOf("t")) {
     override fun exec(args: Array<String>) {
@@ -11,7 +11,7 @@ class ToggleCommand : Command("toggle", "Allow you toggle modules without open C
                     return@forEach
                 }
 
-                val module = Fluidity.moduleManager.getModule(it)
+                val module = ModuleManager.getModule(it)
                 if (module == null) {
                     chat("Module \"$it\" not found.")
                 } else {
@@ -29,7 +29,7 @@ class ToggleCommand : Command("toggle", "Allow you toggle modules without open C
 
         val moduleName = args[0]
 
-        return Fluidity.moduleManager.modules
+        return ModuleManager.modules
             .map { it.name }
             .filter { it.startsWith(moduleName, true) }
             .toList()

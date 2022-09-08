@@ -13,7 +13,7 @@ public class MixinNetworkDispatcher {
 
     @Inject(method = "handleVanilla", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void handleVanilla(Packet<?> packet, CallbackInfoReturnable<Boolean> cir) {
-        if (ConfigManager.Companion.getAntiForge()) {
+        if (ConfigManager.INSTANCE.getAntiForge()) {
             cir.setReturnValue(false);
         }
     }

@@ -1,6 +1,5 @@
 package me.liuli.fluidity.util.move
 
-import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 

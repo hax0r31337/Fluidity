@@ -23,19 +23,16 @@ SOFTWARE.
  */
 package me.liuli.fluidity.pathfinder
 
-import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.*
 import me.liuli.fluidity.module.modules.movement.InventoryMove
 import me.liuli.fluidity.pathfinder.algorithm.AStar
 import me.liuli.fluidity.pathfinder.goals.IGoal
 import me.liuli.fluidity.pathfinder.path.PathMove
 import me.liuli.fluidity.pathfinder.path.PathPlaceInfo
-import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.Vec3d
 import me.liuli.fluidity.util.move.floorPosition
 import me.liuli.fluidity.util.move.lookAt
-import me.liuli.fluidity.util.move.syncPosition
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.rainbow
 import net.minecraft.block.Block

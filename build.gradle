@@ -10,10 +10,15 @@ plugins {
 }
 
 repositories {
+    maven {
+        url = "https://ayanoyuugiri.github.io/compose-j8/"
+        content {
+            includeGroupByRegex "org\\.jetbrains\\.compose.*"
+        }
+    }
     mavenCentral()
     maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url = "https://jitpack.io/" }
-    maven { url = "http://127.0.0.1:8080/" } // 魔改完成后上载广域网路
 }
 
 version = "1.0.0"
@@ -70,7 +75,6 @@ dependencies {
         exclude module: "kotlin-stdlib-common"
         exclude module: "kotlin-stdlib-jdk8"
         exclude module: "skiko"
-//        exclude module: "kotlinx-coroutines-core"
     }
 
     include fileTree(include: ["*.jar"], dir: "libs")
@@ -135,8 +139,8 @@ reobf {
 }
 tasks.reobfJar.dependsOn(shadowJar)
 
-//compose.desktop {
-//    application {
+compose.desktop {
+    application {
 //        mainClass = "MainKt"
-//    }
-//}
+    }
+}

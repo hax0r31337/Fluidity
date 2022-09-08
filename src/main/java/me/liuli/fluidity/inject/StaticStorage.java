@@ -38,4 +38,8 @@ public class StaticStorage {
     public static EnumWorldBlockLayer[] worldBlockLayers() {
         return worldBlockLayers;
     }
+
+    public static void reachabilityFence​(Object ref) {
+
+    }
 }

@@ -14,7 +14,7 @@ public class MixinHandshakeMessageHandler {
 
     @Inject(method = "channelRead0", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void handleVanilla(ChannelHandlerContext ctx, FMLHandshakeMessage msg, CallbackInfo ci) {
-        if (ConfigManager.Companion.getAntiForge()) {
+        if (ConfigManager.INSTANCE.getAntiForge()) {
             ci.cancel();
         }
     }
