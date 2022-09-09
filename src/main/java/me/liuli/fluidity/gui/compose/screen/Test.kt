@@ -36,6 +36,8 @@ fun App() {
         space()
         Text("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.")
         space()
+        Text("戰爭即和平；自由即奴役；無知即力量。")
+        space()
         Text("Amount of clicks: $clickCounter")
 
         Box(Modifier.weight(1f)) {

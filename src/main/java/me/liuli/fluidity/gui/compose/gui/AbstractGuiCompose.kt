@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.event.KeyEvent as AwtKeyEvent
 
-abstract class AbstractGuiCompose : GuiScreen() {
+abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : GuiScreen() {
 
     lateinit var composeManager: ComposeManager
     protected var hasCompose = false
@@ -25,8 +25,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
     private val pressedKeyMap = mutableMapOf<Int, Char>()
 
     open fun initCompose(content: @Composable () -> Unit) {
-        composeManager = ComposeManager(Display.getWidth(), Display.getHeight())
-        composeManager.scene.setContent(content)
+        composeManager = ComposeManager(Display.getWidth(), Display.getHeight(), content)
         hasCompose = true
     }
 
@@ -40,8 +39,21 @@ abstract class AbstractGuiCompose : GuiScreen() {
         if (hasCompose) {
             composeManager.updateCanvas(Display.getWidth(), Display.getHeight())
 
-            GL11.glEnable(GL11.GL_TEXTURE_2D)
+            GL11.glEnable(GL11.GL_ALPHA_TEST)
+            GL11.glEnable(GL11.GL_BLEND)
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
             GL11.glColor4f(1f, 1f, 1f, 1f)
+            if (drawBackground) {
+                GL11.glDisable(GL11.GL_TEXTURE_2D)
+
+                GL11.glBegin(GL11.GL_QUADS)
+                GL11.glVertex2i(0, 0)
+                GL11.glVertex2i(0, height)
+                GL11.glVertex2i(width, height)
+                GL11.glVertex2i(width, 0)
+                GL11.glEnd()
+            }
+            GL11.glEnable(GL11.GL_TEXTURE_2D)
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, composeManager.texId)
 
             GL11.glBegin(GL11.GL_QUADS)
@@ -56,6 +68,7 @@ abstract class AbstractGuiCompose : GuiScreen() {
             GL11.glEnd()
 
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
+            GL11.glDisable(GL11.GL_BLEND)
 
             composeManager.scene.sendPointerEvent(
                 position = getMousePos(),
