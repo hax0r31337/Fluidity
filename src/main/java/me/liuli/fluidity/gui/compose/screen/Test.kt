@@ -15,6 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import me.liuli.fluidity.util.client.queueScreen
+import me.liuli.fluidity.util.mc
+import net.minecraft.client.gui.GuiMultiplayer
 
 @Composable
 fun App() {
@@ -30,7 +33,7 @@ fun App() {
 
         var clickCounter by remember { mutableStateOf(0) }
 
-        Button(onClick = { clickCounter += 1 }) {
+        Button(onClick = { mc.queueScreen(GuiMultiplayer(mc.currentScreen)) }) {
             Text("Click me")
         }
         space()

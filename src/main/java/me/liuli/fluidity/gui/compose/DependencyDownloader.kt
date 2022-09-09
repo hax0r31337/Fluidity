@@ -1,5 +1,6 @@
 package me.liuli.fluidity.gui.compose
 
+import me.liuli.fluidity.util.client.logWarn
 import me.liuli.fluidity.util.mc
 import net.minecraftforge.fml.common.Loader
 import java.awt.BorderLayout
@@ -46,8 +47,9 @@ object DependencyDownloader {
         thread {
             try {
                 for (dep in dependencyList) {
-                    val file = File(dependencyDir, "${dep.name}.jar")
+                    val file = File(dependencyDir, "${dep.name}-${dep.version}.jar")
                     if (!file.exists()) {
+                        logWarn("Dependency 「${dep.name}」 not found, attempt download.")
                         val conn = URL(dep.url).openConnection() as HttpURLConnection
                         conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0")
                         conn.addRequestProperty("Connection", "close")
@@ -55,6 +57,7 @@ object DependencyDownloader {
                         if (size != -1) {
                             totalSize += size
                         }
+                        if (conn.responseCode != 200) throw IllegalStateException("status code ${conn.responseCode}")
                         val ips = conn.inputStream
                         val data = ByteArray(1024)
                         var count: Int

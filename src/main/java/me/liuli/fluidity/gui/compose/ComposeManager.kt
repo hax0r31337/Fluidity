@@ -6,7 +6,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.Constraints
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import me.liuli.fluidity.util.mc
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.currentNanoTime
@@ -28,15 +31,28 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
     val texId: Int
 
     init {
-        coroutineContext.executor.execute {
-            scene = ComposeScene(coroutineContext) { hasRenderUpdate = true }.apply { setContent(content) }
+        exec {
+            scene = ComposeScene(coroutineContext) { hasRenderUpdate = true }.apply {
+                setContent(content)
+                constraints = Constraints(maxWidth = width, maxHeight = height)
+            }
         }
         texId = GL11.glGenTextures()
     }
 
+    fun awaitSceneLoad() {
+        while (!this::scene.isInitialized) {
+            Thread.sleep(1L)
+        }
+    }
+
     fun finalize() {
-        if (this::scene.isInitialized) {
-            scene.close()
+        exec {
+            if (this::scene.isInitialized) {
+                scene.close()
+            }
+            if (!canvas.isClosed) canvas.close()
+            if (this::bitmap.isInitialized) bitmap.close()
         }
         mc.addScheduledTask {
             GL11.glDeleteTextures(texId)
@@ -56,7 +72,7 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
     ) {
         if (!this::scene.isInitialized) return
 
-        coroutineContext.executor.execute {
+        exec {
             scene.sendPointerEvent(eventType, position, scrollDelta, timeMillis, type, buttons, keyboardModifiers, nativeEvent, button)
         }
     }
@@ -64,10 +80,10 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
     fun sendKeyEvent(event: KeyEvent) {
         if (!this::scene.isInitialized) return
 
-        coroutineContext.executor.execute {
+        exec {
             scene.sendKeyEvent(event)
         }
-        }
+    }
 
     private fun createCanvas(width: Int, height: Int): Canvas {
         bitmap = Bitmap().also {
@@ -81,13 +97,17 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
         if (widthNow != width || heightNow != height) {
             bitmap.close()
             canvas = createCanvas(widthNow, heightNow)
+            scene.constraints = Constraints(maxWidth = widthNow, maxHeight = heightNow)
             width = widthNow
             height = heightNow
         }
     }
 
     fun printCanvas() {
-        if (!this::bitmap.isInitialized) return
+        if (!this::scene.isInitialized || !this::bitmap.isInitialized) return
+
+        canvas.clear(Color.TRANSPARENT)
+        scene.render(canvas, System.nanoTime())
 
         val bytes = bitmap.readPixels()
         if (bytes != null) {
@@ -105,22 +125,13 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
         }
     }
 
-    fun drawCanvas() {
-        if (!this::scene.isInitialized) return
-
-        scene.render(canvas, System.nanoTime())
-    }
-
     fun updateCanvas(widthNow: Int, heightNow: Int) {
         if (!this::scene.isInitialized) return
 
         if (hasRenderUpdate) {
-            scene.constraints = Constraints(maxWidth = widthNow, maxHeight = heightNow)
             resizeCanvas(widthNow, heightNow)
-            coroutineContext.executor.execute {
-                drawCanvas()
+            exec {
                 printCanvas()
-                canvas.clear(Color.TRANSPARENT)
             }
             hasRenderUpdate = false
         }
@@ -141,6 +152,11 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
     }
 
     companion object {
-        val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        private val executor = Executors.newSingleThreadExecutor()
+        private val coroutineContext = executor.asCoroutineDispatcher()
+
+        fun exec(func: () -> Unit) {
+            executor.execute(func)
+        }
     }
 }

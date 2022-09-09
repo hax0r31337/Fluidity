@@ -3,6 +3,8 @@ package me.liuli.fluidity.util.client
 import com.google.gson.JsonObject
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.util.mc
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.IChatComponent
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.Display
@@ -42,4 +44,10 @@ fun displayChatMessage(message: String) {
 fun setTitle(status: String? = null) {
     Display.setTitle("${Fluidity.NAME}::${Fluidity.VERSION}" +
             if (!status.isNullOrEmpty()) { "->$status" } else { "" })
+}
+
+fun Minecraft.queueScreen(screen: GuiScreen) {
+    mc.addScheduledTask {
+        mc.displayGuiScreen(screen)
+    }
 }

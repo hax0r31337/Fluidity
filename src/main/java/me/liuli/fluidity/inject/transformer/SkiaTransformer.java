@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SkiaTransformer implements IClassTransformer {
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if (name.startsWith("org.jetbrains.ski")) {
+        if (basicClass != null && name.startsWith("org.jetbrains.ski")) {
             try {
                 final ClassNode classNode = ASMUtils.toClassNode(basicClass);
                 AtomicBoolean changed = new AtomicBoolean(false);
