@@ -70,7 +70,7 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
             GL11.glDisable(GL11.GL_BLEND)
 
-            composeManager.scene.sendPointerEvent(
+            composeManager.sendPointerEvent(
                 position = getMousePos(),
                 eventType = PointerEventType.Move,
                 nativeEvent = MouseEvent(mouseModifiers())
@@ -79,7 +79,7 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
             if (Mouse.hasWheel()) {
                 val wheel = Mouse.getDWheel()
                 if (wheel != 0) {
-                    composeManager.scene.sendPointerEvent(
+                    composeManager.sendPointerEvent(
                         eventType = PointerEventType.Scroll,
                         position = getMousePos(),
                         scrollDelta = Offset(0f, -(wheel / 60f)),
@@ -91,7 +91,7 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
             // key up
             pressedKeyMap.map { it }.forEach { (key, char) ->
                 if (!Keyboard.isKeyDown(key)) {
-                    composeManager.scene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_RELEASED, System.nanoTime() / 1_000_000, keyModifiers(), remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
+                    composeManager.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_RELEASED, System.nanoTime() / 1_000_000, keyModifiers(), remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
                     pressedKeyMap.remove(key)
                 }
             }
@@ -102,7 +102,7 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
 
     override fun mouseClicked(mouseX: Int, mouseY: Int, key: Int) {
         if (hasCompose) {
-            composeManager.scene.sendPointerEvent(
+            composeManager.sendPointerEvent(
                 position = getMousePos(),
                 eventType = PointerEventType.Press,
                 nativeEvent = MouseEvent(mouseModifiers())
@@ -113,7 +113,7 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
 
     override fun mouseReleased(mouseX: Int, mouseY: Int, key: Int) {
         if (hasCompose) {
-            composeManager.scene.sendPointerEvent(
+            composeManager.sendPointerEvent(
                 position = getMousePos(),
                 eventType = PointerEventType.Release,
                 nativeEvent = MouseEvent(mouseModifiers())
@@ -121,7 +121,7 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
         }
         super.mouseClicked(mouseX, mouseY, key)
     }
-
+//
     override fun handleKeyboardInput() {
         if (Keyboard.getEventKeyState()) {
             val char = Keyboard.getEventCharacter()
@@ -132,10 +132,10 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : 
 
                 // Note that we don't distinguish between Left/Right Shift, Del from numpad or not, etc.
                 // To distinguish we should change `location` parameter
-                composeManager.scene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_PRESSED, time, kmod, remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
+                composeManager.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_PRESSED, time, kmod, remapKeycode(key, char), 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
                 pressedKeyMap[key] = char
                 if (ChatAllowedCharacters.isAllowedCharacter(char)) {
-                    composeManager.scene.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_TYPED, time, kmod, 0, char, AwtKeyEvent.KEY_LOCATION_UNKNOWN))
+                    composeManager.sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_TYPED, time, kmod, 0, char, AwtKeyEvent.KEY_LOCATION_UNKNOWN))
                 }
             }
             keyTyped(char, key) // this need to be handled to make window closeable
