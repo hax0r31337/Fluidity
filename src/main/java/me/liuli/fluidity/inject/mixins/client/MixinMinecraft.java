@@ -50,11 +50,6 @@ public abstract class MixinMinecraft {
 
     @Shadow private boolean fullscreen;
 
-    @Inject(method = "createDisplay", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;setTitle(Ljava/lang/String;)V", shift = At.Shift.AFTER))
-    private void createDisplay(CallbackInfo callbackInfo) {
-        ClientUtilsKt.setTitle("InitializeGame");
-    }
-
     @Inject(method = "run", at = @At("HEAD"))
     private void init(CallbackInfo callbackInfo) {
         Fluidity.INSTANCE.init();

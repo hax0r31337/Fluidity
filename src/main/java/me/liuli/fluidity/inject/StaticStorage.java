@@ -1,5 +1,7 @@
 package me.liuli.fluidity.inject;
 
+import me.liuli.fluidity.Fluidity;
+import me.liuli.fluidity.util.client.ClientUtilsKt;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -41,5 +43,10 @@ public class StaticStorage {
 
     public static void reachabilityFence(Object ref) {
 
+    }
+
+    public static void setTitle(String newTitle) {
+        System.out.println("attempt set title: " + newTitle);
+        ClientUtilsKt.setTitle(Fluidity.INSTANCE.getHasLoaded() ? "HaveFun" : "InitializeGame");
     }
 }

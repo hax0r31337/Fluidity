@@ -6,10 +6,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.Constraints
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import me.liuli.fluidity.util.mc
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.currentNanoTime
@@ -38,10 +35,17 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
             }
         }
         texId = GL11.glGenTextures()
+//        awaitSceneLoad()
     }
 
-    fun awaitSceneLoad() {
-        while (!this::scene.isInitialized) {
+//    private fun awaitSceneLoad() {
+//        while (!this::scene.isInitialized) {
+//            Thread.sleep(1L)
+//        }
+//    }
+
+    fun awaitFrame() {
+        while (!hasRenderUpdate) {
             Thread.sleep(1L)
         }
     }
@@ -52,7 +56,7 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
                 scene.close()
             }
             if (!canvas.isClosed) canvas.close()
-            if (this::bitmap.isInitialized) bitmap.close()
+            if (this::bitmap.isInitialized && !bitmap.isClosed) bitmap.close()
         }
         mc.addScheduledTask {
             GL11.glDeleteTextures(texId)
@@ -95,7 +99,7 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
 
     fun resizeCanvas(widthNow: Int, heightNow: Int) {
         if (widthNow != width || heightNow != height) {
-            bitmap.close()
+            if (this::bitmap.isInitialized && !bitmap.isClosed) bitmap.close()
             canvas = createCanvas(widthNow, heightNow)
             scene.constraints = Constraints(maxWidth = widthNow, maxHeight = heightNow)
             width = widthNow

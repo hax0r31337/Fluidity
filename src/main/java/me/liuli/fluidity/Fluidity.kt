@@ -29,6 +29,9 @@ object Fluidity {
 
     lateinit var eventManager: EventManager
 
+    var hasLoaded = false
+        private set
+
     fun init() {
         logInfo("Initialize $NAME $VERSION")
         eventManager = EventManager()
@@ -48,6 +51,7 @@ object Fluidity {
 
         ConfigManager.loadDefault()
 
+        hasLoaded = true
         setTitle("HaveFun")
     }
 

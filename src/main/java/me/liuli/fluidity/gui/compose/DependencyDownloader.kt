@@ -5,6 +5,7 @@ import me.liuli.fluidity.util.mc
 import net.minecraftforge.fml.common.Loader
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -15,7 +16,22 @@ import kotlin.concurrent.thread
 
 object DependencyDownloader {
 
-    private val dependencyDir = File("./.cache/fluidity/deps").also { it.mkdirs() }
+    val os = System.getProperty("os.name").let {
+        if (it.contains("win", true)) {
+            "windows"
+        } else if (it.contains("mac", true) || it.contains("darwin", true)) {
+            "macos"
+        } else {
+            "linux"
+        }
+    }
+    val arch = when (System.getProperty("os.arch")) {
+        "x86_64", "amd64" -> "x64"
+        "aarch64" -> "arm64"
+        else -> error("Unsupported arch: ${System.getProperty("os.arch")}")
+    }
+
+    private val dependencyDir = File("${System.getProperty("user.home")}/.cache/fluidity/deps").also { it.mkdirs() }
     private val dependencyList = mutableListOf<Dependency>()
     var loaded = false
         private set
@@ -25,21 +41,8 @@ object DependencyDownloader {
         private set
 
     init {
-        val os = System.getProperty("os.name").let {
-            if (it.contains("win", true)) {
-                "windows"
-            } else if (it.contains("mac", true) || it.contains("darwin", true)) {
-                "macos"
-            } else {
-                "linux"
-            }
-        }
-        val arch = when (System.getProperty("os.arch")) {
-            "x86_64", "amd64" -> "x64"
-            "aarch64" -> "arm64"
-            else -> error("Unsupported arch: ${System.getProperty("os.arch")}")
-        }
         dependencyList.add(Dependency("skiko-awt-runtime-$os-$arch", "0.7.32", "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-$os-$arch/0.7.32/skiko-awt-runtime-$os-$arch-0.7.32.jar"))
+//        System.setProperty("skiko.library.path", dependencyDir.absolutePath)
     }
 
     fun asyncLoad() {
@@ -61,7 +64,7 @@ object DependencyDownloader {
                         val ips = conn.inputStream
                         val data = ByteArray(1024)
                         var count: Int
-                        val out = FileOutputStream(file)
+                        val out = ByteArrayOutputStream() // crash in downloading progress won't mess up
                         while (ips.read(data).also { count = it } != -1) {
                             out.write(data, 0, count)
                             downloadedSize += count
@@ -71,8 +74,11 @@ object DependencyDownloader {
                         }
                         ips.close()
                         out.close()
+                        file.writeBytes(out.toByteArray())
                     }
-                    loadJar(file)
+                    if (dep.isJar) {
+                        loadJar(file)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -110,5 +116,5 @@ object DependencyDownloader {
         Loader.instance().modClassLoader.addFile(file)
     }
 
-    data class Dependency(val name: String, val version: String, val url: String)
+    data class Dependency(val name: String, val version: String, val url: String, val isJar: Boolean = true)
 }

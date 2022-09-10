@@ -50,6 +50,9 @@ public class OptimizeTransformer implements IClassTransformer {
                                     min.owner = "me/liuli/fluidity/inject/StaticStorage";
                                     min.name = transformMap.get(owner);
                                 }
+                            } else if (min.getOpcode() == Opcodes.INVOKESTATIC && min.owner.equals("org/lwjgl/opengl/Display") && min.name.equals("values")) {
+                                min.owner = "me/liuli/fluidity/inject/StaticStorage";
+                                changed.set(true);
                             }
                         }
                     }
