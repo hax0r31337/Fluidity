@@ -5,23 +5,25 @@ import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.pathfinder.Pathfinder
 import me.liuli.fluidity.pathfinder.PathfinderSimulator
 import me.liuli.fluidity.pathfinder.goals.GoalBlock
+import me.liuli.fluidity.pathfinder.goals.GoalFollow
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
-import me.liuli.fluidity.util.move.floorPosition
-import me.liuli.fluidity.util.move.setClientRotation
-import me.liuli.fluidity.util.move.toRotation
+import me.liuli.fluidity.util.move.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.item.ItemBow
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
+import net.minecraft.network.play.server.S14PacketEntity
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.network.play.server.S30PacketWindowItems
@@ -30,8 +32,10 @@ import net.minecraft.util.Vec3
 
 class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Swift", "Discipline", "Force", "Mastery"), "Swift")
+    private val modeValue = ListValue("Mode", arrayOf("Swift", "Discipline", "Force", "Mastery", "Control"), "Swift")
+    private val latencyValue = IntValue("Latency", 300, 100, 1000)
 
+    private val prevPositionMap = mutableMapOf<Int, Vec3d>()
     private val currentGoodBlocks = mutableListOf<BlockPos>()
     private var serverSlot = 0
 
@@ -43,6 +47,7 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
 
     override fun onDisable() {
         currentGoodBlocks.clear()
+        prevPositionMap.clear()
 
         if (Pathfinder.stateGoal != null) {
             Pathfinder.stateGoal = null
@@ -86,6 +91,15 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                 }
             }
             "Discipline" -> {
+                val zombie =
+                    mc.theWorld.loadedEntityList.filter { it is EntityZombie }
+                        .sortedBy { it.getDistanceSqToEntity(mc.thePlayer) }
+                        .firstOrNull { it.inventory[4] != null } ?: return
+                if (zombie.getDistanceSqToEntity(mc.thePlayer) > 900) return
+                if (!(Pathfinder.stateGoal is GoalFollow && (Pathfinder.stateGoal as GoalFollow).entity == zombie)) {
+                    Pathfinder.setGoal(GoalFollow(zombie, 2.0))
+                }
+
                 val target = mc.objectMouseOver?.entityHit ?: return
                 val slot = disciplinePickSlot(target)
                 if (slot != -1 && mc.thePlayer.inventory.currentItem != slot) {
@@ -105,19 +119,34 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                 if (targets.isEmpty()) {
                     return
                 }
+                val latency = latencyValue.get() / 1000f
                 val bestTargetPair = targets.filter { it.name.contains("§e") }.map { Pair(it, it.name.substring(4).replace(":", ".").toFloat()) }
                     .maxByOrNull {
-                        if (it.second > 0.5) { -1.0f } else { it.second }
+                        if (it.second > latency) { -1.0f } else { it.second }
                     } ?: return
-                if (bestTargetPair.second > 0.5) {
+                if (bestTargetPair.second > latency) {
                     return
                 }
                 val bestTarget = bestTargetPair.first
-//                displayAlert(bestTarget.toString())
                 val rotation = toRotation(Vec3(bestTarget.posX, bestTarget.posY + bestTarget.height + 1.7, bestTarget.posZ), true)
                 setClientRotation(rotation.first, rotation.second)
                 if (mc.thePlayer.itemInUseDuration > 20) {
                     mc.gameSettings.keyBindUseItem.pressed = false
+                }
+            }
+            "Control" -> {
+                val skeleton =
+                    mc.theWorld.loadedEntityList.filter { it.getDistanceSqToEntity(mc.thePlayer) < 900 && it is EntitySkeleton }
+                        .firstOrNull { it.inventory[4] != null } ?: return
+                val latencyMultiplier = latencyValue.get() / 100f
+                val prev = prevPositionMap[skeleton.entityId] ?: Vec3d(skeleton.prevPosX, skeleton.prevPosY, skeleton.prevPosZ).also {
+                    displayAlert("Failed to load previous position of entity ${skeleton.entityId}")
+                }
+                val center = skeleton.getPositionEyes(1f).let {
+                    Vec3(it.xCoord + (skeleton.serverPosX / 32.0 - prev.x) * latencyMultiplier, it.yCoord + (skeleton.serverPosY / 32.0 - prev.y) * (latencyMultiplier * 0.4), it.zCoord + (skeleton.serverPosZ / 32.0 - prev.z) * latencyMultiplier)
+                }
+                toRotation(center, true).let {
+                    setClientRotation(it.first, it.second)
                 }
             }
         }
@@ -172,6 +201,12 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
             "Mastery" -> {
                 if (packet is S30PacketWindowItems && mc.thePlayer.heldItem?.item is ItemBow) {
                     event.cancel()
+                }
+            }
+            "Control" -> {
+                if (packet is S14PacketEntity) {
+                    val entity = packet.getEntity(mc.theWorld) ?: return
+                    prevPositionMap[entity.entityId] = Vec3d(entity.serverPosX / 32.0, entity.serverPosY / 32.0, entity.serverPosZ / 32.0)
                 }
             }
         }
