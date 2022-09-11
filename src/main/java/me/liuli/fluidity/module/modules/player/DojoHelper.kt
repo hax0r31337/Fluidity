@@ -14,11 +14,13 @@ import me.liuli.fluidity.pathfinder.goals.GoalFollow
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
+import me.liuli.fluidity.util.world.getBlock
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemBow
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -29,6 +31,7 @@ import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraft.network.play.server.S30PacketWindowItems
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import kotlin.math.floor
 
 class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYER) {
 
@@ -142,9 +145,20 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                 val prev = prevPositionMap[skeleton.entityId] ?: Vec3d(skeleton.prevPosX, skeleton.prevPosY, skeleton.prevPosZ).also {
                     displayAlert("Failed to load previous position of entity ${skeleton.entityId}")
                 }
-                val center = skeleton.getPositionEyes(1f).let {
-                    Vec3(it.xCoord + (skeleton.serverPosX / 32.0 - prev.x) * latencyMultiplier, it.yCoord + (skeleton.serverPosY / 32.0 - prev.y) * (latencyMultiplier * 0.4), it.zCoord + (skeleton.serverPosZ / 32.0 - prev.z) * latencyMultiplier)
+
+                val xCoord = skeleton.posX + (skeleton.serverPosX / 32.0 - prev.x) * latencyMultiplier
+                val yCoord = skeleton.posY + (skeleton.serverPosY / 32.0 - prev.y) * (latencyMultiplier * 0.4)
+                val zCoord = skeleton.posZ + (skeleton.serverPosZ / 32.0 - prev.z) * latencyMultiplier
+                var groundYCoord = floor(yCoord)
+                while(groundYCoord > yCoord - 5) {
+                    val bl = BlockPos(xCoord, groundYCoord, zCoord)
+                    if (bl.getBlock() != Blocks.air) {
+                        groundYCoord += bl.getBlock()?.let { it.blockBoundsMaxY } ?: 1.0
+                        break
+                    }
+                    groundYCoord--
                 }
+                val center = Vec3(xCoord, groundYCoord + (yCoord - groundYCoord) * 0.3 + skeleton.eyeHeight, zCoord)
                 toRotation(center, true).let {
                     setClientRotation(it.first, it.second)
                 }
@@ -164,12 +178,10 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
             "Swift" -> {
                 if (packet is S23PacketBlockChange) {
                     swiftDojoBlockProc(packet.blockState, packet.blockPosition)
-//                    event.cancel()
                 } else if (packet is S22PacketMultiBlockChange) {
                     packet.changedBlocks.forEach {
                         swiftDojoBlockProc(it.blockState, it.pos)
                     }
-//                    event.cancel()
                 }
             }
             "Discipline" -> {
