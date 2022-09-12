@@ -41,9 +41,9 @@ public class StaticStorage {
         return worldBlockLayers;
     }
 
-    public static void reachabilityFence(Object ref) {
+    public static void reachabilityFence(Object ref) {}
 
-    }
+    public static void dummy() {}
 
     public static void setTitle(String newTitle) {
         System.out.println("attempt set title: " + newTitle);

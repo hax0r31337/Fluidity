@@ -1,4 +1,4 @@
-package me.liuli.fluidity.inject.mixins.other;
+package me.liuli.fluidity.inject.mixins.world;
 
 import me.liuli.fluidity.module.modules.misc.BetterButton;
 import me.liuli.fluidity.module.modules.world.FastMine;

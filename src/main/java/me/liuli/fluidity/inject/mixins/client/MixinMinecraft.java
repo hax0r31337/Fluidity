@@ -122,24 +122,4 @@ public abstract class MixinMinecraft {
             t.printStackTrace();
         }
     }
-
-    @Redirect(method="loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at=@At(value="INVOKE", target="Lnet/minecraft/client/LoadingScreenRenderer;resetProgressAndMessage(Ljava/lang/String;)V"))
-    public void loadWorld(LoadingScreenRenderer loadingScreenRenderer, String string) {
-    }
-
-    @Redirect(method="loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at=@At(value="INVOKE", target="Lnet/minecraft/client/LoadingScreenRenderer;displayLoadingString(Ljava/lang/String;)V"))
-    public void loadWorld1(LoadingScreenRenderer loadingScreenRenderer, String string) {
-    }
-
-    @Redirect(method="loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at=@At(value="INVOKE", target="Ljava/lang/System;gc()V", remap=false))
-    public void loadWorld2() {
-    }
-
-    @Inject(method="toggleFullscreen()V", at=@At(value="INVOKE", target="Lorg/lwjgl/opengl/Display;setFullscreen(Z)V", shift=At.Shift.AFTER, remap=false), require=1, allow=1)
-    private void toggleFullscreen(CallbackInfo callbackInfo) {
-        if (!this.fullscreen) {
-            Display.setResizable(false);
-            Display.setResizable(true);
-        }
-    }
 }

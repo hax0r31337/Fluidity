@@ -1,17 +1,16 @@
 package me.liuli.fluidity.util.timing
 
-class ClickTimer {
+class ClickTimer : TheTimer() {
 
-    private var lastClickTime: Long = 0
     private var delay: Long = 0
 
     fun canClick(): Boolean {
         val currentTime = System.currentTimeMillis()
-        return currentTime - lastClickTime >= delay
+        return currentTime - time >= delay
     }
 
     fun update(minCPS: Int, maxCPS: Int) {
         delay = ((Math.random() * (1000 / minCPS - 1000 / maxCPS + 1)) + 1000 / maxCPS).toLong()
-        lastClickTime = System.currentTimeMillis()
+        time = System.currentTimeMillis()
     }
 }

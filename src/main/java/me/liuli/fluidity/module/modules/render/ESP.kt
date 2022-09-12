@@ -32,10 +32,14 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
 
     @Listen
     fun onRender3D(event: Render3DEvent) {
-        val list = mc.theWorld.loadedEntityList.filter { it.isTarget(onlyShowAttackableValue.get()) }
-            .also { if(it.isEmpty()) return }
+        val list = mc.theWorld.loadedEntityList.filter { it.isTarget(onlyShowAttackableValue.get()) }.toMutableList()
+        if (mc.gameSettings.thirdPersonView != 0) {
+            list.add(mc.thePlayer)
+        }
+        if(list.isEmpty()) return
 
         val nameAlpha = nameBackgroundColorValue.get() shr 24 and 0xFF
+        val renderPlayer = mc.renderViewEntity ?: mc.thePlayer
 
         list.forEach { entity ->
             val entityBox = entity.entityBoundingBox
@@ -64,7 +68,7 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 GL11.glEnable(GL11.GL_BLEND)
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 
-                val scale = ((mc.thePlayer.getDistanceToEntity(entity) / scaleMultiplierValue.get()).coerceAtLeast(1f) / 150F) * scaleValue.get()
+                val scale = ((renderPlayer.getDistanceToEntity(entity) / scaleMultiplierValue.get()).coerceAtLeast(1f) / 150F) * scaleValue.get()
                 GL11.glScalef(-scale, -scale, scale)
                 GL11.glTranslatef(0f, -mc.fontRendererObj.FONT_HEIGHT * 1.4f, 0f)
 

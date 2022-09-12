@@ -26,6 +26,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     private val modeValue = ListValue("Mode", arrayOf("Auto", "Manual", "Visual"), "Visual")
     private val stealChestValue = BoolValue("StealChest", false)
     private val autoCloseValue = BoolValue("AutoClose", false)
+    private val autoCloseDelayValue = IntValue("AutoCloseDelay", 300, 50, 500)
     private val clickMaxCpsValue = IntValue("ClickMaxCPS", 4, 1, 20)
     private val clickMinCpsValue = IntValue("ClickMinCPS", 2, 1, 20)
     val usefulColorValue = ColorValue("UsefulColor", Color.GREEN.rgb)
@@ -116,7 +117,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                     return
                 }
             }
-            if (autoCloseValue.get()) {
+            if (autoCloseValue.get() && clickTimer.hasTimePassed(autoCloseDelayValue.get())) {
                 mc.thePlayer.closeScreen()
             }
         }
