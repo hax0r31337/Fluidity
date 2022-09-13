@@ -14,12 +14,13 @@ repositories {
         url = "https://ayanoyuugiri.github.io/compose-j8/"
         content {
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
+            includeGroupByRegex "org\\.jetbrains\\.skiko.*"
         }
     }
     maven {
         url = "https://maven.pkg.jetbrains.space/public/p/compose/dev"
         content {
-            includeGroupByRegex "org\\.jetbrains\\.skiko.*"
+            includeModuleByRegex ("org\\.jetbrains\\.skiko.*", "skiko-awt-runtime-.*")
         }
     }
     mavenCentral()
@@ -59,6 +60,17 @@ configurations {
     implementation.extendsFrom(include)
 }
 
+String targetOs = "linux"
+if (System.getProperty("os.name").startsWith("Win")) {
+    targetOs = "windows"
+} else if (System.getProperty("os.name") == "Mac OS X") {
+    targetOs = "macos"
+}
+String targetArch = "x64"
+if (System.getProperty("os.arch") == "aarch64") {
+    targetArch = "arm64"
+}
+
 dependencies {
     include("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         transitive = false
@@ -75,7 +87,8 @@ dependencies {
     include "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 
     // compose
-    implementation "org.jetbrains.skiko:skiko-awt:0.7.32"
+    include "org.jetbrains.skiko:skiko-awt:$skiko_version"
+    compileOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:$skiko_version"
     include("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
         exclude module: "kotlin-stdlib"
         exclude module: "kotlin-stdlib-common"
@@ -146,8 +159,5 @@ reobf {
 }
 tasks.reobfJar.dependsOn(shadowJar)
 
-compose.desktop {
-    application {
-//        mainClass = "MainKt"
-    }
+compose.desktop.application {
 }

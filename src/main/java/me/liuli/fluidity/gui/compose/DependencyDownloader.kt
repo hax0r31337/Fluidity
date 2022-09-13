@@ -41,8 +41,13 @@ object DependencyDownloader {
         private set
 
     init {
-        dependencyList.add(Dependency("skiko-awt-runtime-$os-$arch", "0.7.32", "https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/skiko/skiko-awt-runtime-$os-$arch/0.7.32/skiko-awt-runtime-$os-$arch-0.7.32.jar"))
-//        System.setProperty("skiko.library.path", dependencyDir.absolutePath)
+        val skikoVer = "0.7.32"
+        val baseUrl = "https://ayanoyuugiri.github.io/resources/skiko/$skikoVer"
+        dependencyList.add(Dependency(System.mapLibraryName("skiko-$os-$arch"), "$baseUrl/${System.mapLibraryName("skiko-$os-$arch")}", skikoVer))
+        if (os == "windows") {
+            dependencyList.add(Dependency("icudtl.dat", "$baseUrl/icudtl.dat", skikoVer))
+        }
+        System.setProperty("skiko.library.path", File(dependencyDir, skikoVer).absolutePath)
     }
 
     fun asyncLoad() {
@@ -50,7 +55,7 @@ object DependencyDownloader {
         thread {
             try {
                 for (dep in dependencyList) {
-                    val file = File(dependencyDir, "${dep.name}-${dep.version}.jar")
+                    val file = File(if (dep.subdir.isEmpty()) dependencyDir else File(dependencyDir, dep.subdir).apply { mkdirs() }, dep.name)
                     if (!file.exists()) {
                         logWarn("Dependency 「${dep.name}」 not found, attempt download.")
                         val conn = URL(dep.url).openConnection() as HttpURLConnection
@@ -75,9 +80,6 @@ object DependencyDownloader {
                         ips.close()
                         out.close()
                         file.writeBytes(out.toByteArray())
-                    }
-                    if (dep.isJar) {
-                        loadJar(file)
                     }
                 }
             } catch (e: Exception) {
@@ -112,9 +114,5 @@ object DependencyDownloader {
         frame.isVisible = false
     }
 
-    fun loadJar(file: File) {
-        Loader.instance().modClassLoader.addFile(file)
-    }
-
-    data class Dependency(val name: String, val version: String, val url: String, val isJar: Boolean = true)
+    data class Dependency(val name: String, val url: String, val subdir: String = "")
 }

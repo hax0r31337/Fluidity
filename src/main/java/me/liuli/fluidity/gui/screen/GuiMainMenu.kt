@@ -33,27 +33,27 @@ class GuiMainMenu : GuiComposeDynamic() {
 
     @Preview
     @Composable
-    private fun app() {
+    fun app() {
         Column {
             var text by remember { mutableStateOf("Text") }
             TextField(text, { text = it })
 
-            @Composable
-            fun space() = Spacer(Modifier.height(5.dp))
+//            @Composable
+//            fun space() = Spacer(Modifier.height(5.dp))
 
             Text("Hey, this is test :)")
-            Text("red background", Modifier.background(androidx.compose.ui.graphics.Color.Red))
+            Text("red background", Modifier.background(Color.Red))
 
             val clickCounter by remember { mutableStateOf(0) }
 
             Button(onClick = { mc.queueScreen(GuiMultiplayer(mc.currentScreen)) }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray, contentColor = Color.White)) {
-                Text("Click me")
+                Text("don't click me")
             }
-            space()
+//            space()
             Text("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.")
-            space()
+//            space()
             Text("戰爭即和平；自由即奴役；無知即力量。")
-            space()
+//            space()
             Text("Amount of clicks: $clickCounter")
 
             Box(Modifier.weight(1f)) {
