@@ -29,12 +29,6 @@ import java.util.List;
 public abstract class MixinEntityRenderer {
 
     @Shadow
-    public abstract void loadShader(ResourceLocation resourceLocationIn);
-
-    @Shadow
-    public abstract void setupCameraTransform(float partialTicks, int pass);
-
-    @Shadow
     private Entity pointedEntity;
 
     @Shadow

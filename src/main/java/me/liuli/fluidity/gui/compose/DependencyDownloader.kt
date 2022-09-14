@@ -2,12 +2,10 @@ package me.liuli.fluidity.gui.compose
 
 import me.liuli.fluidity.util.client.logWarn
 import me.liuli.fluidity.util.mc
-import net.minecraftforge.fml.common.Loader
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.swing.JFrame

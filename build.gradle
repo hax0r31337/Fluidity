@@ -90,6 +90,7 @@ shadowJar {
     exclude "META-INF/maven/**"
     exclude "META-INF/versions/**"
     exclude "META-INF/*.kotlin_module"
+    exclude "META-INF/**/*.pro"
     exclude "LICENSE.txt"
 }
 
@@ -134,6 +135,8 @@ mixin {
     defaultObfuscationEnv searge
     add sourceSets.main, "mixins.fluidity.refmap.json"
 }
+
+tasks.register("stripDebug", TaskStripDebug.class)
 
 reobf {
     shadowJar {

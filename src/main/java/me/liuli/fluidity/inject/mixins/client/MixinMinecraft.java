@@ -5,9 +5,7 @@ import me.liuli.fluidity.event.ClickBlockEvent;
 import me.liuli.fluidity.event.KeyEvent;
 import me.liuli.fluidity.event.ScreenEvent;
 import me.liuli.fluidity.event.WorldEvent;
-import me.liuli.fluidity.util.client.ClientUtilsKt;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.LoadingScreenRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -18,11 +16,12 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)

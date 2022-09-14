@@ -3,7 +3,6 @@ package me.liuli.fluidity
 import me.liuli.fluidity.command.CommandManager
 import me.liuli.fluidity.config.ConfigManager
 import me.liuli.fluidity.event.EventManager
-import me.liuli.fluidity.gui.compose.ComposeManager
 import me.liuli.fluidity.gui.compose.DependencyDownloader
 import me.liuli.fluidity.module.ModuleManager
 import me.liuli.fluidity.pathfinder.Pathfinder
