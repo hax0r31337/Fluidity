@@ -13,6 +13,7 @@ import org.jetbrains.skiko.currentNanoTime
 import org.lwjgl.opengl.GL11
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
+import java.util.concurrent.locks.ReentrantLock
 
 
 class ComposeManager(private var width: Int, private var height: Int, content: @Composable () -> Unit) {
@@ -23,31 +24,22 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
     var canvas = createCanvas(width, height)
         private set
     private var textureNew: ByteBuffer? = null
-    private var hasRenderUpdate = false
+    private val drawLock = ReentrantLock()
 
     val texId: Int
 
     init {
         exec {
-            scene = ComposeScene(coroutineContext) { hasRenderUpdate = true }.apply {
+            scene = ComposeScene(coroutineContext) {
+                exec {
+                    drawCanvas()
+                }
+            }.apply {
                 setContent(content)
                 constraints = Constraints(maxWidth = width, maxHeight = height)
             }
         }
         texId = GL11.glGenTextures()
-//        awaitSceneLoad()
-    }
-
-//    private fun awaitSceneLoad() {
-//        while (!this::scene.isInitialized) {
-//            Thread.sleep(1L)
-//        }
-//    }
-
-    fun awaitFrame() {
-        while (!hasRenderUpdate) {
-            Thread.sleep(1L)
-        }
     }
 
     fun finalize() {
@@ -97,47 +89,58 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
         return Canvas(bitmap)
     }
 
-    fun resizeCanvas(widthNow: Int, heightNow: Int) {
+    fun resizeCanvas(widthNow: Int, heightNow: Int): Boolean {
         if (widthNow != width || heightNow != height) {
-            if (this::bitmap.isInitialized && !bitmap.isClosed) bitmap.close()
-            canvas = createCanvas(widthNow, heightNow)
-            scene.constraints = Constraints(maxWidth = widthNow, maxHeight = heightNow)
-            width = widthNow
-            height = heightNow
+            drawLock.lock()
+            try {
+                if (this::bitmap.isInitialized && !bitmap.isClosed) bitmap.close()
+                canvas = createCanvas(widthNow, heightNow)
+                scene.constraints = Constraints(maxWidth = widthNow, maxHeight = heightNow)
+                width = widthNow
+                height = heightNow
+            } finally {
+                drawLock.unlock()
+            }
+            return true
         }
+        return false
     }
 
-    fun printCanvas() {
+    fun drawCanvas() {
         if (!this::scene.isInitialized || !this::bitmap.isInitialized) return
 
-        canvas.clear(Color.TRANSPARENT)
-        scene.render(canvas, System.nanoTime())
+        drawLock.lock()
+        try {
+            canvas.clear(Color.TRANSPARENT)
+            scene.render(canvas, System.nanoTime())
 
-        val bytes = bitmap.readPixels()
-        if (bytes != null) {
-            var cache: Byte
-            for (i in bytes.indices step 4) {
-                cache = bytes[i]
-                bytes[i] = bytes[i+2]
-                bytes[i+2] = cache
+            val bytes = bitmap.readPixels()
+            if (bytes != null) {
+                var cache: Byte
+                for (i in bytes.indices step 4) {
+                    cache = bytes[i]
+                    bytes[i] = bytes[i+2]
+                    bytes[i+2] = cache
+                }
+                val byteBuffer = ByteBuffer.allocateDirect(bytes.size)
+                byteBuffer.put(bytes)
+                byteBuffer.flip()
+
+                textureNew = byteBuffer
             }
-            val byteBuffer = ByteBuffer.allocateDirect(bytes.size)
-            byteBuffer.put(bytes)
-            byteBuffer.flip()
-
-            textureNew = byteBuffer
+        } finally {
+            drawLock.unlock()
         }
     }
 
     fun updateCanvas(widthNow: Int, heightNow: Int) {
         if (!this::scene.isInitialized) return
 
-        if (hasRenderUpdate) {
-            resizeCanvas(widthNow, heightNow)
+        if (resizeCanvas(widthNow, heightNow)) {
+            textureNew = null
             exec {
-                printCanvas()
+                drawCanvas()
             }
-            hasRenderUpdate = false
         }
         if (textureNew != null) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texId)

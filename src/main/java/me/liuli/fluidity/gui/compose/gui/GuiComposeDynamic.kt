@@ -3,7 +3,7 @@ package me.liuli.fluidity.gui.compose.gui
 import androidx.compose.runtime.Composable
 import me.liuli.fluidity.gui.compose.IDisplayable
 
-open class GuiComposeDynamic(drawBackground: Boolean = true, awaitFirstFrame: Boolean = false, displayable: IDisplayable? = null) : AbstractGuiCompose(drawBackground, awaitFirstFrame) {
+open class GuiComposeDynamic(drawBackground: Boolean = true, displayable: IDisplayable? = null) : AbstractGuiCompose(drawBackground) {
 
     protected lateinit var content: @Composable () -> Unit
 

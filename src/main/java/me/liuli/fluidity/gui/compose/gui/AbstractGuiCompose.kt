@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.event.KeyEvent as AwtKeyEvent
 
-abstract class AbstractGuiCompose(private val drawBackground: Boolean = true, private val awaitFirstFrame: Boolean = false) : GuiScreen() {
+abstract class AbstractGuiCompose(private val drawBackground: Boolean = true) : GuiScreen() {
 
     lateinit var composeManager: ComposeManager
     protected var hasCompose = false
@@ -27,9 +27,6 @@ abstract class AbstractGuiCompose(private val drawBackground: Boolean = true, pr
     open fun initCompose(content: @Composable () -> Unit) {
         composeManager = ComposeManager(Display.getWidth(), Display.getHeight(), content)
         hasCompose = true
-        if (awaitFirstFrame) {
-            composeManager.awaitFrame()
-        }
     }
 
     open fun closeCompose() {
