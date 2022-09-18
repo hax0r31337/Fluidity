@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import me.liuli.fluidity.gui.compose.IDisplayable
+//import me.liuli.fluidity.gui.compose.access.ComposeMcGuiBridge.guiMultiplayer
 
 object MainMenu : IDisplayable {
 
@@ -33,7 +34,7 @@ object MainMenu : IDisplayable {
 
             val clickCounter by remember { mutableStateOf(0) }
 
-            Button(onClick = {  }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray, contentColor = Color.White)) {
+            Button(onClick = { /* guiMultiplayer() */ }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray, contentColor = Color.White)) {
                 Text("don't click me")
             }
             space()

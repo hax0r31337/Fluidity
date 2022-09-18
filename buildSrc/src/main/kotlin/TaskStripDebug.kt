@@ -1,12 +1,15 @@
-import org.objectweb.asm.tree.MethodNode
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LineNumberNode
-import java.io.*
+import org.objectweb.asm.tree.MethodNode
+import utils.toBytes
+import utils.toClassNode
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.jar.JarEntry
-import java.util.jar.JarInputStream
-import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -23,61 +26,61 @@ open class TaskStripDebug : DefaultTask() {
             }
         }
     }
+}
 
-    private fun patchJar(file: File) {
-        val jis = ZipInputStream(ByteArrayInputStream(file.readBytes()))
-        val jos = ZipOutputStream(FileOutputStream(file))
-        jos.setLevel(9)
-        var entry: ZipEntry?
-        val buffer = ByteArray(1024)
-        while (jis.nextEntry.also { entry = it } != null) {
-            entry ?: break
-            if (entry!!.isDirectory) continue
-            var body: ByteArray
-            run {
-                val bos = ByteArrayOutputStream()
-                var n: Int
-                while (jis.read(buffer).also { n = it } != -1) {
-                    bos.write(buffer, 0, n)
-                }
-                bos.close()
-                body = bos.toByteArray()
+fun patchJar(file: File) {
+    val jis = ZipInputStream(ByteArrayInputStream(file.readBytes()))
+    val jos = ZipOutputStream(FileOutputStream(file))
+    jos.setLevel(9)
+    val buffer = ByteArray(1024)
+    while (true) {
+        val entry = jis.nextEntry ?: break
+        if (entry.isDirectory) continue
+        var body: ByteArray
+        run {
+            val bos = ByteArrayOutputStream()
+            var n: Int
+            while (jis.read(buffer).also { n = it } != -1) {
+                bos.write(buffer, 0, n)
             }
-            if (entry!!.name.endsWith(".class")) {
-                body = patchClass(body)
-            }
-            jos.putNextEntry(JarEntry(entry!!.name))
-            jos.write(body)
-            jos.closeEntry()
+            bos.close()
+            body = bos.toByteArray()
         }
-        jos.close()
+        if (entry.name.endsWith(".class")) {
+            body = patchClass(body)
+        }
+        jos.putNextEntry(JarEntry(entry.name))
+        jos.write(body)
+        jos.closeEntry()
+    }
+    jos.close()
+}
+
+private fun patchClass(data: ByteArray): ByteArray {
+    val klass = toClassNode(data)
+
+    klass.methods.forEach { patchMethod(klass, it) }
+    klass.sourceDebug = ""
+    klass.sourceFile = ""
+
+    klass.visibleAnnotations?.filterNotNull()?.forEach {
+        if (it.desc.equals("Lkotlin/Metadata;")) {
+            klass.visibleAnnotations.remove(it)
+        }
     }
 
-    private fun patchClass(data: ByteArray): ByteArray {
-        val klass = toClassNode(data)
+    return toBytes(klass)
+}
 
-        klass.methods.forEach { patchMethod(klass, it) }
-        klass.sourceDebug = ""
-        klass.sourceFile = ""
-
-        klass.visibleAnnotations?.filterNotNull()?.forEach {
-            if (it.desc.equals("Lkotlin/Metadata;")) {
-                klass.visibleAnnotations.remove(it)
-            }
+private fun patchMethod(klass: ClassNode, method: MethodNode) {
+    val inst = method.instructions.toArray()
+    method.instructions.clear()
+    inst.forEach {
+        if (it is LineNumberNode) {
+            return@forEach
         }
-
-        return toBytes(klass)
+        method.instructions.add(it)
     }
-
-    private fun patchMethod(klass: ClassNode, method: MethodNode) {
-        val inst = method.instructions.toArray()
-        method.instructions.clear()
-        inst.forEach {
-            if (it is LineNumberNode) {
-                return@forEach
-            }
-            method.instructions.add(it)
-        }
 //        val names = mutableListOf<Char>()
 //        fun genChar(): Char {
 //            val c = (0x4E00..0x9FFF).random().toChar()
@@ -88,11 +91,10 @@ open class TaskStripDebug : DefaultTask() {
 //                c
 //            }
 //        }
-        method.localVariables?.forEach {
-            it.name = "\n"
-        }
-        method.parameters?.forEach {
-            it.name = "\n"
-        }
+    method.localVariables?.forEach {
+        it.name = "\n"
+    }
+    method.parameters?.forEach {
+        it.name = "\n"
     }
 }
