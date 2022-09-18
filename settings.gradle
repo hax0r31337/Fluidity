@@ -34,4 +34,6 @@ pluginManagement {
 
 rootProject.name = 'Fluidity'
 include 'gui'
+include 'core'
+include 'Forge-1.8.9'
 

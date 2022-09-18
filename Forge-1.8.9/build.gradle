@@ -1,0 +1,119 @@
+plugins {
+    id "java"
+    id "idea"
+    id "org.jetbrains.kotlin.jvm"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "net.minecraftforge.gradle.forge"
+    id "org.spongepowered.mixin"
+}
+
+repositories {
+    maven {
+        url = "https://ayanoyuugiri.github.io/compose-j8/"
+        content {
+            includeGroupByRegex "org\\.jetbrains\\.compose.*"
+            includeGroupByRegex "org\\.jetbrains\\.skiko.*"
+        }
+    }
+    mavenCentral()
+    maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+    maven { url = "https://jitpack.io/" }
+}
+
+version = "1.0.0"
+group = "me.liuli.fluidity"
+archivesBaseName = "Fluidity"
+
+sourceCompatibility = targetCompatibility = 1.8
+compileJava.options.encoding = "UTF-8"
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+minecraft {
+    version = "1.8.9-11.15.1.2318-1.8.9"
+    runDir = "run"
+    mappings = "stable_22"
+    makeObfSourceJar = false
+    clientJvmArgs += ["-Dfluidity.debug", "-Dfml.coreMods.load=me.liuli.fluidity.inject.MixinLoader", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true", "-Dmixin.dumpTargetOnFailure=true", "-Xmx1024m -Xms1024m"]
+}
+
+configurations {
+    include
+    implementation.extendsFrom(include)
+    all {
+        attributes {
+            attribute(Attribute.of("ui", String.class), "awt")
+        }
+    }
+}
+
+dependencies {
+    include("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        transitive = false
+        exclude module: "guava"
+        exclude module: "commons-io"
+        exclude module: "gson"
+        exclude module: "launchwrapper"
+        exclude module: "log4j-core"
+    }
+
+    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+
+    include (project(":core")) {
+        exclude module: "minecraftbin"
+        exclude group: "org.ow2.asm"
+    }
+    include (project(":gui")) {
+        exclude module: "minecraftbin"
+        exclude group: "org.ow2.asm"
+    }
+
+    include fileTree(include: ["*.jar"], dir: "libs")
+}
+
+shadowJar {
+    archiveClassifier.set("")
+    configurations = [project.configurations.include]
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+
+    exclude "META-INF/maven/**"
+    exclude "META-INF/versions/**"
+    exclude "META-INF/*.kotlin_module"
+    exclude "META-INF/**/*.pro"
+    exclude "LICENSE.txt"
+}
+
+jar {
+    manifest.attributes(
+            "FMLCorePlugin": "me.liuli.fluidity.inject.MixinLoader",
+            "FMLCorePluginContainsFMLMod": true,
+            "ForceLoadAsMod": true,
+            "MixinConfigs": "mixins.fluidity.json",
+            "ModSide": "CLIENT",
+            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+            "TweakOrder": "0",
+            "FMLAT": "fluidity_at.cfg",
+    )
+
+    enabled = false
+}
+
+mixin {
+    disableRefMapWarning = true
+    defaultObfuscationEnv searge
+    add sourceSets.main, "mixins.fluidity.refmap.json"
+}
+
+tasks.register("stripDebug", TaskStripDebug.class)
+
+reobf {
+    shadowJar {
+        mappingType = "SEARGE"
+    }
+}
+
+tasks.reobfJar.dependsOn(shadowJar)

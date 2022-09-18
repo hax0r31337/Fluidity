@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id "idea"
+    id "org.jetbrains.kotlin.jvm"
+    id "com.gorylenko.gradle-git-properties" version "2.4.0"
+}
+
+group 'me.liuli.fluidity.core'
+version '1.0.0'
+
+sourceCompatibility = targetCompatibility = 1.8
+compileJava.options.encoding = "UTF-8"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.ow2.asm:asm-util:9.3"
+
+    implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
+}
