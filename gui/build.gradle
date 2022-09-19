@@ -58,9 +58,9 @@ dependencies {
     }
     implementation "org.jetbrains.compose.ui:ui-util:$compose_version"
 
-    implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
+    runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.32"
 
-    compileOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.32"
+    implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
 }
 
 compose.desktop.application {

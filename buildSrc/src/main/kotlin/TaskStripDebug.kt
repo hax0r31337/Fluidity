@@ -18,7 +18,7 @@ open class TaskStripDebug : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val rootDir = File("build/libs")
+        val rootDir = File(project.projectDir, "build/libs")
         rootDir.listFiles()?.forEach {
             if (it.name.endsWith(".jar")) {
                 println("Patching ${it.absolutePath}...")

@@ -46,8 +46,8 @@ fun setTitle(status: String? = null) {
             if (!status.isNullOrEmpty()) { "->$status" } else { "" })
 }
 
-fun Minecraft.queueScreen(screen: GuiScreen) {
+fun Minecraft.queueScreen(screen: () -> GuiScreen) {
     mc.addScheduledTask {
-        mc.displayGuiScreen(screen)
+        mc.displayGuiScreen(screen())
     }
 }
