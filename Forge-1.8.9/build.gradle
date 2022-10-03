@@ -43,11 +43,6 @@ minecraft {
 configurations {
     include
     implementation.extendsFrom(include)
-    all {
-        attributes {
-            attribute(Attribute.of("ui", String.class), "awt")
-        }
-    }
 }
 
 dependencies {
@@ -100,12 +95,12 @@ shadowJar {
 
 jar {
     manifest.attributes(
-            "FMLCorePlugin": "me.liuli.fluidity.inject.MixinLoader",
-            "FMLCorePluginContainsFMLMod": true,
-            "ForceLoadAsMod": true,
-            "MixinConfigs": "mixins.fluidity.json",
-            "ModSide": "CLIENT",
-            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+//            "FMLCorePlugin": "me.liuli.fluidity.inject.MixinLoader",
+//            "FMLCorePluginContainsFMLMod": true,
+//            "ForceLoadAsMod": true,
+//            "MixinConfigs": "mixins.fluidity.json",
+//            "ModSide": "CLIENT",
+            "TweakClass": "me.liuli.fluidity.inject.TestTweaker",
             "TweakOrder": "0",
             "FMLAT": "fluidity_at.cfg",
     )

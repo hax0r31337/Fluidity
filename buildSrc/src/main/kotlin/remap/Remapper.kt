@@ -1,14 +1,10 @@
 package remap
 
-import net.md_5.specialsource.AccessMap
-import net.md_5.specialsource.Jar
-import net.md_5.specialsource.JarMapping
-import net.md_5.specialsource.JarRemapper
-import net.md_5.specialsource.RemapperProcessor
+import net.md_5.specialsource.*
+import utils.readCsvMapping
 import java.io.BufferedReader
 import java.io.File
 import java.io.Reader
-import java.lang.StringBuilder
 
 class Remapper {
 
@@ -45,18 +41,8 @@ class Remapper {
     }
 
     fun applyWarppedSrg(mapping: Reader, fieldsMapping: Reader, methodsMapping: Reader): Remapper {
-        val fields = mutableMapOf<String, String>()
-        val methods = mutableMapOf<String, String>()
-        fieldsMapping.readLines().forEach {
-            val args = it.split(",")
-            if (args[0] == "searge") return@forEach
-            fields[args[0]] = args[1]
-        }
-        methodsMapping.readLines().forEach {
-            val args = it.split(",")
-            if (args[0] == "searge") return@forEach
-            methods[args[0]] = args[1]
-        }
+        val fields = readCsvMapping(fieldsMapping)
+        val methods = readCsvMapping(methodsMapping)
         mapping.readLines().forEach {
             val args = it.split(" ")
             when(args[0]) {

@@ -1,5 +1,6 @@
 package utils
 
+import org.gradle.api.Project
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -24,4 +25,12 @@ fun resourceCached(cacheDir: File, path: String, url: String): File {
     }
 
     return file
+}
+
+fun minecraftJar(project: Project): File {
+    return File(project.rootDir, ".gradle/fluidity/repo/minecraftbin-1.8.9-${project.rootProject.name}.jar")
+}
+
+fun cacheDir(project: Project): File {
+    return File(project.gradle.gradleUserHomeDir, "caches/fluidity/")
 }

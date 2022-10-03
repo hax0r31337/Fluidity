@@ -21,3 +21,5 @@ dependencies {
 
     implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
 }
+
+tasks.register("reobf", TaskStripDebugAndReobfuscate.class)

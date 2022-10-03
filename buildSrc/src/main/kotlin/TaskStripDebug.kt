@@ -1,4 +1,5 @@
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LineNumberNode
@@ -10,11 +11,13 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.jar.JarEntry
-import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-open class TaskStripDebug : DefaultTask() {
+abstract class TaskClassPatching : DefaultTask() {
+
+    @get:Internal
+    protected abstract val patcher: (ClassNode) -> Unit
 
     @TaskAction
     fun execute() {
@@ -22,13 +25,26 @@ open class TaskStripDebug : DefaultTask() {
         rootDir.listFiles()?.forEach {
             if (it.name.endsWith(".jar")) {
                 println("Patching ${it.absolutePath}...")
-                patchJar(it)
+                patchJar(it, patcher)
             }
         }
     }
 }
 
-fun patchJar(file: File) {
+open class TaskStripDebug : TaskClassPatching() {
+
+    override val patcher: (ClassNode) -> Unit = { patchClass(it) }
+}
+
+open class TaskStripDebugAndReobfuscate : TaskReobfuscateArtifact() {
+
+    override val patcher: (ClassNode) -> Unit = {
+        patchClass(it)
+        reobfuscateClass(it, mapping)
+    }
+}
+
+fun patchJar(file: File, patchClass: (ClassNode) -> Unit) {
     val jis = ZipInputStream(ByteArrayInputStream(file.readBytes()))
     val jos = ZipOutputStream(FileOutputStream(file))
     jos.setLevel(9)
@@ -47,7 +63,9 @@ fun patchJar(file: File) {
             body = bos.toByteArray()
         }
         if (entry.name.endsWith(".class")) {
-            body = patchClass(body)
+            val klass = toClassNode(body)
+            patchClass(klass)
+            body = toBytes(klass)
         }
         jos.putNextEntry(JarEntry(entry.name))
         jos.write(body)
@@ -56,9 +74,7 @@ fun patchJar(file: File) {
     jos.close()
 }
 
-private fun patchClass(data: ByteArray): ByteArray {
-    val klass = toClassNode(data)
-
+private fun patchClass(klass: ClassNode) {
     klass.methods.forEach { patchMethod(klass, it) }
     klass.sourceDebug = null
     klass.sourceFile = null
@@ -68,8 +84,6 @@ private fun patchClass(data: ByteArray): ByteArray {
             klass.visibleAnnotations.remove(it)
         }
     }
-
-    return toBytes(klass)
 }
 
 private fun patchMethod(klass: ClassNode, method: MethodNode) {

@@ -1,22 +1,14 @@
 import com.beust.klaxon.Klaxon
 import com.beust.klaxon.PathMatcher
-import com.google.common.collect.ImmutableMap
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import remap.ErroringRemappingAccessMap
 import remap.Remapper
+import utils.cacheDir
+import utils.minecraftJar
 import utils.resourceCached
 import java.io.File
-
-private fun minecraftJar(project: Project): File {
-    return File(project.rootDir, ".gradle/fluidity/repo/minecraftbin-1.8.9-${project.rootProject.name}.jar")
-}
-
-private fun cacheDir(project: Project): File {
-    return File(project.gradle.gradleUserHomeDir, "caches/fluidity/")
-}
 
 fun minecraftDep(project: Project, vararg accessTransformer: String): String {
     val minecraftJar = minecraftJar(project)
