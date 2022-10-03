@@ -60,8 +60,8 @@ private fun patchClass(data: ByteArray): ByteArray {
     val klass = toClassNode(data)
 
     klass.methods.forEach { patchMethod(klass, it) }
-    klass.sourceDebug = ""
-    klass.sourceFile = ""
+    klass.sourceDebug = null
+    klass.sourceFile = null
 
     klass.visibleAnnotations?.filterNotNull()?.forEach {
         if (it.desc.equals("Lkotlin/Metadata;")) {
