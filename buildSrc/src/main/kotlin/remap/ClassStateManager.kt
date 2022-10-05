@@ -27,6 +27,8 @@ class ClassStateManager() {
             bos.close()
             addClass(bos.toByteArray())
         }
+
+        jis.close()
     }
 
     fun addClass(classNode: ClassNode) {
@@ -56,5 +58,14 @@ class ClassStateManager() {
         return list.also {
             superclassCache[name] = it
         }
+    }
+
+    fun clearCache() {
+        superclassCache.clear()
+    }
+
+    fun clear() {
+        clearCache()
+        classes.clear()
     }
 }

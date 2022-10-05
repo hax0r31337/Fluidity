@@ -2,7 +2,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.LineNumberNode
+import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import utils.toBytes
 import utils.toClassNode
@@ -45,7 +47,7 @@ open class TaskStripDebugAndReobfuscate : TaskReobfuscateArtifact() {
 }
 
 fun patchJar(file: File, patchClass: (ClassNode) -> Unit) {
-    val jis = ZipInputStream(ByteArrayInputStream(file.readBytes()))
+    val jis = ZipInputStream(ByteArrayInputStream(file.readBytes())) // prevent file overwrite
     val jos = ZipOutputStream(FileOutputStream(file))
     jos.setLevel(9)
     val buffer = ByteArray(1024)
@@ -71,6 +73,7 @@ fun patchJar(file: File, patchClass: (ClassNode) -> Unit) {
         jos.write(body)
         jos.closeEntry()
     }
+    jis.close()
     jos.close()
 }
 
@@ -87,28 +90,21 @@ private fun patchClass(klass: ClassNode) {
 }
 
 private fun patchMethod(klass: ClassNode, method: MethodNode) {
-    val inst = method.instructions.toArray()
-    method.instructions.clear()
+    val insnList = method.instructions
+    val inst = insnList.toArray()
+    insnList.clear()
+    var count = 0
     inst.forEach {
         if (it is LineNumberNode) {
             return@forEach
+        } else if (it is MethodInsnNode && it.owner == "kotlin/jvm/internal/Intrinsics" && it.desc.contains("Ljava/lang/String;)")) {
+            val lastNode = insnList.last
+            if (lastNode is LdcInsnNode) {
+                lastNode.cst = "${count++}"
+            }
         }
-        method.instructions.add(it)
+        insnList.add(it)
     }
-//        val names = mutableListOf<Char>()
-//        fun genChar(): Char {
-//            val c = (0x4E00..0x9FFF).random().toChar()
-//            return if (names.contains(c)) {
-//                genChar()
-//            } else {
-//                names.add(c)
-//                c
-//            }
-//        }
-    method.localVariables?.forEach {
-        it.name = "\n"
-    }
-    method.parameters?.forEach {
-        it.name = "\n"
-    }
+    method.localVariables?.clear()
+    method.parameters?.clear()
 }

@@ -97,7 +97,6 @@ jar {
     manifest.attributes(
 //            "FMLCorePlugin": "me.liuli.fluidity.inject.MixinLoader",
 //            "FMLCorePluginContainsFMLMod": true,
-//            "ForceLoadAsMod": true,
 //            "MixinConfigs": "mixins.fluidity.json",
 //            "ModSide": "CLIENT",
             "TweakClass": "me.liuli.fluidity.inject.TestTweaker",

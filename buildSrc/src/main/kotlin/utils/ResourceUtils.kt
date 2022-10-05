@@ -12,7 +12,7 @@ fun resourceCached(cacheDir: File, path: String, url: String): File {
     val file = File(cacheDir, path)
     if (!file.exists()) {
         file.parentFile.mkdirs()
-        println("Downloading resource ${file.absolutePath} from ${url}")
+        println("Downloading resource ${file.absolutePath} from $url")
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.requestMethod = "GET"
         conn.connectTimeout = 2000

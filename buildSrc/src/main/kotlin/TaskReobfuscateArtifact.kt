@@ -26,7 +26,10 @@ fun generateReobfuscateMapping(project: Project): Pair<Map<String, String>, Map<
                 "M" -> resultMethods[args[1]] = args[2]
             }
         }
+        return resultFields to resultMethods
     }
+
+    println("Generating re-obfuscate mapping cache...")
 
     val srgMapping = resourceCached(cacheDir, "1.8.9.srg", "https://ayanoyuugiri.github.io/resources/srg/1.8.9/joined.srg")
     val fieldsCsvMapping = resourceCached(cacheDir, "fields-22.csv", "https://ayanoyuugiri.github.io/resources/srg/1.8.9/fields.csv")
@@ -59,11 +62,13 @@ fun generateReobfuscateMapping(project: Project): Pair<Map<String, String>, Map<
         }
     }
 
+    csm.clear()
+
     val sb = StringBuilder()
-    resultFields.forEach { s, s2 ->
+    resultFields.forEach { (s, s2) ->
         sb.append("F ").append(s).append(' ').append(s2).append('\n')
     }
-    resultMethods.forEach { s, s2 ->
+    resultMethods.forEach { (s, s2) ->
         sb.append("M ").append(s).append(' ').append(s2).append('\n')
     }
     mapping.writeText(sb.toString(), Charsets.UTF_8)
@@ -96,8 +101,8 @@ private fun reobfuscateMethod(method: MethodNode, map: Pair<Map<String, String>,
 
 open class TaskReobfuscateArtifact : TaskClassPatching() {
 
-    @Internal
-    protected val mapping = generateReobfuscateMapping(project)
+    @get:Internal
+    val mapping by lazy { generateReobfuscateMapping(project) }
 
     override val patcher: (ClassNode) -> Unit = { reobfuscateClass(it, mapping) }
 }
