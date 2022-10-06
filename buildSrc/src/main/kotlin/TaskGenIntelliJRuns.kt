@@ -1,3 +1,4 @@
+import asm.ClassDump
 import minecraft.MinecraftAssetsDownloader
 import minecraft.MinecraftVersion
 import org.gradle.api.DefaultTask
@@ -11,7 +12,10 @@ import utils.cacheDir
 import utils.minecraftJar
 import utils.resourceCached
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -62,12 +66,25 @@ open class TaskGenIntelliJRuns : DefaultTask() {
         val assets = MinecraftAssetsDownloader(version.getAssetsVersion(), version.getAssetsUrl(), assetsDir)
         assets.getAssets() // download assets
 
+        // prepare for hot reobfuscate
+        val agentJar = File(cacheDir, "agent/agent.jar").also {
+            if (!it.exists()) {
+                it.parentFile.mkdirs()
+                genAgentJar(it)
+            }
+        }
+        val mainJar = File(cacheDir, "agent/main.jar").also {
+            if (!it.exists()) {
+                genMainJar(it, version.getMainClass(), agentJar)
+            }
+        }
+
+
 //         inject run configuration into config file
         val docFactory = DocumentBuilderFactory.newInstance()
         val docBuilder = docFactory.newDocumentBuilder()
         val document = docBuilder.parse(file)
 
-        // TODO: process
         val gameDir = File(project.rootDir, "run").apply { mkdirs() }
         val args = version.getArguments(mapOf("auth_player_name" to "FluidityUser",
             "auth_uuid" to UUID.randomUUID().toString(),
@@ -78,8 +95,8 @@ open class TaskGenIntelliJRuns : DefaultTask() {
             "assets_index_name" to version.getAssetsVersion(),
             "user_properties" to "{}",
             "user_type" to "LEGACY"))
-        document.injectRunConfiguration("RunFluidity (${getProjectName()})", version.getMainClass(), "-Djava.library.path=\"${nativesDir.canonicalPath}\" $vmParams",
-            "$args $programParams", gameDir, version.getJars(cacheDir), listOf(minecraftJar(project)))
+        document.injectRunConfiguration("RunFluidity (${getProjectName()})", "me.yuugiri.agent.AgentLoader", "-Djava.library.path=\"${nativesDir.canonicalPath}\" $vmParams",
+            "$args $programParams", gameDir, version.getJars(cacheDir).toMutableList().also { it.add(mainJar) }, listOf(minecraftJar(project)))
 
         // write the content into xml file
         val transformerFactory: TransformerFactory = TransformerFactory.newInstance()
@@ -93,6 +110,42 @@ open class TaskGenIntelliJRuns : DefaultTask() {
         val source = DOMSource(document)
         val result = StreamResult(file)
         transformer.transform(source, result)
+    }
+
+    private fun genMainJar(jarFile: File, targetMain: String, agentJar: File) {
+        val zos = ZipOutputStream(FileOutputStream(jarFile))
+
+        zos.putNextEntry(ZipEntry("META-INF/MANIFEST.MF"))
+        zos.write("Manifest-Version: 1.0".toByteArray(Charsets.UTF_8))
+        zos.closeEntry()
+
+        zos.putNextEntry(ZipEntry("me/yuugiri/agent/AgentLoader.class"))
+        zos.write(ClassDump.dump(targetMain.replace('.', '/'), agentJar.canonicalPath))
+        zos.closeEntry()
+
+        zos.close()
+    }
+
+    private fun genAgentJar(jarFile: File) {
+        val zos = ZipOutputStream(FileOutputStream(jarFile))
+
+        zos.putNextEntry(ZipEntry("META-INF/MANIFEST.MF"))
+        zos.write("""
+Manifest-Version: 1.0
+Agent-Class: me.yuugiri.agent.AgentTransformer
+        """.trimIndent().toByteArray(Charsets.UTF_8))
+        zos.closeEntry()
+
+        // generate remap mapping
+        val cacheDir = cacheDir(project)
+        val mapping = File(cacheDir, "1.8.9-remap.dat")
+        if (!mapping.exists()) generateReobfuscateMapping(project)
+
+        zos.putNextEntry(ZipEntry("me/yuugiri/agent/AgentTransformer.class"))
+        zos.write(ClassDump.dumpTransformer(mapping.canonicalPath))
+        zos.closeEntry()
+
+        zos.close()
     }
 
     private fun Document.injectRunConfiguration(configName: String, mainClassName: String, vmParams: String, programParams: String, runDir: File,
@@ -122,7 +175,7 @@ open class TaskGenIntelliJRuns : DefaultTask() {
         config.add("option", mapOf("name" to "MAIN_CLASS_NAME", "value" to mainClassName))
         config.add("option", mapOf("name" to "VM_PARAMETERS", "value" to vmParams))
         config.add("option", mapOf("name" to "PROGRAM_PARAMETERS", "value" to programParams))
-        config.add("option", mapOf("name" to "WORKING_DIRECTORY", "value" to "file://${runDir.canonicalPath}"))
+        config.add("option", mapOf("name" to "WORKING_DIRECTORY", "value" to runDir.canonicalPath))
         config.add("option", mapOf("name" to "ALTERNATIVE_JRE_PATH_ENABLED", "value" to "false"))
         config.add("option", mapOf("name" to "ALTERNATIVE_JRE_PATH", "value" to ""))
         config.add("option", mapOf("name" to "ENABLE_SWING_INSPECTOR", "value" to "false"))
@@ -131,10 +184,10 @@ open class TaskGenIntelliJRuns : DefaultTask() {
         if (classpathIncludes.isNotEmpty() || classpathExcludes.isNotEmpty()) {
             val classpathMods = config.add("classpathModifications", emptyMap())
             classpathIncludes.forEach {
-                classpathMods.add("entry", mapOf("path" to "file://${it.canonicalPath}"))
+                classpathMods.add("entry", mapOf("path" to it.canonicalPath))
             }
             classpathExcludes.forEach {
-                classpathMods.add("entry", mapOf("exclude" to "true", "path" to "file://${it.canonicalPath}"))
+                classpathMods.add("entry", mapOf("exclude" to "true", "path" to it.canonicalPath))
             }
         }
     }
