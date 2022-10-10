@@ -38,6 +38,16 @@ fun <T : Any> resolvePackage(packagePath: String, klass: Class<T>): List<Class<o
     return list
 }
 
+fun <T : Any> resolveInstances(packagePath: String, klass: Class<T>): List<T> {
+    return resolvePackage(packagePath, klass).map {
+        try {
+            it.newInstance()
+        } catch (e: IllegalAccessException) {
+            getObjectInstance(it)
+        }
+    }
+}
+
 fun <T> getObjectInstance(clazz: Class<T>): T {
     clazz.declaredFields.forEach {
         if (it.name.equals("INSTANCE")) {

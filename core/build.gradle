@@ -1,8 +1,9 @@
 plugins {
-    id 'java'
+    id "java"
     id "idea"
     id "org.jetbrains.kotlin.jvm"
     id "com.gorylenko.gradle-git-properties" version "2.4.0"
+    id "me.yuugiri.fluiditygradle"
 }
 
 group 'me.liuli.fluidity.core'
@@ -20,8 +21,4 @@ dependencies {
     implementation "org.ow2.asm:asm-util:9.3"
 
     implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
-}
-
-tasks.register("test1", TaskGenIntelliJRuns.class) {
-    vmParams = "-Dexample=true"
 }

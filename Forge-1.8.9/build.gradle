@@ -3,8 +3,7 @@ plugins {
     id "idea"
     id "org.jetbrains.kotlin.jvm"
     id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "net.minecraftforge.gradle.forge"
-    id "org.spongepowered.mixin"
+    id "me.yuugiri.fluiditygradle"
 }
 
 repositories {
@@ -32,30 +31,20 @@ compileKotlin {
     }
 }
 
-minecraft {
-    version = "1.8.9-11.15.1.2318-1.8.9"
-    runDir = "run"
-    mappings = "stable_22"
-    makeObfSourceJar = false
-    clientJvmArgs += ["-Dfluidity.debug", "-Dfml.coreMods.load=me.liuli.fluidity.inject.MixinLoader", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true", "-Dmixin.dumpTargetOnFailure=true", "-Xmx1024m -Xms1024m"]
-}
-
 configurations {
     include
     implementation.extendsFrom(include)
 }
 
 dependencies {
-    include("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        transitive = false
-        exclude module: "guava"
-        exclude module: "commons-io"
-        exclude module: "gson"
-        exclude module: "launchwrapper"
-        exclude module: "log4j-core"
+    include('com.github.mccheatz:HookUtility:446793c386') {
+        exclude group: 'org.ow2.asm'
     }
+    implementation 'org.ow2.asm:asm-all:5.0.3' // forge 1.8.9 asm version
 
-    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
+    implementation MinecraftDependencyKt.launchWrapper(project)
+    implementation MinecraftDependencyKt.minecraftforge(project)
 
     include (project(":core")) {
         exclude module: "minecraftbin"
@@ -69,13 +58,13 @@ dependencies {
 
     // ==== USED IN DEBUG ENVIRONMENT ====
     include "org.jetbrains.skiko:skiko-awt:$skiko_version"
-    implementation("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
-        exclude module: "kotlin-stdlib"
-        exclude module: "kotlin-stdlib-common"
-        exclude module: "kotlin-stdlib-jdk8"
-        exclude module: "skiko"
-    }
-    implementation "org.jetbrains.compose.ui:ui-util:$compose_version"
+//    implementation("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
+//        exclude module: "kotlin-stdlib"
+//        exclude module: "kotlin-stdlib-common"
+//        exclude module: "kotlin-stdlib-jdk8"
+//        exclude module: "skiko"
+//    }
+//    implementation "org.jetbrains.compose.ui:ui-util:$compose_version"
     // ==== USED IN DEBUG ENVIRONMENT ====
 
     include fileTree(include: ["*.jar"], dir: "libs")
@@ -91,34 +80,21 @@ shadowJar {
     exclude "META-INF/*.kotlin_module"
     exclude "META-INF/**/*.pro"
     exclude "LICENSE.txt"
-}
+    exclude "**/module-info.class"
+    exclude "**/package-info.class"
+    exclude "**/*.kotlin_metadata"
+    exclude "**/*.kotlin_builtins"
 
-jar {
-    manifest.attributes(
-//            "FMLCorePlugin": "me.liuli.fluidity.inject.MixinLoader",
-//            "FMLCorePluginContainsFMLMod": true,
-//            "MixinConfigs": "mixins.fluidity.json",
-//            "ModSide": "CLIENT",
-            "TweakClass": "me.liuli.fluidity.inject.TestTweaker",
-            "TweakOrder": "0",
-            "FMLAT": "fluidity_at.cfg",
-    )
-
-    enabled = false
-}
-
-mixin {
-    disableRefMapWarning = true
-    defaultObfuscationEnv searge
-    add sourceSets.main, "mixins.fluidity.refmap.json"
-}
-
-reobf {
-    shadowJar {
-        mappingType = "SEARGE"
+    manifest {
+        attributes["FMLCorePlugin"] = "me.liuli.fluidity.inject.inject.FMLLoadingPlugin"
+        attributes["FMLCorePluginContainsFMLMod"] = "true"
+        attributes["ModSide"] = "CLIENT"
     }
 }
 
-tasks.register("stripDebug", TaskStripDebug.class)
-
-tasks.reobfJar.dependsOn(shadowJar)
+genIntelliJRuns {
+    vmParams = "-Dfml.coreMods.load=me.liuli.fluidity.inject.inject.FMLLoadingPlugin"
+}
+classes.dependsOn(putObfMap)
+reobfJarWithStrip.dependsOn(shadowJar)
+tasks.getByName("build").dependsOn(reobfJarWithStrip)

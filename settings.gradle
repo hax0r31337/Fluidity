@@ -15,11 +15,8 @@ pluginManagement {
 	resolutionStrategy {
 		eachPlugin {
 			switch (requested.id.id) {
-				case "net.minecraftforge.gradle.forge":
-					useModule("com.github.kotonemywaifu:ForgeGradle:${forgegradle_version}")
-					break
-				case "org.spongepowered.mixin":
-					useModule("com.github.xcfrg:mixingradle:${mixingradle_version}")
+				case "me.yuugiri.fluiditygradle":
+					useModule("com.github.mccheatz:FluidityGradle:${fluiditygradle_version}")
 					break
 				case "org.jetbrains.compose":
 					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}")
