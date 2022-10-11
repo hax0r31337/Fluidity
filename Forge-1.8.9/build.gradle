@@ -86,14 +86,14 @@ shadowJar {
     exclude "**/*.kotlin_builtins"
 
     manifest {
-        attributes["FMLCorePlugin"] = "me.liuli.fluidity.inject.inject.FMLLoadingPlugin"
+        attributes["FMLCorePlugin"] = "me.liuli.fluidity.inject.FMLLoadingPlugin"
         attributes["FMLCorePluginContainsFMLMod"] = "true"
         attributes["ModSide"] = "CLIENT"
     }
 }
 
 genIntelliJRuns {
-    vmParams = "-Dfml.coreMods.load=me.liuli.fluidity.inject.inject.FMLLoadingPlugin"
+    vmParams = "-Dfml.coreMods.load=me.liuli.fluidity.inject.FMLLoadingPlugin"
 }
 classes.dependsOn(putObfMap)
 reobfJarWithStrip.dependsOn(shadowJar)

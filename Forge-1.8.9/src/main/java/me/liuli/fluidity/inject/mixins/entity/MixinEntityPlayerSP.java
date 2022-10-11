@@ -33,81 +33,6 @@ import java.util.List;
 
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
-    @Shadow
-    private boolean serverSneakState;
-
-    @Shadow
-    public boolean serverSprintState;
-
-    @Shadow
-    public abstract void playSound(String name, float volume, float pitch);
-
-    @Shadow
-    public int sprintingTicksLeft;
-
-    @Shadow
-    protected int sprintToggleTimer;
-
-    @Shadow
-    public float timeInPortal;
-
-    @Shadow
-    public float prevTimeInPortal;
-
-    @Shadow
-    protected Minecraft mc;
-
-    @Shadow
-    public MovementInput movementInput;
-
-    @Shadow
-    public abstract void setSprinting(boolean sprinting);
-
-    @Shadow
-    protected abstract boolean pushOutOfBlocks(double x, double y, double z);
-
-    @Shadow
-    public abstract void sendPlayerAbilities();
-
-    @Shadow
-    public float horseJumpPower;
-
-    @Shadow
-    public int horseJumpPowerCounter;
-
-    @Shadow
-    protected abstract void sendHorseJump();
-
-    @Shadow
-    public abstract boolean isRidingHorse();
-
-    @Shadow
-    @Final
-    public NetHandlerPlayClient sendQueue;
-
-    @Shadow
-    public abstract boolean isSneaking();
-
-    @Shadow
-    protected abstract boolean isCurrentViewEntity();
-
-    @Shadow
-    private double lastReportedPosX;
-
-    @Shadow
-    private int positionUpdateTicks;
-
-    @Shadow
-    private double lastReportedPosY;
-
-    @Shadow
-    private double lastReportedPosZ;
-
-    @Shadow
-    private float lastReportedYaw;
-
-    @Shadow
-    private float lastReportedPitch;
 
     @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"), cancellable = true)
     public void onUpdateWalkingPlayer(CallbackInfo ci) {
@@ -630,16 +555,5 @@ public abstract class MixinEntityPlayerSP extends MixinEntityPlayer {
 
             this.worldObj.theProfiler.endSection();
         }
-    }
-
-    @Override
-    public Vec3 getLook(float p_getLook_1_) {
-        float yaw = RotationUtilsKt.getLastReportedYaw(), pitch = RotationUtilsKt.getLastReportedPitch();
-
-        float f = MathHelper.cos(-yaw * 0.017453292F - 3.1415927F);
-        float f1 = MathHelper.sin(-yaw * 0.017453292F - 3.1415927F);
-        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vec3(f1 * f2, f3, f * f2);
     }
 }
