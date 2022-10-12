@@ -2,14 +2,18 @@ package me.liuli.fluidity.inject.hooks.impl.render
 
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.Render3DEvent
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.MethodProcess
+import me.liuli.fluidity.module.modules.combat.Reach
+import me.liuli.fluidity.module.modules.combat.Reach.reach
 import me.liuli.fluidity.module.modules.render.CameraClip
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.other.asmName
 import me.yuugiri.hutil.obfuscation.AbstractObfuscationMap
 import me.yuugiri.hutil.processor.hook.MethodHookParam
 import me.yuugiri.hutil.util.forEach
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.EntityRenderer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
@@ -17,8 +21,9 @@ import net.minecraft.entity.passive.EntityAnimal
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
+import org.objectweb.asm.tree.VarInsnNode
 
-class HookEntityRenderer : HookProvider("net.minecraft.client.renderer.EntityRenderer") {
+object HookEntityRenderer : HookProvider("net.minecraft.client.renderer.EntityRenderer") {
 
     @Hook(method = "renderWorldPass", type = Hook.Type("FIELD", "net/minecraft/client/renderer/EntityRenderer;renderHand"))
     fun renderWorldPass(param: MethodHookParam) {
@@ -33,10 +38,21 @@ class HookEntityRenderer : HookProvider("net.minecraft.client.renderer.EntityRen
             val obf = AbstractObfuscationMap.methodObfuscationRecord(obfuscationMap, node.owner, node.name, node.desc)
             if (obf.name == "distanceTo") {
                 hasHooked = true
-                method.instructions.insert(node, MethodInsnNode(Opcodes.INVOKESTATIC, "me/liuli/fluidity/inject/StaticStorage", "retraceEntity", "(DF)D", false))
+                method.instructions.insert(node, MethodInsnNode(Opcodes.INVOKESTATIC, HookEntityRenderer::class.java.asmName, "retraceEntity", "(DF)D", false))
+                method.instructions.insert(node, VarInsnNode(Opcodes.FLOAD, 1))
             }
         }
         if (!hasHooked) throw UnknownError("unable to found hook point for net.minecraft.client.renderer.EntityRenderer;getMouseOver(F)V")
+    }
+
+    @JvmStatic
+    fun retraceEntity(original: Double, p_getMouseOver_1_: Float): Double {
+        if (Reach.state) {
+            val entity = Minecraft.getMinecraft().renderViewEntity
+            val movingObjectPosition = entity.rayTrace(reach, p_getMouseOver_1_)
+            if (movingObjectPosition != null) return movingObjectPosition.hitVec.distanceTo(entity.getPositionEyes(p_getMouseOver_1_))
+        }
+        return original
     }
 
     @Hook(method = "orientCamera", type = Hook.Type("INVOKE", "net/minecraft/util/Vec3;distanceTo(Lnet/minecraft/util/Vec3;)D"))

@@ -47,14 +47,4 @@ public class StaticStorage {
         System.out.println("attempt set title: " + newTitle);
         ClientUtilsKt.setTitle(Fluidity.INSTANCE.getHasLoaded() ? "HaveFun" : "InitializeGame");
     }
-
-    public static double retraceEntity(final double original, final float p_getMouseOver_1_) {
-        if (Reach.INSTANCE.getState()) {
-            final Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
-            final MovingObjectPosition movingObjectPosition = entity.rayTrace(Reach.INSTANCE.getReach(), p_getMouseOver_1_);
-
-            if(movingObjectPosition != null) return movingObjectPosition.hitVec.distanceTo(entity.getPositionEyes(p_getMouseOver_1_));
-        }
-        return original;
-    }
 }

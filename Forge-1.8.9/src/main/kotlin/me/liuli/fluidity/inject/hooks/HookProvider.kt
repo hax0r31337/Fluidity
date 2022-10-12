@@ -13,7 +13,7 @@ annotation class Hook(val method: String = "", val desc: String = "*", val type:
     /**
      * @param type ENTER, EXIT, THROW, INVOKE, FIELD
      */
-    annotation class Type(val type: String, val info: String = "", val isInfoRegex: Boolean = false)
+    annotation class Type(val type: String, val info: String = "", val superclass: String = "", val isInfoRegex: Boolean = false)
 }
 
 annotation class MethodProcess(val method: String = "", val desc: String = "*")
@@ -50,9 +50,11 @@ abstract class HookProvider(val className: String) {
         method.isAccessible = true
         val isStatic = Modifier.isStatic(method.modifiers)
         return if (method.parameterCount == 0) {
-            if (isStatic) ({ method.invoke(null) }) else ({ method.invoke(this) })
+            if (isStatic) ({ try { method.invoke(null) } catch (t: Throwable) { t.printStackTrace() } })
+            else ({ try { method.invoke(this) } catch (t: Throwable) { t.printStackTrace() } })
         } else if (method.parameterCount == 1) {
-            if (isStatic) ({ method.invoke(null, it) }) else ({ method.invoke(this, it) })
+            if (isStatic) ({ try { method.invoke(null, it) } catch (t: Throwable) { t.printStackTrace() } })
+            else ({ try { method.invoke(this, it) } catch (t: Throwable) { t.printStackTrace() } })
         } else throw IllegalArgumentException("Unsupported parameter count: $method")
     }
 
@@ -61,8 +63,8 @@ abstract class HookProvider(val className: String) {
             "ENTER" -> HookPointEnter()
             "EXIT" -> HookPointExit()
             "THROW" -> HookPointThrow()
-            "INVOKE" -> HookPointInvoke(this.getHookMatcher())
-            "FIELD" -> HookPointField(this.getHookMatcher())
+            "INVOKE" -> HookPointInvoke(this.getHookMatcher(), this.superclass)
+            "FIELD" -> HookPointField(this.getHookMatcher(), this.superclass)
             else -> throw IllegalArgumentException("Illegal hook point type: ${this.type}")
         }
     }

@@ -13,7 +13,7 @@ class HookNetworkManager : HookProvider("net.minecraft.network.NetworkManager") 
 
     @Hook(method = "channelRead0", type = Hook.Type("ENTER"))
     fun channelRead0(param: MethodHookParam) {
-        val packet = (param.args[0] ?: return) as Packet<*>
+        val packet = (param.args[1] ?: return) as Packet<*>
 
         if (getPacketType(packet) !== PacketUtils.PacketType.SERVERSIDE) return
 

@@ -56,7 +56,7 @@ class HookGuiChat : HookProvider("net.minecraft.client.gui.GuiChat") {
         }
     }
 
-    @Hook(method = "onAutocompleteResponse", type = Hook.Type("INVOKE", "net/minecraft/client/gui/GuiChat;autocompletePlayerNames(F)V"))
+    @Hook(method = "onAutocompleteResponse", type = Hook.Type("INVOKE", "net/minecraft/client/gui/GuiChat;autocompletePlayerNames()V"))
     fun onAutocompleteResponse(param: MethodHookParam) {
         if (CommandManager.latestAutoComplete.isNotEmpty())
             param.result = null

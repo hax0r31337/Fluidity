@@ -24,6 +24,36 @@ var silentRotationPitch = Float.NaN
 var lastReportedYaw = 0f
 var lastReportedPitch = 0f
 
+/**
+ * handle calls from hook
+ */
+object RotationUtils {
+
+    fun flushLastReported() {
+        lastReportedYaw = mc.thePlayer.serverRotationYaw
+        lastReportedPitch = mc.thePlayer.serverRotationPitch
+        silentRotationYaw = Float.NaN
+        silentRotationPitch = Float.NaN
+    }
+
+    fun applyVisualYawUpdate() {
+        if (!silentRotationYaw.isNaN()) {
+            mc.thePlayer.rotationYawHead = silentRotationYaw
+            mc.thePlayer.renderYawOffset = silentRotationYaw
+        }
+    }
+
+    @JvmStatic
+    fun rotationYaw(): Float {
+        return mc.thePlayer.serverRotationYaw
+    }
+
+    @JvmStatic
+    fun rotationPitch(): Float {
+        return mc.thePlayer.serverRotationPitch
+    }
+}
+
 fun setServerRotation(yaw: Float, pitch: Float) {
     // fix GCD sensitivity to bypass some anti-cheat measures
     fixSensitivity(yaw, pitch).also {
@@ -36,13 +66,6 @@ fun setClientRotation(yaw: Float, pitch: Float) {
     fixSensitivity(yaw, pitch).also {
         mc.thePlayer.rotationYaw = it.first
         mc.thePlayer.rotationPitch = it.second
-    }
-}
-
-fun EntityLivingBase.applyVisualYawUpdate() {
-    if (!silentRotationYaw.isNaN()) {
-        this.rotationYawHead = silentRotationYaw
-        this.renderYawOffset = silentRotationYaw
     }
 }
 

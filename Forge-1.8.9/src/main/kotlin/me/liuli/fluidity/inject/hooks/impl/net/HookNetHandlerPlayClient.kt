@@ -5,6 +5,7 @@ import me.liuli.fluidity.inject.hooks.Hook
 import me.liuli.fluidity.module.modules.misc.NoRotateSet
 import me.liuli.fluidity.util.mc
 import me.yuugiri.hutil.processor.hook.MethodHookParam
+import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook.EnumFlags
@@ -27,9 +28,9 @@ class HookNetHandlerPlayClient : HookProvider("net.minecraft.client.network.NetH
         }
     }
 
-    @Hook(method = "handlePlayerPosLook", type = Hook.Type("INVOKE", "net/minecraft/entity/player/EntityPlayer;setPositionAndRotation(DDDFF)V"))
+    @Hook(method = "handlePlayerPosLook", type = Hook.Type("INVOKE", "net/minecraft/entity/player/EntityPlayer;setPositionAndRotation(DDDFF)V", "net/minecraft/entity/Entity"))
     fun handlePlayPosLook_Invoke(param: MethodHookParam) {
-        if (NoRotateSet.state) {
+        if (NoRotateSet.state && (param.thisObject as NetHandlerPlayClient).doneLoadingTerrain) {
             val var1 = param.args[0] as S08PacketPlayerPosLook
 
             val var2 = mc.thePlayer

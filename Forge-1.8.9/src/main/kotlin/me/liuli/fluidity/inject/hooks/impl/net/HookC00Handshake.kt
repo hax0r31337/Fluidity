@@ -19,5 +19,7 @@ class HookC00Handshake : HookProvider("net.minecraft.network.handshake.client.C0
         buf.writeString(pk.ip + if (ConfigManager.antiForge && !Minecraft.getMinecraft().isIntegratedServerRunning) "" else "\u0000FML\u0000")
         buf.writeShort(pk.port)
         buf.writeVarIntToBuffer(pk.requestedState.id)
+
+        param.result = null
     }
 }

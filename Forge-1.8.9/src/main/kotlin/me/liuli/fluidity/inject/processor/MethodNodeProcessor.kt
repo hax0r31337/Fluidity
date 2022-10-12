@@ -3,6 +3,7 @@ package me.liuli.fluidity.inject.processor
 import me.yuugiri.hutil.obfuscation.AbstractObfuscationMap
 import me.yuugiri.hutil.processor.IClassProcessor
 import me.yuugiri.hutil.processor.hook.AbstractHookTarget
+import me.yuugiri.hutil.processor.hook.HookTargetImpl
 import me.yuugiri.hutil.util.methods_
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
@@ -34,6 +35,7 @@ class MethodNodeProcessor : IClassProcessor {
                 processors = selectedRecords.filter { it.first.target.methodMatches(method.name, method.desc) }
             }
             processors.forEach { p ->
+                p.second.set(true)
                 changed = p.first.callback(obfuscationMap, method) || changed
             }
         }

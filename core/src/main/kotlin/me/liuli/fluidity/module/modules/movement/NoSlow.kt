@@ -15,12 +15,9 @@ import net.minecraft.util.EnumFacing
 class NoSlow : Module("NoSlow", "Make you not slow down during item use", ModuleCategory.MOVEMENT) {
 
     private val modeValue = ListValue("Mode", arrayOf("Vanilla", "Hypixel", "Matrix"), "Vanilla")
-    private val blockForwardMultiplier = FloatValue("BlockForwardMultiplier", 1.0F, 0.2F, 1.0F)
-    private val blockStrafeMultiplier = FloatValue("BlockStrafeMultiplier", 1.0F, 0.2F, 1.0F)
-    private val consumeForwardMultiplier = FloatValue("ConsumeForwardMultiplier", 1.0F, 0.2F, 1.0F)
-    private val consumeStrafeMultiplier = FloatValue("ConsumeStrafeMultiplier", 1.0F, 0.2F, 1.0F)
-    private val bowForwardMultiplier = FloatValue("BowForwardMultiplier", 1.0F, 0.2F, 1.0F)
-    private val bowStrafeMultiplier = FloatValue("BowStrafeMultiplier", 1.0F, 0.2F, 1.0F)
+    private val blockMultiplier = FloatValue("BlockMultiplier", 1.0F, 0.2F, 1.0F)
+    private val consumeMultiplier = FloatValue("ConsumeMultiplier", 1.0F, 0.2F, 1.0F)
+    private val bowMultiplier = FloatValue("BowMultiplier", 1.0F, 0.2F, 1.0F)
 
     private var needNoSlow = false
     private val packetBuf = mutableListOf<Packet<*>>()
@@ -93,22 +90,13 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
 
     @Listen
     fun onSlowDown(event: SlowDownEvent) {
-        val heldItem = mc.thePlayer.heldItem?.item
+        val item = mc.thePlayer.heldItem?.item
 
-        event.forward = getMultiplier(heldItem, true)
-        event.strafe = getMultiplier(heldItem, false)
-    }
-
-    private fun getMultiplier(item: Item?, isForward: Boolean) = when (item) {
-        is ItemFood, is ItemPotion, is ItemBucketMilk -> {
-            if (isForward) this.consumeForwardMultiplier.get() else this.consumeStrafeMultiplier.get()
+        event.percentage = when (item) {
+            is ItemFood, is ItemPotion, is ItemBucketMilk -> this.consumeMultiplier.get()
+            is ItemSword -> this.blockMultiplier.get()
+            is ItemBow -> this.bowMultiplier.get()
+            else -> 0.2F
         }
-        is ItemSword -> {
-            if (isForward) this.blockForwardMultiplier.get() else this.blockStrafeMultiplier.get()
-        }
-        is ItemBow -> {
-            if (isForward) this.bowForwardMultiplier.get() else this.bowStrafeMultiplier.get()
-        }
-        else -> 0.2F
     }
 }

@@ -35,7 +35,7 @@ class PreMotionEvent : Event()
 
 class PostMotionEvent : Event()
 
-class SlowDownEvent(var strafe: Float, var forward: Float) : Event()
+class SlowDownEvent(var percentage: Float) : Event()
 
 class KeyEvent(val key: Int) : Event()
 

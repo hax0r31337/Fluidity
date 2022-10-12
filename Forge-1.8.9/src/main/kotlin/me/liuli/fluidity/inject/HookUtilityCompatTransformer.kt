@@ -12,6 +12,7 @@ import net.minecraft.launchwrapper.IClassTransformer
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.ClassNode
+import java.io.File
 import java.util.zip.GZIPInputStream
 
 class HookUtilityCompatTransformer : IClassTransformer {
@@ -21,21 +22,11 @@ class HookUtilityCompatTransformer : IClassTransformer {
     }
 
     override fun transform(name: String, transformedName: String?, data: ByteArray): ByteArray {
-        if (name.startsWith("kotlin")) return data
+        if (name.startsWith("kotlin") || name.startsWith("me.yuugiri")) return data
 
-        // read into ClassNode
-        val classReader = ClassReader(data)
-        val classNode = ClassNode()
-        classReader.accept(classNode, 0)
-
-        if (!hook.dealWithClassNode(classNode)) {
-            return data // save performance when no changes has apply to the class
-        }
-
-        // write back to bytecode form
-        val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES)
-        classNode.accept(classWriter)
-        return classWriter.toByteArray()
+        return hook.dealWithClassData(data, (transformedName ?: name).replace('.', '/'))/*.also {
+            File("dump/$name.class").writeBytes(it)
+        }*/
     }
 
     companion object {
@@ -46,7 +37,7 @@ class HookUtilityCompatTransformer : IClassTransformer {
             if (hookInitialized) return
             val time = System.nanoTime()
 
-            // load obfuscation map
+            // load obfuscation mapEnumFacing
             hook.obfuscationMap = SeargeObfuscationMap(GZIPInputStream(HookUtilityCompatTransformer::class.java.getResourceAsStream("/1.8.9-mcp.srg.gz")).bufferedReader(Charsets.UTF_8))
 
             // load access transformer

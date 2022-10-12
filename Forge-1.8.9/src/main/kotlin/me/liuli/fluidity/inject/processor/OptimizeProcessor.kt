@@ -13,11 +13,12 @@ class OptimizeProcessor : IClassProcessor {
     private val transformMap = mapOf("net/minecraft/util/EnumFacing" to "facings",
         "net/minecraft/util/EnumChatFormatting" to "chatFormatting",
         "net/minecraft/util/EnumParticleTypes" to "particleTypes",
-        "net/minecraft/util/EnumBlockLayer" to "worldBlockLayers")
+        "net/minecraft/util/EnumWorldBlockLayer" to "worldBlockLayers")
 
     override fun selectClass(name: String) = name.startsWith("net/minecraft")
 
     override fun processClass(obfuscationMap: AbstractObfuscationMap?, map: AbstractObfuscationMap.ClassObfuscationRecord, klass: ClassNode): Boolean {
+        if (transformMap.containsKey(map.name)) return false
         var hasChanged = false
 
         klass.methods_.forEach { method ->

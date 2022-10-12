@@ -37,7 +37,7 @@ configurations {
 }
 
 dependencies {
-    include('com.github.mccheatz:HookUtility:446793c386') {
+    include('com.github.mccheatz:HookUtility:792e21cbd9') {
         exclude group: 'org.ow2.asm'
     }
     implementation 'org.ow2.asm:asm-all:5.0.3' // forge 1.8.9 asm version

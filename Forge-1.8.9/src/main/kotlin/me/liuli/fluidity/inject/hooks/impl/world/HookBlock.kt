@@ -31,7 +31,7 @@ class HookBlock : HookProvider("net.minecraft.block.Block") {
 
     @Hook(method = "getPlayerRelativeBlockHardness", type = Hook.Type("EXIT"))
     fun getPlayerRelativeBlockHardness(param: MethodHookParam) {
-        if (param.result is Float && FastMine.state) {
+        if (FastMine.state) {
             param.result = FastMine.multiplier.get() * (param.result as Float)
         }
     }

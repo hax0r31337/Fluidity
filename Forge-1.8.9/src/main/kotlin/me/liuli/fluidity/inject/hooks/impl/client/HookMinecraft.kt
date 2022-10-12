@@ -2,14 +2,15 @@ package me.liuli.fluidity.inject.hooks.impl.client
 
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.*
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.util.mc
 import me.yuugiri.hutil.processor.hook.EnumHookShift
 import me.yuugiri.hutil.processor.hook.MethodHookParam
 import net.minecraft.block.material.Material
 import net.minecraft.client.gui.GuiMainMenu
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.multiplayer.WorldClient
 import org.lwjgl.input.Keyboard
 
@@ -22,7 +23,7 @@ class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
 
     @Hook(method = "startGame", type = Hook.Type("EXIT"))
     fun startGame() {
-        Fluidity.init()
+        Fluidity.load()
     }
 
     @Hook(method = "shutdown", type = Hook.Type("ENTER"))
@@ -58,7 +59,7 @@ class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
     fun displayGuiScreen(param: MethodHookParam) {
         val screen = param.args[0] as GuiScreen?
         Fluidity.eventManager.call(ScreenEvent(screen))
-        if (screen is GuiMainMenu) {
+        if (screen is GuiMainMenu/* || (screen == null && mc.theWorld == null)*/) {
             param.args[0] = me.liuli.fluidity.gui.screen.GuiMainMenu()
         }
     }

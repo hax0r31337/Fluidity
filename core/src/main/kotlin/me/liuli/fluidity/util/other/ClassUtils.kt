@@ -56,3 +56,6 @@ fun <T> getObjectInstance(clazz: Class<T>): T {
     }
     throw IllegalAccessException("This class not a kotlin object")
 }
+
+val Class<*>.asmName: String
+    get() = this.name.replace('.', '/')
