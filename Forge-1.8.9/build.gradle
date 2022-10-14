@@ -15,7 +15,6 @@ repositories {
         }
     }
     mavenCentral()
-    maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
     maven { url = "https://jitpack.io/" }
 }
 
@@ -40,11 +39,8 @@ dependencies {
     include('com.github.mccheatz:HookUtility:792e21cbd9') {
         exclude group: 'org.ow2.asm'
     }
-    implementation 'org.ow2.asm:asm-all:5.0.3' // forge 1.8.9 asm version
 
     implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
-    implementation MinecraftDependencyKt.launchWrapper(project)
-    implementation MinecraftDependencyKt.minecraftforge(project)
 
     include (project(":core")) {
         exclude module: "minecraftbin"
@@ -98,3 +94,4 @@ genIntelliJRuns {
 classes.dependsOn(putObfMap)
 reobfJarWithStrip.dependsOn(shadowJar)
 tasks.getByName("build").dependsOn(reobfJarWithStrip)
+//tasks.getByName("build").dependsOn(shadowJar)

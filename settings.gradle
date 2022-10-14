@@ -1,5 +1,6 @@
 pluginManagement {
 	repositories {
+//		mavenLocal()
 		maven {
 			url = "https://ayanoyuugiri.github.io/compose-j8/"
 			content {
@@ -9,14 +10,13 @@ pluginManagement {
 		mavenCentral()
 		gradlePluginPortal()
 		maven { url = "https://jitpack.io/" }
-		maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
-		maven { url = "https://maven.minecraftforge.net/" }
 	}
 	resolutionStrategy {
 		eachPlugin {
 			switch (requested.id.id) {
 				case "me.yuugiri.fluiditygradle":
-					useModule("com.github.mccheatz:FluidityGradle:${fluiditygradle_version}")
+					useModule("com.github.mccheatz:FluidityGradle:b60c2956c5")
+//					useModule("me.yuugiri.fluiditygradle:FluidityGradle:1.0.0")
 					break
 				case "org.jetbrains.compose":
 					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}")
