@@ -1,8 +1,9 @@
 plugins {
-    id 'java'
+    id "java"
     id "idea"
     id "org.jetbrains.compose"
     id "org.jetbrains.kotlin.jvm"
+    id "me.yuugiri.fluiditygradle"
 }
 
 group 'me.liuli.fluidity.gui'

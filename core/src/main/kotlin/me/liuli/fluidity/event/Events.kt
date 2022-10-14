@@ -35,7 +35,7 @@ class PreMotionEvent : Event()
 
 class PostMotionEvent : Event()
 
-class SlowDownEvent(var strafe: Float, var forward: Float) : Event()
+class SlowDownEvent(var percentage: Float) : Event()
 
 class KeyEvent(val key: Int) : Event()
 
@@ -59,7 +59,5 @@ class PacketEvent(val packet: Packet<*>, val type: Type) : EventCancellable() {
 }
 
 class Render2DEvent(val scaledResolution: ScaledResolution, val partialTicks: Float) : Event()
-
-class RenderScreenEvent(val mouseX: Int, val mouseY: Int, val partialTicks: Float) : Event()
 
 class Render3DEvent(val partialTicks: Float) : Event()
