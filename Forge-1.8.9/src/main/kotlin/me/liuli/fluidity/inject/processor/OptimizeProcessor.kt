@@ -6,6 +6,8 @@ import me.yuugiri.hutil.util.forEach
 import me.yuugiri.hutil.util.methods_
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.InsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 
 class OptimizeProcessor : IClassProcessor {
@@ -29,16 +31,16 @@ class OptimizeProcessor : IClassProcessor {
                      var owner = node.owner
                      if (transformMap.containsKey(node.owner)
                          || transformMap.containsKey(AbstractObfuscationMap.classObfuscationRecord(obfuscationMap, node.owner).name.also { owner = it })) {
-                         node.owner = "me/liuli/fluidity/inject/StaticStorage"
-                         node.name = transformMap[owner]!!
+                         method.instructions.insert(node, FieldInsnNode(Opcodes.GETSTATIC, "me/liuli/fluidity/inject/StaticStorage", transformMap[owner]!!, node.desc.substring(node.desc.indexOf(')')+1)))
+                         method.instructions.remove(node)
                          hasChanged = true
                      }
                  } else if (node.owner == "org/lwjgl/opengl/Display" && node.name == "setTitle") {
                      node.owner = "me/liuli/fluidity/inject/StaticStorage"
                      hasChanged = true
                  } else if (node.owner == "java/lang/System" && node.name == "gc") {
-                     node.owner = "me/liuli/fluidity/inject/StaticStorage"
-                     node.name = "dummy"
+                     method.instructions.insert(node, InsnNode(Opcodes.NOP))
+                     method.instructions.remove(node)
                      hasChanged = true
                  }
             }
