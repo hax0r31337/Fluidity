@@ -1,5 +1,6 @@
-package me.liuli.fluidity.util.client
+package me.liuli.fluidity.gui
 
+import me.liuli.fluidity.util.client.logWarn
 import me.liuli.fluidity.util.mc
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -32,17 +33,19 @@ object DependencyDownloader {
     private val dependencyList = mutableListOf<Dependency>()
     var loaded = false
         private set
-    var totalSize = 0
+    var exception: Throwable? = null
         private set
-    var downloadedSize = 0
-        private set
+    private var totalSize = 0
+    private var downloadedSize = 0
 
     init {
-        val skikoVer = "0.7.32"
+        val skikoVer = "0.7.36"
         val baseUrl = "https://ayanoyuugiri.github.io/resources/skiko/$skikoVer"
-        dependencyList.add(Dependency(System.mapLibraryName("skiko-$os-$arch"), "$baseUrl/${System.mapLibraryName("skiko-$os-$arch")}", skikoVer))
+        System.mapLibraryName("skiko-$os-$arch").also {
+            dependencyList.add(Dependency(it, "$baseUrl/$it", skikoVer))
+        }
         if (os == "windows") {
-            dependencyList.add(Dependency("icudtl.dat", "$baseUrl/icudtl.dat", skikoVer))
+            dependencyList.add(Dependency("icudtl.dat", "https://ayanoyuugiri.github.io/resources/skiko/icudtl.dat", skikoVer))
         }
         System.setProperty("skiko.library.path", File(dependencyDir, skikoVer).absolutePath)
     }
@@ -79,10 +82,10 @@ object DependencyDownloader {
                         file.writeBytes(out.toByteArray())
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 e.printStackTrace()
                 dependencyDir.deleteRecursively() // this may solve the crash while loading
-                mc.addScheduledTask { throw e }
+                exception = e
             } finally {
                 loaded = true
             }
@@ -90,7 +93,12 @@ object DependencyDownloader {
     }
 
     fun awaitLoad() {
-        if (loaded) return
+        if (loaded) {
+            if (exception != null) {
+                throw exception!!
+            }
+            return
+        }
 
         val frame = JFrame("Please wait...")
         frame.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE

@@ -2,6 +2,7 @@ package me.liuli.fluidity.inject.hooks.impl.client
 
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.*
+import me.liuli.fluidity.gui.DependencyDownloader
 import me.liuli.fluidity.inject.hooks.Hook
 import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.util.mc
@@ -18,11 +19,13 @@ class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
 
     @Hook(method = "run", type = Hook.Type("ENTER"))
     fun run() {
+        DependencyDownloader.asyncLoad()
         Fluidity.init()
     }
 
     @Hook(method = "startGame", type = Hook.Type("EXIT"))
     fun startGame() {
+        DependencyDownloader.awaitLoad()
         Fluidity.load()
     }
 
@@ -59,7 +62,7 @@ class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
     fun displayGuiScreen(param: MethodHookParam) {
         val screen = param.args[0] as GuiScreen?
         Fluidity.eventManager.call(ScreenEvent(screen))
-        if (screen is GuiMainMenu/* || (screen == null && mc.theWorld == null)*/) {
+        if (screen is GuiMainMenu || (screen == null && mc.theWorld == null)) {
             param.args[0] = me.liuli.fluidity.gui.screen.GuiMainMenu()
         }
     }

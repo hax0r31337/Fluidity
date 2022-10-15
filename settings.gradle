@@ -2,9 +2,11 @@ pluginManagement {
 	repositories {
 //		mavenLocal()
 		maven {
-			url = "https://ayanoyuugiri.github.io/compose-j8/"
+			url = "https://mccheatz.github.io/maven_repo/"
 			content {
+				includeGroupByRegex "me\\.yuugiri\\.compose.*"
 				includeGroupByRegex "org\\.jetbrains\\.compose.*"
+				includeGroupByRegex "org\\.jetbrains\\.skiko.*"
 			}
 		}
 		mavenCentral()
@@ -19,7 +21,7 @@ pluginManagement {
 //					useModule("me.yuugiri.fluiditygradle:FluidityGradle:1.0.0")
 					break
 				case "org.jetbrains.compose":
-					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}")
+					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}-edit")
 					break
 			}
 		}

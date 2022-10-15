@@ -8,8 +8,9 @@ plugins {
 
 repositories {
     maven {
-        url = "https://ayanoyuugiri.github.io/compose-j8/"
+        url = "https://mccheatz.github.io/maven_repo/"
         content {
+            includeGroupByRegex "me\\.yuugiri\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.skiko.*"
         }
@@ -35,6 +36,17 @@ configurations {
     implementation.extendsFrom(include)
 }
 
+String targetOs = "linux"
+if (System.getProperty("os.name").startsWith("Win")) {
+    targetOs = "windows"
+} else if (System.getProperty("os.name") == "Mac OS X") {
+    targetOs = "macos"
+}
+String targetArch = "x64"
+if (System.getProperty("os.arch") == "aarch64") {
+    targetArch = "arm64"
+}
+
 dependencies {
     include('com.github.mccheatz:HookUtility:792e21cbd9') {
         exclude group: 'org.ow2.asm'
@@ -49,19 +61,8 @@ dependencies {
     include (project(":gui")) {
         exclude module: "minecraftbin"
         exclude group: "org.ow2.asm"
-        exclude group: "org.jetbrains.skiko"
+        exclude module: "skiko-awt-runtime-$targetOs-$targetArch"
     }
-
-    // ==== USED IN DEBUG ENVIRONMENT ====
-    include "org.jetbrains.skiko:skiko-awt:$skiko_version"
-//    implementation("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
-//        exclude module: "kotlin-stdlib"
-//        exclude module: "kotlin-stdlib-common"
-//        exclude module: "kotlin-stdlib-jdk8"
-//        exclude module: "skiko"
-//    }
-//    implementation "org.jetbrains.compose.ui:ui-util:$compose_version"
-    // ==== USED IN DEBUG ENVIRONMENT ====
 
     include fileTree(include: ["*.jar"], dir: "libs")
 }
@@ -91,6 +92,7 @@ shadowJar {
 genIntelliJRuns {
     vmParams = "-Dfml.coreMods.load=me.liuli.fluidity.inject.FMLLoadingPlugin"
 }
+
 classes.dependsOn(putObfMap)
 reobfJarWithStrip.dependsOn(shadowJar)
 tasks.getByName("build").dependsOn(reobfJarWithStrip)

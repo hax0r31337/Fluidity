@@ -5,7 +5,6 @@ import me.liuli.fluidity.config.ConfigManager
 import me.liuli.fluidity.event.EventManager
 import me.liuli.fluidity.module.ModuleManager
 import me.liuli.fluidity.pathfinder.Pathfinder
-import me.liuli.fluidity.util.client.DependencyDownloader
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.client.setTitle
 import java.util.*
@@ -34,14 +33,11 @@ object Fluidity {
     fun init() {
         logInfo("Initialize $NAME $VERSION")
         eventManager = EventManager()
-        DependencyDownloader.asyncLoad()
     }
 
     fun load() {
         logInfo("Loading $NAME $VERSION")
         setTitle("LoadClient")
-
-        DependencyDownloader.awaitLoad()
 
         eventManager.registerListener(ConfigManager)
         CommandManager

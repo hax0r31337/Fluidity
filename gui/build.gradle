@@ -19,8 +19,9 @@ configurations.all {
 
 repositories {
     maven {
-        url = "https://ayanoyuugiri.github.io/compose-j8/"
+        url = "https://mccheatz.github.io/maven_repo/"
         content {
+            includeGroupByRegex "me\\.yuugiri\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.skiko.*"
         }
@@ -28,6 +29,7 @@ repositories {
     maven {
         url = "https://maven.pkg.jetbrains.space/public/p/compose/dev"
         content {
+            includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeModuleByRegex ("org\\.jetbrains\\.skiko.*", "skiko-awt-runtime-.*")
         }
     }
@@ -55,11 +57,11 @@ dependencies {
         exclude module: "kotlin-stdlib"
         exclude module: "kotlin-stdlib-common"
         exclude module: "kotlin-stdlib-jdk8"
-        exclude module: "skiko"
+        exclude group: "org.jetbrains.skiko"
     }
     implementation "org.jetbrains.compose.ui:ui-util:$compose_version"
 
-    runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.32"
+    runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.36"
 
     implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
 }
