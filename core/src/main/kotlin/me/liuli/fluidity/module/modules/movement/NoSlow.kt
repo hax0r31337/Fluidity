@@ -19,7 +19,7 @@ import net.minecraft.util.EnumFacing
 
 class NoSlow : Module("NoSlow", "Make you not slow down during item use", ModuleCategory.MOVEMENT) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Vanilla", "Hypixel", "Matrix"), "Vanilla")
+    private val modeValue = ListValue("Mode", arrayOf("Vanilla", "Hypixel", "Matrix", "PikaNW"), "Vanilla")
     private val blockMultiplier = FloatValue("BlockMultiplier", 1.0F, 0.2F, 1.0F)
     private val consumeMultiplier = FloatValue("ConsumeMultiplier", 1.0F, 0.2F, 1.0F)
     private val bowMultiplier = FloatValue("BowMultiplier", 1.0F, 0.2F, 1.0F)
@@ -63,6 +63,14 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
                 if (packetBuf.size >= 3 && pre) {
                     mc.netHandler.addToSendQueue(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
                     releaseBuf()
+                    mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0.0f, 0.0f, 0.0f))
+                }
+            }
+            "PikaNW" -> {
+                val ticks = mc.thePlayer.ticksExisted % 30
+                if (ticks == 25 && pre) {
+                    mc.netHandler.addToSendQueue(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN))
+                } else if (ticks == 0 && !pre) {
                     mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), 255, null, 0.0f, 0.0f, 0.0f))
                 }
             }
