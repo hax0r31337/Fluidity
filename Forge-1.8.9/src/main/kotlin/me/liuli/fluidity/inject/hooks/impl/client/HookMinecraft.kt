@@ -1,3 +1,8 @@
+/*
+ * This file is part of Fluidity Utility Mod.
+ * Use of this source code is governed by the GPLv3 license that can be found in the LICENSE file.
+ */
+
 package me.liuli.fluidity.inject.hooks.impl.client
 
 import me.liuli.fluidity.Fluidity
@@ -31,7 +36,9 @@ class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
 
     @Hook(method = "shutdown", type = Hook.Type("ENTER"))
     fun shutdown() {
-        Fluidity.shutdown()
+        if (Fluidity.hasLoaded) {
+            Fluidity.shutdown()
+        }
     }
 
     @Hook(method = "runTick", type = Hook.Type("INVOKE", "net/minecraft/client/Minecraft;dispatchKeypresses()V"), shift = EnumHookShift.AFTER)
