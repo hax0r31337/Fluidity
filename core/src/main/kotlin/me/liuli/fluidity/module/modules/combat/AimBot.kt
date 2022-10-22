@@ -23,8 +23,10 @@ import kotlin.math.floor
 class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
 
     private val rangeValue = FloatValue("Range", 4.5f, 1f, 10f)
-    private val minTurnSpeedValue = FloatValue("MinTurnSpeed", 10f, 1F, 180F)
-    private val maxTurnSpeedValue = FloatValue("MaxTurnSpeed", 50f, 1F, 180F)
+    private val minYawTurnSpeedValue = FloatValue("MinYawTurnSpeed", 10f, 1F, 180F)
+    private val maxYawTurnSpeedValue = FloatValue("MaxYawTurnSpeed", 50f, 1F, 180F)
+    private val minPitchTurnSpeedValue = FloatValue("MinPitchTurnSpeed", 10f, 1F, 180F)
+    private val maxPitchTurnSpeedValue = FloatValue("MaxPitchTurnSpeed", 50f, 1F, 180F)
     private val priorityValue = ListValue("Priority", arrayOf("Health", "Distance", "Fov", "LivingTime", "Armor", "HurtResistantTime"), "Distance")
     private val fovValue = FloatValue("FOV", 180F, 1F, 180F)
     private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
@@ -89,7 +91,8 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         val rotationDiff = getRotationDifference(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second)
 
         var (yaw, pitch) = limitAngleChange(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second,
-            ((rotationDiff / 180) * maxTurnSpeedValue.get() + (1 - rotationDiff / 180) * minTurnSpeedValue.get()).toFloat())
+            ((rotationDiff / 180) * maxYawTurnSpeedValue.get() + (1 - rotationDiff / 180) * minYawTurnSpeedValue.get()).toFloat(),
+            ((rotationDiff / 180) * maxPitchTurnSpeedValue.get() + (1 - rotationDiff / 180) * minPitchTurnSpeedValue.get()).toFloat())
 
         if (floor(yaw) == floor(mc.thePlayer.rotationYaw) && floor(pitch) == floor(mc.thePlayer.rotationPitch)) {
             needAimBack = false

@@ -41,18 +41,28 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     private val sortSwordValue = IntValue("SortSword", 0, -1, 8)
     private val sortPickaxeValue = IntValue("SortPickaxe", 5, -1, 8)
     private val sortAxeValue = IntValue("SortAxe", 6, -1, 8)
+    private val sortBlockValue = IntValue("SortBlock", 7, -1, 8)
+    private val sortGAppleValue = IntValue("SortGapple", 2, -1, 8)
+    private val noSortNoCloseForPlayerValue = BoolValue("NoSortNoCloseForPlayer", true)
 
     val usefulItems = mutableListOf<Slot>()
     val garbageItems = mutableListOf<Slot>()
     val normalItems = mutableListOf<Slot>()
 
     private val clickTimer = ClickTimer()
+    private var sorted = false
 
     override fun onDisable() {
         usefulItems.clear()
         garbageItems.clear()
         normalItems.clear()
+        updateClick()
+        sorted = false
+    }
+    
+    private fun updateClick() {
         clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+        sorted = true
     }
 
     @Listen
@@ -61,7 +71,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
         garbageItems.clear()
         normalItems.clear()
         if (mc.currentScreen !is GuiContainer) {
-            clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+            updateClick()
+            sorted = false
             return
         }
 
@@ -89,36 +100,36 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             // sort inventory
             garbageItems.forEach {
                 if (processClick(it, gui, ItemLevel.GARBAGE, mouseX, mouseY)) {
-                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    updateClick()
                     return
                 }
             }
             usefulItems.forEach {
                 if (processClick(it, gui, ItemLevel.BETTER, mouseX, mouseY)) {
-                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    updateClick()
                     return
                 }
             }
             normalItems.forEach {
-                if (it.slotNumber !in 36..44 && processClick(it, gui, ItemLevel.NORMAL, mouseX, mouseY)) {
-                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                if (processClick(it, gui, ItemLevel.NORMAL, mouseX, mouseY)) {
+                    updateClick()
                     return
                 }
             }
-            if (autoCloseValue.get()) {
+            if (autoCloseValue.get() && clickTimer.hasTimePassed(autoCloseDelayValue.get()) && (!noSortNoCloseForPlayerValue.get() || sorted)) {
                 mc.thePlayer.closeScreen()
             }
         } else if (stealChestValue.get()) {
             // steal items
             usefulItems.forEach {
                 if (processSteal(it, gui, mouseX, mouseY)) {
-                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    updateClick()
                     return
                 }
             }
             normalItems.forEach {
                 if (processSteal(it, gui, mouseX, mouseY)) {
-                    clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+                    updateClick()
                     return
                 }
             }
@@ -166,6 +177,16 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                 false
             }
         } else {
+            val item = slot.stack?.item ?: return false
+            if (sortGAppleValue.get() != -1 && item is ItemAppleGold && slot.slotNumber != 36 + sortGAppleValue.get() && mc.thePlayer.inventory.getStackInSlot(sortGAppleValue.get())?.item !is ItemAppleGold) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortGAppleValue.get(), 2, mc.thePlayer)
+                true
+            } else if (sortBlockValue.get() != -1 && item is ItemBlock && slot.slotNumber != 36 + sortBlockValue.get() && mc.thePlayer.inventory.getStackInSlot(sortBlockValue.get())?.item !is ItemBlock) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortBlockValue.get(), 2, mc.thePlayer)
+                true
+            } else {
+                false
+            }
             // TODO: sort normal items
             false
         }

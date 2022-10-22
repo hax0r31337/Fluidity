@@ -148,12 +148,12 @@ fun getAngleDifference(a: Float, b: Float): Float {
  * @param turnSpeed your turn speed
  * @return limited rotation
  */
-fun limitAngleChange(aYaw: Float, aPitch: Float, bYaw: Float, bPitch: Float, turnSpeed: Float): Pair<Float, Float> {
+fun limitAngleChange(aYaw: Float, aPitch: Float, bYaw: Float, bPitch: Float, turnSpeedYaw: Float, turnSpeedPitch: Float): Pair<Float, Float> {
     val yawDifference = getAngleDifference(bYaw, aYaw)
     val pitchDifference = getAngleDifference(bPitch, aPitch)
     return Pair(
-        aYaw + if (yawDifference > turnSpeed) turnSpeed else yawDifference.coerceAtLeast(-turnSpeed),
-        aPitch + if (pitchDifference > turnSpeed) turnSpeed else pitchDifference.coerceAtLeast(-turnSpeed)
+        aYaw + if (yawDifference > turnSpeedYaw) turnSpeedYaw else yawDifference.coerceAtLeast(-turnSpeedYaw),
+        aPitch + if (pitchDifference > turnSpeedPitch) turnSpeedPitch else pitchDifference.coerceAtLeast(-turnSpeedPitch)
     )
 }
 
