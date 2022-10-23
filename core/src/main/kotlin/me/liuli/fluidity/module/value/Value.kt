@@ -11,7 +11,7 @@ import me.liuli.fluidity.util.client.logWarn
 abstract class Value<T>(val name: String, protected var value: T) {
     val defaultValue = value
 
-    fun set(newValue: T) {
+    open fun set(newValue: T) {
         if (newValue == value) return
 
         val oldValue = get()
@@ -25,7 +25,7 @@ abstract class Value<T>(val name: String, protected var value: T) {
         }
     }
 
-    fun get() = value
+    open fun get() = value
 
     open fun changeValue(value: T) {
         this.value = value

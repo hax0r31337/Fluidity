@@ -14,6 +14,8 @@ import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook.EnumFlags
+import net.minecraft.network.play.server.S40PacketDisconnect
+import net.minecraft.util.ChatComponentText
 
 class HookNetHandlerPlayClient : HookProvider("net.minecraft.client.network.NetHandlerPlayClient") {
 
@@ -28,7 +30,7 @@ class HookNetHandlerPlayClient : HookProvider("net.minecraft.client.network.NetH
         val y = pk.y
         val z = pk.z
         if (x >= Int.MAX_VALUE || x <= Int.MIN_VALUE || y >= Int.MAX_VALUE || y <= Int.MIN_VALUE || z >= Int.MAX_VALUE || z <= Int.MIN_VALUE) {
-            mc.netHandler.addToSendQueue(C06PacketPlayerPosLook(x, y, z, pk.yaw, pk.pitch, false))
+            mc.netHandler.networkManager.closeChannel(ChatComponentText("The server attempt crash your client."))
             param.result = null
         }
     }

@@ -9,6 +9,7 @@ import me.liuli.fluidity.command.CommandManager
 import me.liuli.fluidity.config.ConfigManager
 import me.liuli.fluidity.event.EventManager
 import me.liuli.fluidity.module.ModuleManager
+import me.liuli.fluidity.module.special.CombatManager
 import me.liuli.fluidity.pathfinder.Pathfinder
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.client.setTitle
@@ -46,6 +47,7 @@ object Fluidity {
 
         eventManager.registerListener(ConfigManager)
         CommandManager
+        eventManager.registerListener(CombatManager)
         eventManager.registerListener(Pathfinder)
         eventManager.registerListener(ModuleManager)
 

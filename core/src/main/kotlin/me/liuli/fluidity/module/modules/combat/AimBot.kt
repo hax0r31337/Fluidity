@@ -12,12 +12,18 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
+import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
+import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.*
+import me.liuli.fluidity.util.timing.TheTimer
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
 import me.liuli.fluidity.util.world.rayTraceEntity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.Vec3
+import java.util.*
 import kotlin.math.floor
 
 class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
@@ -27,23 +33,38 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private val maxYawTurnSpeedValue = FloatValue("MaxYawTurnSpeed", 50f, 1F, 180F)
     private val minPitchTurnSpeedValue = FloatValue("MinPitchTurnSpeed", 10f, 1F, 180F)
     private val maxPitchTurnSpeedValue = FloatValue("MaxPitchTurnSpeed", 50f, 1F, 180F)
+    private val backtrackTicksValue = IntValue("BackTrack", 0, 0, 10)
     private val priorityValue = ListValue("Priority", arrayOf("Health", "Distance", "Fov", "LivingTime", "Armor", "HurtResistantTime"), "Distance")
     private val fovValue = FloatValue("FOV", 180F, 1F, 180F)
     private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
     private val throughWallsValue = BoolValue("ThroughWalls", false)
     private val onlyHoldMouseValue = BoolValue("OnlyHoldMouse", true)
     private val silentRotationValue = BoolValue("SilentRotation", false)
-    private val lockValue = BoolValue("Lock", false)
+    private val aimingModeValue = ListValue("AimingMode", arrayOf("Common", "Lock", "PikaNW"), "Common")
+    private val keepRotationValue = IntValue("KeepRotation", 1000, 0, 2500)
 
     private val playerRotation: Pair<Float, Float>
-        get() = Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
+        get() = if (lastAimingAt != null && !lastAimingTimer.hasTimePassed(keepRotationValue.get())) lastAimingAt!!
+                else Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
 
     private var hasTarget = false
     private var needAimBack = false
+    private var lastAimingAt: Pair<Float, Float>? = null
+    private var lastAimingTimer = TheTimer()
+    private val backtrackQueue = mutableMapOf<Int, Queue<Vec3>>()
 
-    override fun onEnable() {
+    override fun onDisable() {
         hasTarget = false
         needAimBack = false
+        backtrackQueue.clear()
+        lastAimingAt = null
+    }
+
+    private fun getCenter(entity: EntityLivingBase): Vec3 {
+        // only limit the scope of backtrack to player, that saves performance :)
+        if (entity !is EntityPlayer || backtrackTicksValue.get() == 0) return getCenter(entity.entityBoundingBox)
+
+        return backtrackQueue[entity.entityId]?.peek() ?: getCenter(entity.entityBoundingBox)
     }
 
     private fun getRotation(): Pair<Float, Float>{
@@ -67,18 +88,29 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
                 }
             } ?: return playerRotation
 
-        val boundingBox = entity.entityBoundingBox ?: return playerRotation
-
         hasTarget = true
         needAimBack = true
 
-        val correctAim = toRotation(getCenter(boundingBox), true)
-        if (lockValue.get()) return correctAim
-
-        // simple searching
-        return if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.rotationPitch) { it == entity } != null) {
-            Pair(correctAim.first, mc.thePlayer.rotationPitch)
-        } else correctAim
+        val correctAim = toRotation(getCenter(entity), true)
+        return when(aimingModeValue.get()) {
+            "Lock" -> correctAim
+            // TODO: improve
+            "Common" -> if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.serverRotationPitch) { it == entity } != null) {
+                Pair(correctAim.first, mc.thePlayer.serverRotationPitch)
+            } else correctAim
+            "PikaNW" -> {
+                val hurt = ((1 - (entity.hurtTime / (entity.maxHurtTime - 1).toFloat())) * 1.5f).coerceAtMost(1f).let {
+                    if (it == 1f) 0f else it
+                }
+                val aim = if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.serverRotationPitch) { it == entity } != null) {
+                    Pair(correctAim.first, mc.thePlayer.serverRotationPitch) } else correctAim
+                Pair(aim.first + hurt * 100 + if (hurt != 0f) -50 else 0, aim.second)
+            }
+            else -> throw IllegalArgumentException("Invalid aiming mode: ${aimingModeValue.get()}")
+        }.also {
+            lastAimingAt = it
+            lastAimingTimer.reset()
+        }
     }
 
     @Listen
@@ -110,6 +142,27 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
             setServerRotation(yaw, pitch)
         } else {
             setClientRotation(yaw, pitch)
+        }
+
+        try {
+            updateBacktrack()
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
+    }
+
+    private fun updateBacktrack() {
+        val t = backtrackTicksValue.get()
+        if (t == 0) return
+        backtrackQueue.keys.map { it }.forEach {
+            if (mc.theWorld.getEntityByID(it) == null) {
+                backtrackQueue.remove(it)
+            }
+        }
+        mc.theWorld.loadedEntityList.filterIsInstance<EntityPlayer>().forEach {
+            val q = backtrackQueue[it.entityId] ?: LinkedList<Vec3>().also { q -> backtrackQueue[it.entityId] = q }
+            q.offer(getCenter(it.entityBoundingBox))
+            if (q.size > t) q.poll()
         }
     }
 }

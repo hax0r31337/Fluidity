@@ -22,6 +22,8 @@ import org.lwjgl.input.Keyboard
 
 class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
 
+    private val disableCustomMenuGui = System.getProperty("fluidity.disableCustomMenu") != null
+
     @Hook(method = "run", type = Hook.Type("ENTER"))
     fun run() {
         DependencyDownloader.asyncLoad()
@@ -69,7 +71,7 @@ class HookMinecraft : HookProvider("net.minecraft.client.Minecraft") {
     fun displayGuiScreen(param: MethodHookParam) {
         val screen = param.args[0] as GuiScreen?
         Fluidity.eventManager.call(ScreenEvent(screen))
-        if (screen is GuiMainMenu || (screen == null && mc.theWorld == null)) {
+        if (!disableCustomMenuGui && (screen is GuiMainMenu || (screen == null && mc.theWorld == null))) {
             param.args[0] = me.liuli.fluidity.gui.screen.GuiMainMenu()
         }
     }

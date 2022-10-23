@@ -187,8 +187,6 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             } else {
                 false
             }
-            // TODO: sort normal items
-            false
         }
     }
 

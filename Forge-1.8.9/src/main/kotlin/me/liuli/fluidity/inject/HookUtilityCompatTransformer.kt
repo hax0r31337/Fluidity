@@ -27,7 +27,7 @@ class HookUtilityCompatTransformer : IClassTransformer {
     }
 
     override fun transform(name: String, transformedName: String?, data: ByteArray): ByteArray {
-        if (name.startsWith("kotlin") || name.startsWith("me.yuugiri")) return data
+        if (name.startsWith("kotlin") || name.startsWith("me.yuugiri") || name.startsWith("org.spongepowered")) return data
 
         return hook.dealWithClassData(data, (transformedName ?: name).replace('.', '/'))/*.also {
             File("dump/$name.class").writeBytes(it)
