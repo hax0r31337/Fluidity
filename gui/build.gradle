@@ -53,13 +53,15 @@ dependencies {
 
     // compose
     implementation "org.jetbrains.skiko:skiko-awt:$skiko_version"
-    implementation("org.jetbrains.compose.desktop:desktop-jvm:$compose_version") {
+    implementation("org.jetbrains.compose.material3:material3-desktop:$compose_version")  {
         exclude module: "kotlin-stdlib"
         exclude module: "kotlin-stdlib-common"
         exclude module: "kotlin-stdlib-jdk8"
         exclude group: "org.jetbrains.skiko"
     }
-    implementation "org.jetbrains.compose.ui:ui-util:$compose_version"
+    implementation("org.jetbrains.compose.ui:ui-tooling:$compose_version") {
+        exclude group: "org.jetbrains.skiko"
+    }
 
     runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.36"
 

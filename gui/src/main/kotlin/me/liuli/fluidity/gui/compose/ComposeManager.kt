@@ -20,7 +20,6 @@ import org.lwjgl.BufferChecks
 import org.lwjgl.opengl.ContextCapabilities
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
-import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -46,7 +45,9 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
             scene = ComposeScene(coroutineContext) {
                 queueDraw = true
             }.apply {
-                setContent(content)
+                setContent {
+                    content() // TODO: themed
+                }
                 constraints = Constraints(maxWidth = width, maxHeight = height)
             }
         }

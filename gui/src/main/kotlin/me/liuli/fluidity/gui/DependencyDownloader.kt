@@ -6,7 +6,6 @@
 package me.liuli.fluidity.gui
 
 import me.liuli.fluidity.util.client.logWarn
-import me.liuli.fluidity.util.mc
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.io.ByteArrayOutputStream
