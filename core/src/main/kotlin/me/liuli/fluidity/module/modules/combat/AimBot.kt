@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.Vec3
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.floor
 
 class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
@@ -99,12 +100,14 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
                 Pair(correctAim.first, mc.thePlayer.serverRotationPitch)
             } else correctAim
             "PikaNW" -> {
-                val hurt = ((1 - (entity.hurtTime / (entity.maxHurtTime - 1).toFloat())) * 1.5f).coerceAtMost(1f).let {
+                val hurt = ((1 - (entity.hurtTime / entity.maxHurtTime.toFloat())) * 1.5f).coerceAtMost(1f).let {
                     if (it == 1f) 0f else it
                 }
                 val aim = if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.serverRotationPitch) { it == entity } != null) {
                     Pair(correctAim.first, mc.thePlayer.serverRotationPitch) } else correctAim
-                Pair(aim.first + hurt * 100 + if (hurt != 0f) -50 else 0, aim.second)
+                var yaw = aim.first + hurt * 50 + if (hurt != 0f) -25 else 0
+                if (abs(mc.thePlayer.serverRotationYaw - yaw) > 30) yaw += (Math.random().toFloat() - 0.5f) * 6
+                Pair(yaw, aim.second + (Math.random().toFloat() - 0.5f) * 6)
             }
             else -> throw IllegalArgumentException("Invalid aiming mode: ${aimingModeValue.get()}")
         }.also {

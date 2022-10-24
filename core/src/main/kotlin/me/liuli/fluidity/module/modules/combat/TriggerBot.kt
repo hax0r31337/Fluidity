@@ -18,6 +18,7 @@ import me.liuli.fluidity.util.timing.ClickTimer
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
 import me.liuli.fluidity.util.world.rayTraceEntity
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemSword
 
 class TriggerBot : Module("TriggerBot", "Automatically attack the target you view", ModuleCategory.COMBAT) {
@@ -26,7 +27,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     private val maxCpsValue = IntValue("MaxCPS", 12, 1, 20)
     private val swingItemValue = BoolValue("SwingItem", true)
     private val rayTraceValue = ListValue("RayTrace", arrayOf("Vanilla", "ThroughWall"), "Vanilla")
-    private val autoBlockValue = BoolValue("AutoBlock", false)
+    private val autoBlockValue = ListValue("AutoBlock", arrayOf("Vanilla", "Hurt", "None"), "None")
 
     private val clickTimer = ClickTimer()
     private var lastBlocked = false
@@ -51,17 +52,27 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
 
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
-        if (autoBlockValue.get()) {
-            if (mc.thePlayer.heldItem?.item is ItemSword && mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }) {
-                lastBlocked = true
-                mc.gameSettings.keyBindUseItem.pressed = true
-            } else {
-                if (lastBlocked) {
-                    lastBlocked = false
-                    mc.gameSettings.keyBindUseItem.pressed = false
-                }
+        // autoblock
+        val canBlock = mc.thePlayer.heldItem?.item is ItemSword && when(autoBlockValue.get()) {
+            "Vanilla" -> mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
+            "Hurt" -> {
+                val target = mc.theWorld.loadedEntityList.find { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
+                if (target != null && target is EntityLivingBase) {
+                    ((1 - (target.hurtTime / target.maxHurtTime.toFloat())) * 1.7f).coerceAtMost(1f).let { if (it == 1f) 0f else it } != 0f
+                } else false
+            }
+            else -> false
+        }
+        if (canBlock) {
+            lastBlocked = true
+            mc.gameSettings.keyBindUseItem.pressed = true
+        } else {
+            if (lastBlocked) {
+                lastBlocked = false
+                mc.gameSettings.keyBindUseItem.pressed = false
             }
         }
+
         if (clickTimer.canClick()) {
             val target = rayTraceTarget() ?: return
             if (!target.isTarget(true)) {
