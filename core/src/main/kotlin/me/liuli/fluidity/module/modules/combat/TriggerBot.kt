@@ -58,7 +58,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
             "Hurt" -> {
                 val target = mc.theWorld.loadedEntityList.find { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
                 if (target != null && target is EntityLivingBase) {
-                    ((1 - (target.hurtTime / target.maxHurtTime.toFloat())) * 1.7f).coerceAtMost(1f).let { if (it == 1f) 0f else it } != 0f
+                    ((1 - (target.hurtTime / 10f)) * 1.5f).coerceAtMost(1f).let { if (it == 1f) 0f else it } != 0f
                 } else false
             }
             else -> false
