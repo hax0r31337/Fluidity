@@ -12,21 +12,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import me.liuli.fluidity.gui.compose.ThemeManager.theme
 import me.liuli.fluidity.gui.compose.gui.GuiComposeDynamic
 import me.liuli.fluidity.util.client.queueScreen
 import me.liuli.fluidity.util.mc
 import net.minecraft.client.gui.GuiMultiplayer
 
-private val theme = darkColorScheme()
 @Preview
 @Composable
 private fun MainMenu() {
+
     Column {
         var text by remember { mutableStateOf("Text") }
         TextField(text, { text = it })

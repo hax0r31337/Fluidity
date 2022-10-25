@@ -219,7 +219,6 @@ abstract class AbstractGuiCompose(private val backgroundColor: Int = Color.WHITE
                 Keyboard.KEY_K -> AwtKeyEvent.VK_K
                 Keyboard.KEY_L -> AwtKeyEvent.VK_L
                 Keyboard.KEY_SEMICOLON -> AwtKeyEvent.VK_SEMICOLON
-//                Keyboard.KEY_APOSTROPHE
                 Keyboard.KEY_GRAVE -> AwtKeyEvent.VK_DEAD_GRAVE
                 Keyboard.KEY_LSHIFT, Keyboard.KEY_RSHIFT -> AwtKeyEvent.VK_SHIFT
                 Keyboard.KEY_BACKSLASH -> AwtKeyEvent.VK_BACK_SLASH
@@ -281,31 +280,17 @@ abstract class AbstractGuiCompose(private val backgroundColor: Int = Color.WHITE
                 Keyboard.KEY_UNDERLINE -> AwtKeyEvent.VK_UNDERSCORE
                 Keyboard.KEY_KANJI -> AwtKeyEvent.VK_KANJI
                 Keyboard.KEY_STOP -> AwtKeyEvent.VK_STOP
-//                Keyboard.KEY_AX
-//                Keyboard.KEY_UNLABELED
-//                Keyboard.KEY_SECTION
                 Keyboard.KEY_DIVIDE -> AwtKeyEvent.VK_DIVIDE
-//                Keyboard.KEY_SYSRQ
-//                Keyboard.KEY_FUNCTION
                 Keyboard.KEY_PAUSE -> AwtKeyEvent.VK_PAUSE
                 Keyboard.KEY_HOME -> AwtKeyEvent.VK_HOME
                 Keyboard.KEY_UP -> AwtKeyEvent.VK_UP
-//                Keyboard.KEY_PRIOR
                 Keyboard.KEY_LEFT -> AwtKeyEvent.VK_LEFT
                 Keyboard.KEY_RIGHT -> AwtKeyEvent.VK_RIGHT
                 Keyboard.KEY_END -> AwtKeyEvent.VK_END
                 Keyboard.KEY_DOWN -> AwtKeyEvent.VK_DOWN
-//                Keyboard.KEY_NEXT
                 Keyboard.KEY_INSERT -> AwtKeyEvent.VK_INSERT
                 Keyboard.KEY_DELETE -> AwtKeyEvent.VK_DELETE
                 Keyboard.KEY_CLEAR -> AwtKeyEvent.VK_CLEAR
-//                Keyboard.KEY_LMETA
-                Keyboard.KEY_LWIN -> AwtKeyEvent.VK_WINDOWS
-                Keyboard.KEY_RMETA -> AwtKeyEvent.VK_WINDOWS
-                Keyboard.KEY_RWIN -> AwtKeyEvent.VK_WINDOWS
-//                Keyboard.KEY_APPS
-//                Keyboard.KEY_POWER
-//                Keyboard.KEY_SLEEP
                 else -> c.code
             }
         }

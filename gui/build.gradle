@@ -15,13 +15,18 @@ configurations.all {
     attributes {
         attribute(Attribute.of("ui", String.class), "awt")
     }
+    resolutionStrategy.eachDependency {
+        if (requested.group == "me.yuugiri.compose.compiler") {
+            useTarget("androidx.compose.compiler:compiler:1.3.3")
+        }
+    }
 }
 
 repositories {
     maven {
         url = "https://mccheatz.github.io/maven_repo/"
         content {
-            includeGroupByRegex "me\\.yuugiri\\.compose.*"
+            includeGroupByRegex "androidx\\.compose\\.compiler.*"
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.skiko.*"
         }
