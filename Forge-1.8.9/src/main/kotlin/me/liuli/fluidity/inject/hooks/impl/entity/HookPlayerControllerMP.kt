@@ -23,7 +23,7 @@ class HookPlayerControllerMP : HookProvider("net.minecraft.client.multiplayer.Pl
         val targetEntity = (param.args[1] ?: return) as Entity
 
         val event = AttackEvent(targetEntity)
-        Fluidity.eventManager.call(event)
+        Fluidity.eventManager.emit(event)
         if (event.cancelled) {
             param.result = null
         }
@@ -31,7 +31,7 @@ class HookPlayerControllerMP : HookProvider("net.minecraft.client.multiplayer.Pl
 
     @Hook(method = "onPlayerRightClick", type = Hook.Type("ENTER"))
     fun onPlayerRightClick(param: MethodHookParam) {
-        Fluidity.eventManager.call(ClickBlockEvent(ClickBlockEvent.Type.RIGHT, param.args[3] as BlockPos?, param.args[4] as EnumFacing?))
+        Fluidity.eventManager.emit(ClickBlockEvent(ClickBlockEvent.Type.RIGHT, param.args[3] as BlockPos?, param.args[4] as EnumFacing?))
     }
 
     @Hook(method = "getBlockReachDistance", type = Hook.Type("ENTER"))

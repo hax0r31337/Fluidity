@@ -30,7 +30,7 @@ object HookEntityPlayerSP : HookProvider("net.minecraft.client.entity.EntityPlay
 
     @Hook(method = "onUpdateWalkingPlayer", type = Hook.Type("ENTER"))
     fun onUpdateWalkingPlayerEnter() {
-        Fluidity.eventManager.call(PreMotionEvent())
+        Fluidity.eventManager.emit(PreMotionEvent())
     }
 
     @Hook(method = "onUpdateWalkingPlayer", type = Hook.Type("EXIT"))
@@ -39,7 +39,7 @@ object HookEntityPlayerSP : HookProvider("net.minecraft.client.entity.EntityPlay
         RotationUtils.applyVisualYawUpdate()
         RotationUtils.flushLastReported()
 
-        Fluidity.eventManager.call(PostMotionEvent())
+        Fluidity.eventManager.emit(PostMotionEvent())
     }
 
     @MethodProcess(method = "onUpdateWalkingPlayer")
@@ -60,13 +60,13 @@ object HookEntityPlayerSP : HookProvider("net.minecraft.client.entity.EntityPlay
 
     @Hook(method = "onLivingUpdate", type = Hook.Type("ENTER"))
     fun onLivingUpdate(param: MethodHookParam) {
-        Fluidity.eventManager.call(UpdateEvent())
+        Fluidity.eventManager.emit(UpdateEvent())
 
         val player = param.thisObject as EntityPlayerSP
         // call SlowDownEvent and get value
         if (player.isUsingItem && !player.isRiding) {
             val slowDownEvent = SlowDownEvent(0.2f)
-            Fluidity.eventManager.call(slowDownEvent)
+            Fluidity.eventManager.emit(slowDownEvent)
             slowdown = slowDownEvent.percentage
         }
     }

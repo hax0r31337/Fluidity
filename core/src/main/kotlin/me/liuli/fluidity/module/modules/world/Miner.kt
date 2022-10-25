@@ -98,7 +98,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
 
                 if (currentDamage == 0F) {
                     val event = ClickBlockEvent(ClickBlockEvent.Type.LEFT, pos, EnumFacing.DOWN)
-                    Fluidity.eventManager.call(event)
+                    Fluidity.eventManager.emit(event)
                     mc.netHandler.addToSendQueue(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, pos, EnumFacing.DOWN))
 
                     if (mc.thePlayer.capabilities.isCreativeMode ||

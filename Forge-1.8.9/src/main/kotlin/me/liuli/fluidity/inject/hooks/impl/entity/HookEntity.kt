@@ -33,7 +33,7 @@ object HookEntity : HookProvider("net.minecraft.entity.Entity") {
             return
 
         val strafeEvent = StrafeEvent(param.args[0] as Float, param.args[1] as Float, param.args[2] as Float)
-        Fluidity.eventManager.call(strafeEvent)
+        Fluidity.eventManager.emit(strafeEvent)
 
         if (strafeEvent.cancelled)
             param.result = null
@@ -51,7 +51,7 @@ object HookEntity : HookProvider("net.minecraft.entity.Entity") {
             return
 
         val moveEvent = MoveEvent(param.args[0] as Double, param.args[1] as Double, param.args[2] as Double)
-        Fluidity.eventManager.call(moveEvent)
+        Fluidity.eventManager.emit(moveEvent)
 
         if (moveEvent.cancelled)
             param.result = null
@@ -77,7 +77,7 @@ object HookEntity : HookProvider("net.minecraft.entity.Entity") {
     @JvmStatic
     fun stepHeight(stepHeightIn: Float): Float {
         val stepEvent = StepEvent(stepHeightIn)
-        Fluidity.eventManager.call(stepEvent)
+        Fluidity.eventManager.emit(stepEvent)
         return stepEvent.stepHeight
     }
 }

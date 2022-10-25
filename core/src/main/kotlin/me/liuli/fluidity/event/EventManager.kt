@@ -25,7 +25,7 @@ class EventManager {
         registerHandler(HandlerFunction(func, target))
     }
 
-    fun call(event: Event) {
+    fun emit(event: Event) {
         for (handler in (handlers[event.javaClass] ?: return)) {
             handler.invoke(event)
         }

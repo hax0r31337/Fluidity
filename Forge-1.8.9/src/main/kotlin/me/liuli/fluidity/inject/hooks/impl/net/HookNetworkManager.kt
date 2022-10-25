@@ -23,7 +23,7 @@ class HookNetworkManager : HookProvider("net.minecraft.network.NetworkManager") 
         if (getPacketType(packet) !== PacketUtils.PacketType.SERVERSIDE) return
 
         val event = PacketEvent(packet, PacketEvent.Type.RECEIVE)
-        Fluidity.eventManager.call(event)
+        Fluidity.eventManager.emit(event)
 
         if (event.cancelled) param.result = null
     }
@@ -35,7 +35,7 @@ class HookNetworkManager : HookProvider("net.minecraft.network.NetworkManager") 
         if (getPacketType(packet) !== PacketUtils.PacketType.CLIENTSIDE) return
 
         val event = PacketEvent(packet, PacketEvent.Type.SEND)
-        Fluidity.eventManager.call(event)
+        Fluidity.eventManager.emit(event)
 
         if (event.cancelled) param.result = null
     }

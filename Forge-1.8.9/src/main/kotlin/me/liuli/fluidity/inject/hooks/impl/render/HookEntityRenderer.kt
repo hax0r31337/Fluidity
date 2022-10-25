@@ -32,7 +32,7 @@ object HookEntityRenderer : HookProvider("net.minecraft.client.renderer.EntityRe
 
     @Hook(method = "renderWorldPass", type = Hook.Type("FIELD", "net/minecraft/client/renderer/EntityRenderer;renderHand"))
     fun renderWorldPass(param: MethodHookParam) {
-        Fluidity.eventManager.call(Render3DEvent(param.args[1] as Float))
+        Fluidity.eventManager.emit(Render3DEvent(param.args[1] as Float))
     }
 
     @MethodProcess(method = "getMouseOver")

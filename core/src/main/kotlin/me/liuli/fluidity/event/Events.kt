@@ -10,6 +10,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 
@@ -66,3 +67,5 @@ class PacketEvent(val packet: Packet<*>, val type: Type) : EventCancellable() {
 class Render2DEvent(val scaledResolution: ScaledResolution, val partialTicks: Float) : Event()
 
 class Render3DEvent(val partialTicks: Float) : Event()
+
+class BlockBBEvent(val list: MutableList<AxisAlignedBB>) : Event()
