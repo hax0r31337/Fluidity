@@ -12,16 +12,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import me.liuli.fluidity.gui.compose.ThemeManager.theme
+import me.liuli.fluidity.gui.theme.ThemeManager.scheme
 import me.liuli.fluidity.gui.compose.gui.GuiComposeDynamic
+import me.liuli.fluidity.gui.theme.ThemeManager.background
 import me.liuli.fluidity.util.client.queueScreen
 import me.liuli.fluidity.util.mc
 import net.minecraft.client.gui.GuiMultiplayer
@@ -29,7 +31,6 @@ import net.minecraft.client.gui.GuiMultiplayer
 @Preview
 @Composable
 private fun MainMenu() {
-
     Column {
         var text by remember { mutableStateOf("Text") }
         TextField(text, { text = it })
@@ -37,12 +38,12 @@ private fun MainMenu() {
         @Composable
         fun space() = Spacer(Modifier.height(5.dp))
 
-        Text("Hey, this is test :)", color = theme.primary)
+        Text("Hey, this is test :)", color = scheme.primary)
         Text("red background", Modifier.background(Color.Red))
 
         val clickCounter by remember { mutableStateOf(0) }
 
-        Button(onClick = { mc.queueScreen { GuiMultiplayer(mc.currentScreen) } }, colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray, contentColor = Color.White)) {
+        Button(onClick = { mc.queueScreen { GuiMultiplayer(mc.currentScreen) } }) {
             Text("don't click me")
         }
         space()
@@ -72,7 +73,17 @@ private fun MainMenu() {
 class GuiMainMenu : GuiComposeDynamic() {
 
     init {
-        content = { MainMenu() }
+        content = {
+            background(Modifier
+                .fillMaxSize()
+                .blur(
+                    radiusX = 10.dp,
+                    radiusY = 10.dp,
+                    edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(8.dp))
+                )
+            )
+            MainMenu()
+        }
     }
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {}

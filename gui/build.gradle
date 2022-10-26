@@ -39,6 +39,7 @@ repositories {
         }
     }
     mavenCentral()
+    maven { url = "https://jitpack.io/" }
 }
 
 String targetOs = "linux"
@@ -67,6 +68,7 @@ dependencies {
     implementation("org.jetbrains.compose.ui:ui-tooling:$compose_version") {
         exclude group: "org.jetbrains.skiko"
     }
+    implementation 'com.github.mccheatz:material-color-utilities-java:aafe62f0fc'
 
     runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.36"
 

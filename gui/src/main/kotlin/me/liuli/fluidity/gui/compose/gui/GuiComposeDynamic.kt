@@ -7,7 +7,7 @@ package me.liuli.fluidity.gui.compose.gui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import me.liuli.fluidity.gui.compose.ThemeManager.theme
+import me.liuli.fluidity.gui.theme.ThemeManager.scheme
 import org.jetbrains.skia.Color
 
 open class GuiComposeDynamic(backgroundColor: Int = Color.WHITE, repeatKeys: Boolean = true) : AbstractGuiCompose(backgroundColor, repeatKeys) {
@@ -15,7 +15,7 @@ open class GuiComposeDynamic(backgroundColor: Int = Color.WHITE, repeatKeys: Boo
     protected var content: @Composable () -> Unit = {}
         set(value) {
             field = {
-                MaterialTheme(colorScheme = theme) {
+                MaterialTheme(colorScheme = scheme) {
                     value()
                 }
             }
