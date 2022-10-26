@@ -53,16 +53,15 @@ class GhostInteract : Module("GhostInteract", "Allows you interact blocks throug
                             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.heldItem,
                                     blockPos, hitInfo.sideHit, hitInfo.hitVec)) {
                                 mc.thePlayer.swingItem()
+                                mc.gameSettings.keyBindUseItem.pressed = false
+                                hasClick = true
+                                return
                             }
                         }
                     }
                 }
             }
-
-            mc.gameSettings.keyBindUseItem.pressed = false
-            hasClick = true
         } else if (hasClick && mc.gameSettings.keyBindUseItem.pressed) {
-            mc.gameSettings.keyBindUseItem.pressed = false
         } else {
             hasClick = false
         }

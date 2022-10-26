@@ -20,6 +20,10 @@ import me.liuli.fluidity.util.world.rayTraceEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemSword
+import net.minecraft.network.play.client.C07PacketPlayerDigging
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing
 
 class TriggerBot : Module("TriggerBot", "Automatically attack the target you view", ModuleCategory.COMBAT) {
 
@@ -28,6 +32,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     private val swingItemValue = BoolValue("SwingItem", true)
     private val rayTraceValue = ListValue("RayTrace", arrayOf("Vanilla", "ThroughWall"), "Vanilla")
     private val autoBlockValue = ListValue("AutoBlock", arrayOf("Vanilla", "Hurt", "None"), "None")
+    private val autoBlockPacketValue = ListValue("AutoBlockPacket", arrayOf("Vanilla", "Packet"), "Vanilla")
 
     private val clickTimer = ClickTimer()
     private var lastBlocked = false
@@ -39,7 +44,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
 
     override fun onDisable() {
         if (lastBlocked) {
-            mc.gameSettings.keyBindUseItem.pressed = false
+            unblockSword()
         }
     }
 
@@ -65,11 +70,11 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
         }
         if (canBlock) {
             lastBlocked = true
-            mc.gameSettings.keyBindUseItem.pressed = true
+            blockSword()
         } else {
             if (lastBlocked) {
                 lastBlocked = false
-                mc.gameSettings.keyBindUseItem.pressed = false
+                unblockSword()
             }
         }
 
@@ -84,6 +89,20 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
             }
             mc.playerController.attackEntity(mc.thePlayer,  target)
             clickTimer.update(minCpsValue.get(), maxCpsValue.get())
+        }
+    }
+
+    private fun blockSword() {
+        when(autoBlockPacketValue.get()) {
+            "Vanilla" -> mc.gameSettings.keyBindUseItem.pressed = true
+            "Packet" -> mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), -1, mc.thePlayer.heldItem, 0f, 0f, 0f))
+        }
+    }
+
+    private fun unblockSword() {
+        when(autoBlockPacketValue.get()) {
+            "Vanilla" -> mc.gameSettings.keyBindUseItem.pressed = false
+            "Packet" -> mc.netHandler.addToSendQueue(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos(0, 0, 0), EnumFacing.DOWN))
         }
     }
 }
