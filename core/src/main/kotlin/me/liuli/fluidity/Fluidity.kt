@@ -17,19 +17,15 @@ import java.util.*
 
 object Fluidity {
 
-    private val gitInfo = Properties().also {
-        val inputStream = Fluidity::class.java.classLoader.getResourceAsStream("git.properties")
-        if(inputStream != null) {
-            it.load(inputStream)
-        } else {
-            throw RuntimeException("git.properties not found")
-        }
-    }
-
     const val NAME = "Fluidity"
     const val COLORED_NAME = "§3F§bluidity"
     @JvmField
-    val VERSION = gitInfo["git.commit.id.abbrev"]?.let { "git-$it" } ?: "unknown"
+    val VERSION = try {
+        "git-" + Fluidity::class.java.getResourceAsStream("/git.info").readBytes().toString(Charsets.UTF_8)
+    } catch (t: Throwable) {
+        t.printStackTrace()
+        "unknown"
+    }
 
     lateinit var eventManager: EventManager
 

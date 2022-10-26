@@ -96,4 +96,3 @@ genIntelliJRuns {
 classes.dependsOn(putObfMap)
 reobfJarWithStrip.dependsOn(shadowJar)
 tasks.getByName("build").dependsOn(reobfJarWithStrip)
-//tasks.getByName("build").dependsOn(shadowJar)

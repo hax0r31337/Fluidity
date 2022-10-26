@@ -2,7 +2,6 @@ plugins {
     id "java"
     id "idea"
     id "org.jetbrains.kotlin.jvm"
-    id "com.gorylenko.gradle-git-properties" version "2.4.0"
     id "me.yuugiri.fluiditygradle"
 }
 
@@ -22,3 +21,5 @@ dependencies {
 
     implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
 }
+
+classes.dependsOn(putGitInfo)

@@ -45,7 +45,7 @@ abstract class HookProvider(val className: String) {
         method.isAccessible = true
         val isStatic = Modifier.isStatic(method.modifiers)
         return if (method.parameterCount == 1) {
-            if (isStatic) ({ a, b -> method.invoke(null, b); true }) else ({ a, b -> method.invoke(this, b); true })
+            if (isStatic) ({ _, b -> method.invoke(null, b); true }) else ({ _, b -> method.invoke(this, b); true })
         } else if (method.parameterCount == 2) {
             if (isStatic) ({ a, b -> method.invoke(null, a, b); true }) else ({ a, b -> method.invoke(this, a, b); true })
         } else throw IllegalArgumentException("Unsupported parameter count: $method")
