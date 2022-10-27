@@ -16,7 +16,7 @@ configurations.all {
         attribute(Attribute.of("ui", String.class), "awt")
     }
     resolutionStrategy.eachDependency {
-        if (requested.group == "me.yuugiri.compose.compiler") {
+        if (requested.group == "org.jetbrains.compose.compiler") {
             useTarget("androidx.compose.compiler:compiler:1.3.3")
         }
     }
@@ -24,8 +24,10 @@ configurations.all {
 
 repositories {
     maven {
+        name = "ExpertCheat"
         url = "https://mccheatz.github.io/maven_repo/"
         content {
+            includeModule("org.jetbrains.compose", "preview-rpc")
             includeGroupByRegex "androidx\\.compose\\.compiler.*"
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.skiko.*"
@@ -35,7 +37,7 @@ repositories {
         url = "https://maven.pkg.jetbrains.space/public/p/compose/dev"
         content {
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
-            includeModuleByRegex ("org\\.jetbrains\\.skiko.*", "skiko-awt-runtime-.*")
+            includeModuleByRegex("org\\.jetbrains\\.skiko.*", "skiko-awt-runtime-.*")
         }
     }
     mavenCentral()
@@ -68,6 +70,10 @@ dependencies {
     implementation("org.jetbrains.compose.ui:ui-tooling:$compose_version") {
         exclude group: "org.jetbrains.skiko"
     }
+//    implementation("org.jetbrains.compose:preview-rpc:1.2.0")
+//    implementation("org.jetbrains.compose.material:material-icons-extended:$compose_version") {
+//        exclude group: "org.jetbrains.skiko"
+//    }
     implementation 'com.github.mccheatz:material-color-utilities-java:aafe62f0fc'
 
     runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.36"

@@ -21,7 +21,7 @@ pluginManagement {
 //					useModule("me.yuugiri.fluiditygradle:FluidityGradle:1.0.0")
 					break
 				case "org.jetbrains.compose":
-					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}-edit")
+					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}-edit1")
 					break
 			}
 		}
