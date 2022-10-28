@@ -55,7 +55,7 @@ object ThemeManager {
             load = { imageBitmap },
             painterFor = { remember { BitmapPainter(it) } },
             contentDescription = "Background",
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             contentScale = ContentScale.Crop
         )
     }

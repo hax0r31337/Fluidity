@@ -10,16 +10,9 @@ import androidx.compose.runtime.Composable
 import me.liuli.fluidity.gui.theme.ThemeManager.scheme
 import org.jetbrains.skia.Color
 
-open class GuiComposeDynamic(backgroundColor: Int = Color.WHITE, repeatKeys: Boolean = true) : AbstractGuiCompose(backgroundColor, repeatKeys) {
+open class GuiComposeDynamic(backgroundColor: Int = Color.WHITE, repeatKeys: Boolean = true, waitComposeLoad: Boolean = false) : AbstractGuiCompose(backgroundColor, repeatKeys, waitComposeLoad) {
 
-    protected var content: @Composable () -> Unit = {}
-        set(value) {
-            field = {
-                MaterialTheme(colorScheme = scheme) {
-                    value()
-                }
-            }
-        }
+    protected var content: (@Composable () -> Unit)? = null
 
 //    init {
 //        contentIn?.let {
@@ -28,7 +21,7 @@ open class GuiComposeDynamic(backgroundColor: Int = Color.WHITE, repeatKeys: Boo
 //    }
 
     override fun initGui() {
-        initCompose(content)
+        initCompose(content!!)
         super.initGui()
     }
 

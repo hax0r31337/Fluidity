@@ -8,6 +8,8 @@ package me.liuli.fluidity.inject.hooks.impl.entity
 import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
 import me.liuli.fluidity.module.modules.movement.KeepSprint
+import me.liuli.fluidity.module.special.CombatManager
+import me.liuli.fluidity.util.mc
 import me.yuugiri.hutil.processor.hook.EnumHookShift
 import me.yuugiri.hutil.processor.hook.MethodHookParam
 import net.minecraft.entity.player.EntityPlayer
@@ -26,5 +28,11 @@ class HookEntityPlayer : HookProvider("net.minecraft.entity.player.EntityPlayer"
                 thisObject.isSprinting = true
             }
         }
+    }
+
+    @Hook(method = "getItemInUseCount", type = Hook.Type("ENTER"))
+    fun getItemInUseCount(param: MethodHookParam) {
+        if (param.thisObject != mc.thePlayer || !CombatManager.isPacketBlocking) return
+        param.result = 1
     }
 }

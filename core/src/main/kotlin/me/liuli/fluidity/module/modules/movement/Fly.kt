@@ -67,7 +67,7 @@ class Fly : Module("Fly", "Make you like a bird", ModuleCategory.MOVEMENT) {
     @Listen
     fun onBlockBB(event: BlockBBEvent) {
         if (modeValue.get() != "FakeGround") return
-        event.list.add(AxisAlignedBB(mc.thePlayer.posX - 0.5, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ - 0.5,
-            mc.thePlayer.posX + 0.5, mc.thePlayer.posY, mc.thePlayer.posZ + 0.5))
+        event.list.add(AxisAlignedBB(mc.thePlayer.posX - 0.5, launchY - 1.0, mc.thePlayer.posZ - 0.5,
+            mc.thePlayer.posX + 0.5, launchY, mc.thePlayer.posZ + 0.5))
     }
 }

@@ -10,9 +10,11 @@ import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.modules.client.Targets.isTarget
+import me.liuli.fluidity.module.special.CombatManager
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
+import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.timing.ClickTimer
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
@@ -24,13 +26,15 @@ import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.MovingObjectPosition
 
 class TriggerBot : Module("TriggerBot", "Automatically attack the target you view", ModuleCategory.COMBAT) {
 
     private val minCpsValue = IntValue("MinCPS", 7, 1, 20)
     private val maxCpsValue = IntValue("MaxCPS", 12, 1, 20)
     private val swingItemValue = BoolValue("SwingItem", true)
-    private val rayTraceValue = ListValue("RayTrace", arrayOf("Vanilla", "ThroughWall"), "Vanilla")
+    private val rayCastValue = BoolValue("RayCast", false)
+    private val throughWallsValue = BoolValue("ThroughWalls", false)
     private val autoBlockValue = ListValue("AutoBlock", arrayOf("Vanilla", "Hurt", "None"), "None")
     private val autoBlockPacketValue = ListValue("AutoBlockPacket", arrayOf("Vanilla", "Packet"), "Vanilla")
 
@@ -49,21 +53,39 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     }
 
     private fun rayTraceTarget(): Entity? {
-        return when(rayTraceValue.get()) {
-            "ThroughWall" -> rayTraceEntity(Reach.reach)
-            else -> mc.objectMouseOver?.entityHit
-        }
+        val target = rayTraceEntity(Reach.reach) { it.isTarget(true) } ?: return null
+        if (!throughWallsValue.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) return null
+
+        return if (rayCastValue.get()) {
+            return rayTraceEntity(Reach.reach).also {
+                if (target != it) {
+                    displayAlert(it.toString())
+                }
+            }
+        } else target
     }
 
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
+        if (clickTimer.canClick()) {
+            val target = rayTraceTarget()
+            if (target != null) {
+                // attack
+                if (swingItemValue.get()) {
+                    mc.thePlayer.swingItem()
+                }
+                mc.playerController.attackEntity(mc.thePlayer,  target)
+                clickTimer.update(minCpsValue.get(), maxCpsValue.get())
+            }
+        }
+
         // autoblock
         val canBlock = mc.thePlayer.heldItem?.item is ItemSword && when(autoBlockValue.get()) {
             "Vanilla" -> mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
             "Hurt" -> {
                 val target = mc.theWorld.loadedEntityList.find { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
                 if (target != null && target is EntityLivingBase) {
-                    ((1 - (target.hurtTime / 10f)) * 1.5f).coerceAtMost(1f).let { if (it == 1f) 0f else it } != 0f
+                    target.hurtTime in 3..10
                 } else false
             }
             else -> false
@@ -77,32 +99,19 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
                 unblockSword()
             }
         }
-
-        if (clickTimer.canClick()) {
-            val target = rayTraceTarget() ?: return
-            if (!target.isTarget(true)) {
-                return
-            }
-            // attack
-            if (swingItemValue.get()) {
-                mc.thePlayer.swingItem()
-            }
-            mc.playerController.attackEntity(mc.thePlayer,  target)
-            clickTimer.update(minCpsValue.get(), maxCpsValue.get())
-        }
     }
 
     private fun blockSword() {
         when(autoBlockPacketValue.get()) {
             "Vanilla" -> mc.gameSettings.keyBindUseItem.pressed = true
-            "Packet" -> mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(BlockPos(-1, -1, -1), -1, mc.thePlayer.heldItem, 0f, 0f, 0f))
+            "Packet" -> CombatManager.blockSword()
         }
     }
 
     private fun unblockSword() {
         when(autoBlockPacketValue.get()) {
             "Vanilla" -> mc.gameSettings.keyBindUseItem.pressed = false
-            "Packet" -> mc.netHandler.addToSendQueue(C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos(0, 0, 0), EnumFacing.DOWN))
+            "Packet" -> CombatManager.unblockSword()
         }
     }
 }

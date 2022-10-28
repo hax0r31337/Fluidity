@@ -5,6 +5,7 @@
 
 package me.liuli.fluidity.gui.compose
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.geometry.Offset
@@ -12,6 +13,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.unit.Constraints
 import kotlinx.coroutines.asCoroutineDispatcher
+import me.liuli.fluidity.gui.theme.ThemeManager
 import me.liuli.fluidity.util.client.logInfo
 import me.liuli.fluidity.util.mc
 import org.jetbrains.skia.*
@@ -37,6 +39,8 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
     private var queueDraw = false
     private var queueRefreshTexture = false
 
+    var hasSuccessRender = false
+        private set
     val texId: Int
 
     init {
@@ -46,7 +50,9 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
                 queueDraw = true
             }.apply {
                 setContent {
-                    content() // TODO: themed
+                    MaterialTheme(colorScheme = ThemeManager.scheme) {
+                        content()
+                    }
                 }
                 constraints = Constraints(maxWidth = width, maxHeight = height)
             }
@@ -152,6 +158,7 @@ class ComposeManager(private var width: Int, private var height: Int, content: @
 
                 GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
             }
+            hasSuccessRender = true
             queueRefreshTexture = false
         }
         if (queueDraw) {

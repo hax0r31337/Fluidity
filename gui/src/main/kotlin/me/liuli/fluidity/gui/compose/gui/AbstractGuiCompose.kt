@@ -23,7 +23,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.event.KeyEvent as AwtKeyEvent
 
-abstract class AbstractGuiCompose(private val backgroundColor: Int = Color.WHITE, private val repeatKeys: Boolean = true) : GuiScreen() {
+abstract class AbstractGuiCompose(private val backgroundColor: Int = Color.WHITE, private val repeatKeys: Boolean = true, private val waitComposeLoad: Boolean = false) : GuiScreen() {
 
     lateinit var composeManager: ComposeManager
     protected var hasCompose = false
@@ -54,30 +54,53 @@ abstract class AbstractGuiCompose(private val backgroundColor: Int = Color.WHITE
         }
     }
 
+    protected open fun drawComposeLoadingScreen() {
+        if (waitComposeLoad) {
+            val width = Display.getWidth()
+            val height = Display.getHeight()
+            while (!composeManager.hasSuccessRender) {
+                composeManager.updateCanvas(width, height)
+                Thread.sleep(5L)
+            }
+            drawComposeCanvas()
+        } else {
+            drawBackground(0)
+        }
+    }
+
+    protected open fun drawComposeCanvas() {
+        GL11.glEnable(GL11.GL_ALPHA_TEST)
+        GL11.glEnable(GL11.GL_BLEND)
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GL11.glColor4f(1f, 1f, 1f, 1f)
+        GL11.glEnable(GL11.GL_TEXTURE_2D)
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, composeManager.texId)
+
+        GL11.glBegin(GL11.GL_QUADS)
+        GL11.glTexCoord2f(0f, 0f)
+        GL11.glVertex2i(0, 0)
+        GL11.glTexCoord2f(0f, 1f)
+        GL11.glVertex2i(0, height)
+        GL11.glTexCoord2f(1f, 1f)
+        GL11.glVertex2i(width, height)
+        GL11.glTexCoord2f(1f, 0f)
+        GL11.glVertex2i(width, 0)
+        GL11.glEnd()
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
+        GL11.glDisable(GL11.GL_BLEND)
+    }
+
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (hasCompose) {
             composeManager.updateCanvas(Display.getWidth(), Display.getHeight())
 
-            GL11.glEnable(GL11.GL_ALPHA_TEST)
-            GL11.glEnable(GL11.GL_BLEND)
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-            GL11.glColor4f(1f, 1f, 1f, 1f)
-            GL11.glEnable(GL11.GL_TEXTURE_2D)
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, composeManager.texId)
+            if (!composeManager.hasSuccessRender) {
+                this.drawComposeLoadingScreen()
+                return
+            }
 
-            GL11.glBegin(GL11.GL_QUADS)
-            GL11.glTexCoord2f(0f, 0f)
-            GL11.glVertex2i(0, 0)
-            GL11.glTexCoord2f(0f, 1f)
-            GL11.glVertex2i(0, height)
-            GL11.glTexCoord2f(1f, 1f)
-            GL11.glVertex2i(width, height)
-            GL11.glTexCoord2f(1f, 0f)
-            GL11.glVertex2i(width, 0)
-            GL11.glEnd()
-
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
-            GL11.glDisable(GL11.GL_BLEND)
+            this.drawComposeCanvas()
 
             composeManager.sendPointerEvent(
                 position = getMousePos(),

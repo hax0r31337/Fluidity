@@ -53,6 +53,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private var lastAimingAt: Pair<Float, Float>? = null
     private var lastAimingTimer = TheTimer()
     private val backtrackQueue = mutableMapOf<Int, Queue<Vec3>>()
+    private var pikanwLastYaw = 0f
 
     override fun onDisable() {
         hasTarget = false
@@ -100,13 +101,14 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
                 Pair(correctAim.first, mc.thePlayer.serverRotationPitch)
             } else correctAim
             "PikaNW" -> {
-                val hurt = ((1 - (entity.hurtTime / 10f)) * 1.4f).coerceAtMost(1f).let {
+                val hurt = ((1 - (entity.hurtTime / 10f)) * 1.8f).coerceAtMost(1f).let {
                     if (it == 1f) 0f else it
                 }
-                val pitch = if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.serverRotationPitch) { it == entity } != null)
-                    mc.thePlayer.serverRotationPitch else correctAim.second
-                var yaw = correctAim.first + (hurt * 50f + if (hurt != 0f) -25f else (Math.random().toFloat() - 0.5f) * 6)
-                Pair(yaw, pitch + (Math.random().toFloat() - 0.5f) * 6)
+                if (hurt == 0f) {
+                    pikanwLastYaw = correctAim.first
+                }
+                var yaw = hurt * 60f + if (hurt != 0f) -30f + pikanwLastYaw else ((Math.random().toFloat() - 0.5f) * 3 + correctAim.first)
+                Pair(yaw, correctAim.second + (Math.random().toFloat() - 0.5f) * 3)
             }
             else -> throw IllegalArgumentException("Invalid aiming mode: ${aimingModeValue.get()}")
         }.also {
@@ -128,7 +130,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
             ((rotationDiff / 180) * maxYawTurnSpeedValue.get() + (1 - rotationDiff / 180) * minYawTurnSpeedValue.get()).toFloat(),
             ((rotationDiff / 180) * maxPitchTurnSpeedValue.get() + (1 - rotationDiff / 180) * minPitchTurnSpeedValue.get()).toFloat())
 
-        if (floor(yaw) == floor(mc.thePlayer.rotationYaw) && floor(pitch) == floor(mc.thePlayer.rotationPitch)) {
+        if (yaw.toInt() == mc.thePlayer.rotationYaw.toInt() && pitch.toInt() == mc.thePlayer.rotationPitch.toInt()) {
             needAimBack = false
             if (silentRotationValue.get()) return
         }

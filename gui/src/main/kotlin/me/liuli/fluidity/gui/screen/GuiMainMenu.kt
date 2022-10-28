@@ -88,18 +88,11 @@ private fun MainMenu() {
     }
 }
 
-class GuiMainMenu : GuiComposeDynamic() {
+class GuiMainMenu : GuiComposeDynamic(waitComposeLoad = true) {
 
     init {
         content = {
-            background(Modifier
-                .fillMaxSize()
-                .blur(
-                    radiusX = 10.dp,
-                    radiusY = 10.dp,
-                    edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(8.dp))
-                )
-            )
+            background()
             MainMenu()
         }
     }
