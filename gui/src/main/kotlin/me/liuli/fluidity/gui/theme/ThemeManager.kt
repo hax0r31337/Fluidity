@@ -19,7 +19,6 @@ import androidx.compose.ui.layout.ContentScale
 import io.material.color.quantize.QuantizerCelebi
 import io.material.color.scheme.Scheme
 import io.material.color.score.Score
-import me.liuli.fluidity.gui.compose.component.AsyncImage
 import me.liuli.fluidity.gui.theme.background.CommonBackgroundSource
 import org.jetbrains.skia.Image
 import org.jetbrains.skiko.SystemTheme
@@ -51,9 +50,9 @@ object ThemeManager {
 
     @Composable
     fun background(modifier: Modifier = Modifier.fillMaxSize()) {
-        AsyncImage(
-            load = { imageBitmap },
-            painterFor = { remember { BitmapPainter(it) } },
+        val painter = remember { BitmapPainter(imageBitmap) }
+        androidx.compose.foundation.Image(
+            painter = painter,
             contentDescription = "Background",
             modifier = modifier,
             contentScale = ContentScale.Crop

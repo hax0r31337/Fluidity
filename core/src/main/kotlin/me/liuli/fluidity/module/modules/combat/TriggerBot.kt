@@ -35,6 +35,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     private val swingItemValue = BoolValue("SwingItem", true)
     private val rayCastValue = BoolValue("RayCast", false)
     private val throughWallsValue = BoolValue("ThroughWalls", false)
+    private val noBlockAttacksValue = BoolValue("NoBlockAttacks", true)
     private val autoBlockValue = ListValue("AutoBlock", arrayOf("Vanilla", "Hurt", "None"), "None")
     private val autoBlockPacketValue = ListValue("AutoBlockPacket", arrayOf("Vanilla", "Packet"), "Vanilla")
 
@@ -67,25 +68,13 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
 
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
-        if (clickTimer.canClick()) {
-            val target = rayTraceTarget()
-            if (target != null) {
-                // attack
-                if (swingItemValue.get()) {
-                    mc.thePlayer.swingItem()
-                }
-                mc.playerController.attackEntity(mc.thePlayer,  target)
-                clickTimer.update(minCpsValue.get(), maxCpsValue.get())
-            }
-        }
-
         // autoblock
         val canBlock = mc.thePlayer.heldItem?.item is ItemSword && when(autoBlockValue.get()) {
             "Vanilla" -> mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
             "Hurt" -> {
                 val target = mc.theWorld.loadedEntityList.find { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }
                 if (target != null && target is EntityLivingBase) {
-                    target.hurtTime in 3..10
+                    target.hurtTime in 3..9
                 } else false
             }
             else -> false
@@ -97,6 +86,20 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
             if (lastBlocked) {
                 lastBlocked = false
                 unblockSword()
+            }
+        }
+
+        if (noBlockAttacksValue.get() && mc.thePlayer.itemInUseCount != 0) return
+
+        if (clickTimer.canClick()) {
+            val target = rayTraceTarget()
+            if (target != null) {
+                // attack
+                if (swingItemValue.get()) {
+                    mc.thePlayer.swingItem()
+                }
+                mc.playerController.attackEntity(mc.thePlayer,  target)
+                clickTimer.update(minCpsValue.get(), maxCpsValue.get())
             }
         }
     }
