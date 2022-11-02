@@ -38,32 +38,13 @@ configurations {
     implementation.extendsFrom(include)
 }
 
-String targetOs = "linux"
-if (System.getProperty("os.name").startsWith("Win")) {
-    targetOs = "windows"
-} else if (System.getProperty("os.name") == "Mac OS X") {
-    targetOs = "macos"
-}
-String targetArch = "x64"
-if (System.getProperty("os.arch") == "aarch64") {
-    targetArch = "arm64"
-}
-
 dependencies {
-    include('com.github.mccheatz:HookUtility:792e21cbd9') {
-        exclude group: 'org.ow2.asm'
-    }
-
     implementation MinecraftDependencyKt.minecraftDep(project, "core/src/main/resources/fluidity_at.cfg")
+    // hot injection
+    implementation files(Jvm.current().toolsJar)
 
-    include (project(":core")) {
+    include (project(":Forge-1.8.9")) {
         exclude module: "minecraftbin"
-        exclude group: "org.ow2.asm"
-    }
-    include (project(":gui")) {
-        exclude module: "minecraftbin"
-        exclude group: "org.ow2.asm"
-        exclude module: "skiko-awt-runtime-$targetOs-$targetArch"
     }
 
 //    include fileTree(include: ["*.jar"], dir: "libs")
@@ -96,10 +77,6 @@ shadowJar {
     }
 }
 
-genIntelliJRuns {
-    vmParams = "-Dfml.coreMods.load=me.liuli.fluidity.inject.FMLLoadingPlugin"
-}
-
 classes.dependsOn(putObfMap)
-reobfJarWithStrip.dependsOn(shadowJar)
-tasks.getByName("build").dependsOn(reobfJarWithStrip)
+reobfJar.dependsOn(shadowJar)
+tasks.getByName("build").dependsOn(reobfJar)
