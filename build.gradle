@@ -3,7 +3,6 @@ group = "me.liuli.fluidity"
 
 repositories {
     mavenCentral()
-    maven { url = "https://jitpack.io/" }
 }
 
 subprojects {

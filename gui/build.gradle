@@ -23,6 +23,7 @@ configurations.all {
 }
 
 repositories {
+    mavenLocal()
     maven {
         name = "ExpertCheat"
         url = "https://mccheatz.github.io/maven_repo/"
@@ -31,6 +32,7 @@ repositories {
             includeGroupByRegex "androidx\\.compose\\.compiler.*"
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.skiko.*"
+            includeGroupByRegex "io\\.material\\.*"
         }
     }
     maven {
@@ -41,7 +43,6 @@ repositories {
         }
     }
     mavenCentral()
-    maven { url = "https://jitpack.io/" }
 }
 
 String targetOs = "linux"
@@ -74,7 +75,7 @@ dependencies {
 //    implementation("org.jetbrains.compose.material:material-icons-extended:$compose_version") {
 //        exclude group: "org.jetbrains.skiko"
 //    }
-    implementation 'com.github.mccheatz:material-color-utilities-java:aafe62f0fc'
+    implementation 'io.material.color:material-color-utilities:0.2.0'
 
     runtimeOnly "org.jetbrains.skiko:skiko-awt-runtime-$targetOs-$targetArch:0.7.36"
 

@@ -1,24 +1,22 @@
 pluginManagement {
 	repositories {
-//		mavenLocal()
+		mavenLocal()
 		maven {
 			url = "https://mccheatz.github.io/maven_repo/"
 			content {
-				includeGroupByRegex "me\\.yuugiri\\.compose.*"
+				includeGroupByRegex "me\\.yuugiri\\.*"
 				includeGroupByRegex "org\\.jetbrains\\.compose.*"
 				includeGroupByRegex "org\\.jetbrains\\.skiko.*"
 			}
 		}
 		mavenCentral()
 		gradlePluginPortal()
-		maven { url = "https://jitpack.io/" }
 	}
 	resolutionStrategy {
 		eachPlugin {
 			switch (requested.id.id) {
 				case "me.yuugiri.fluiditygradle":
-					useModule("com.github.mccheatz:FluidityGradle:e0d832005c")
-//					useModule("me.yuugiri.fluiditygradle:FluidityGradle:1.0.0")
+					useModule("me.yuugiri.fluiditygradle:FluidityGradle:1.0.0")
 					break
 				case "org.jetbrains.compose":
 					useModule("org.jetbrains.compose:compose-gradle-plugin:${compose_version}-edit1")

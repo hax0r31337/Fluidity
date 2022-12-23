@@ -20,7 +20,7 @@ import net.minecraft.util.ChatComponentText
 class HookNetHandlerPlayClient : HookProvider("net.minecraft.client.network.NetHandlerPlayClient") {
 
     /**
-     * anti client crash
+     * prevent client crash
      */
     @Hook(method = "handlePlayerPosLook", type = Hook.Type("ENTER"))
     fun handlePlayerPosLook_Enter(param: MethodHookParam) {

@@ -7,16 +7,16 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     maven {
         url = "https://mccheatz.github.io/maven_repo/"
         content {
-            includeGroupByRegex "me\\.yuugiri\\.compose.*"
+            includeGroupByRegex "me\\.yuugiri\\.*"
             includeGroupByRegex "org\\.jetbrains\\.compose.*"
             includeGroupByRegex "org\\.jetbrains\\.skiko.*"
         }
     }
     mavenCentral()
-    maven { url = "https://jitpack.io/" }
 }
 
 group = "me.liuli.fluidity"
@@ -48,7 +48,7 @@ if (System.getProperty("os.arch") == "aarch64") {
 }
 
 dependencies {
-    include('com.github.mccheatz:HookUtility:792e21cbd9') {
+    include('me.yuugiri.hutil:hook-utility:792e21c') {
         exclude group: 'org.ow2.asm'
     }
 
