@@ -35,7 +35,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     private val swingItemValue = BoolValue("SwingItem", true)
     private val rayCastValue = BoolValue("RayCast", false)
     private val throughWallsValue = BoolValue("ThroughWalls", false)
-    private val noBlockAttacksValue = BoolValue("NoBlockAttacks", true)
+    private val noBlockAttacksValue = ListValue("NoBlockAttacks", arrayOf("Always", "Tick", "None"), "None")
     private val autoBlockValue = ListValue("AutoBlock", arrayOf("Vanilla", "Hurt", "None"), "None")
     private val autoBlockPacketValue = ListValue("AutoBlockPacket", arrayOf("Vanilla", "Packet"), "Vanilla")
 
@@ -80,16 +80,20 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
             else -> false
         }
         if (canBlock) {
-            lastBlocked = true
             blockSword()
+            if (!lastBlocked && noBlockAttacksValue.get() == "Tick") {
+                lastBlocked = true
+                return
+            }
         } else {
             if (lastBlocked) {
                 lastBlocked = false
                 unblockSword()
+                if (!lastBlocked && noBlockAttacksValue.get() == "Tick") return
             }
         }
 
-        if (noBlockAttacksValue.get() && mc.thePlayer.itemInUseCount != 0) return
+        if (noBlockAttacksValue.get() == "Always" && mc.thePlayer.itemInUseCount != 0) return
 
         if (clickTimer.canClick()) {
             val target = rayTraceTarget()

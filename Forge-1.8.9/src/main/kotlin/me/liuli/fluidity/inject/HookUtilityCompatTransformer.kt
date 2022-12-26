@@ -26,7 +26,9 @@ class HookUtilityCompatTransformer : IClassTransformer {
         initHooks() // initialize hook utility before got pushed into transformer list
     }
 
-    override fun transform(name: String, transformedName: String?, data: ByteArray): ByteArray {
+    override fun transform(name: String?, transformedName: String?, data: ByteArray?): ByteArray? {
+        name ?: return data
+        data ?: return null
         if (name.startsWith("kotlin") || name.startsWith("me.yuugiri") || name.startsWith("org.spongepowered")) return data
 
         return hook.dealWithClassData(data, (transformedName ?: name).replace('.', '/'))/*.also {

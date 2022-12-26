@@ -13,6 +13,7 @@ import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.client.logError
 import me.liuli.fluidity.util.other.getObjectInstance
+import me.liuli.fluidity.util.other.resolveInstances
 import me.liuli.fluidity.util.other.resolvePackage
 import org.lwjgl.input.Keyboard
 
@@ -23,16 +24,9 @@ object ModuleManager : Listener {
     private var pendingKeyBindModule: Module? = null
 
     init {
-        resolvePackage("${this.javaClass.`package`.name}.modules", Module::class.java)
+        resolveInstances("${this.javaClass.`package`.name}.modules", Module::class.java)
             .forEach {
-                try {
-                    registerModule(it.newInstance())
-                } catch (e: IllegalAccessException) {
-                    // this module is a kotlin object
-                    registerModule(getObjectInstance(it))
-                } catch (e: Throwable) {
-                    logError("Failed to load module: ${it.name} (${e.javaClass.name}: ${e.message})")
-                }
+                registerModule(it)
             }
     }
 
