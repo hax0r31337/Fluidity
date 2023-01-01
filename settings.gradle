@@ -4,7 +4,7 @@ pluginManagement {
 		maven {
 			url = "https://mccheatz.github.io/maven_repo/"
 			content {
-				includeGroupByRegex "me\\.yuugiri\\.*"
+				includeGroupByRegex "me\\.yuugiri.*"
 				includeGroupByRegex "org\\.jetbrains\\.compose.*"
 				includeGroupByRegex "org\\.jetbrains\\.skiko.*"
 			}
