@@ -6,9 +6,11 @@
 package me.liuli.fluidity.module.modules.player
 
 import me.liuli.fluidity.event.Listen
+import me.liuli.fluidity.event.PacketEvent
 import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
@@ -16,12 +18,14 @@ import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.timing.TheTimer
 import net.minecraft.init.Items
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.client.C0BPacketEntityAction
 
 class AutoConsume : Module("AutoConsume", "Automatically consume items.", ModuleCategory.PLAYER) {
 
     private val modeValue = ListValue("Mode", arrayOf("Soup", "Head", "Wand"), "Soup")
     private val healthValue = FloatValue("Health", 10F, 1F, 20F)
     private val delayValue = IntValue("Delay", 1000, 0, 10000)
+    private val noConsumeHitValue = BoolValue("NoConsumeHit", false)
 
     private var consumed = false
     private var prevSlot = -1
@@ -54,6 +58,15 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
         } else if (!consumed && prevSlot != -1) {
             mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
             consumed = true
+        }
+    }
+
+    @Listen
+    fun onPacket(event: PacketEvent) {
+        val packet = event.packet
+
+        if (noConsumeHitValue.get() && prevSlot != -1 && packet is C0BPacketEntityAction) {
+            event.cancel()
         }
     }
 
