@@ -42,7 +42,7 @@ object HookEntity : HookProvider("net.minecraft.entity.Entity") {
     @Hook(method = "getCollisionBorderSize", type = Hook.Type("ENTER"))
     fun getCollisionBorderSize(param: MethodHookParam) {
         if (HitBox.state && (param.thisObject as Entity).isTarget(true))
-            param.result = 0.1f + HitBox.sizeValue.get()
+            param.result = 0.1f + HitBox.sizeValue
     }
 
     @Hook(method = "moveEntity", type = Hook.Type("ENTER"))

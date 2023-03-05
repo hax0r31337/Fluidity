@@ -26,10 +26,10 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 
 class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
 
-    private val detectionValue = ListValue("Detection", arrayOf("Motion", "Sound"), "Sound")
-    private val recastValue = BoolValue("Recast", true)
-    private val recastDelayValue = IntValue("RecastDelay", 500, 0, 1000)
-    private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
+    private val detectionValue by ListValue("Detection", arrayOf("Motion", "Sound"), "Sound")
+    private val recastValue by BoolValue("Recast", true)
+    private val recastDelayValue by IntValue("RecastDelay", 500, 0, 1000)
+    private val jitterValue by FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
 
     private var stage = Stage.NOTHING
     private val recastTimer = TheTimer()
@@ -42,7 +42,7 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
     fun onUpdate(event: UpdateEvent) {
         if (stage == Stage.RECOVERING) {
             mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-            stage = if (recastValue.get()) {
+            stage = if (recastValue) {
                 recastTimer.reset()
                 Stage.RECASTING
             } else {
@@ -50,12 +50,12 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
             }
             return
         } else if (stage == Stage.RECASTING) {
-            if (jitterValue.get() != 0f) {
-                jitterRotation(jitterValue.get()).also {
+            if (jitterValue != 0f) {
+                jitterRotation(jitterValue).also {
                     setServerRotation(it.first, it.second)
                 }
             }
-            if (recastTimer.hasTimePassed(recastDelayValue.get())) {
+            if (recastTimer.hasTimePassed(recastDelayValue)) {
                 mc.netHandler.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
                 stage = Stage.NOTHING
             }
@@ -65,10 +65,10 @@ class Fisher : Module("Fisher", "Automatically fishing", ModuleCategory.WORLD) {
     @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
-        if (detectionValue.get() == "Sound" && packet is S29PacketSoundEffect && mc.thePlayer?.fishEntity != null
+        if (detectionValue == "Sound" && packet is S29PacketSoundEffect && mc.thePlayer?.fishEntity != null
             && packet.soundName == "random.splash" && packet.x.inRange(mc.thePlayer.fishEntity.posX, 1.5) && packet.z.inRange(mc.thePlayer.fishEntity.posZ, 1.5)) {
             recoverFishRod()
-        } else if (detectionValue.get() == "Motion" && packet is S12PacketEntityVelocity && mc.thePlayer?.fishEntity != null
+        } else if (detectionValue == "Motion" && packet is S12PacketEntityVelocity && mc.thePlayer?.fishEntity != null
             && packet.entityID == mc.thePlayer.fishEntity.entityId && packet.motionX == 0 && packet.motionY != 0 && packet.motionZ == 0) {
             recoverFishRod()
         }

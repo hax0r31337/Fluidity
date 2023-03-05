@@ -12,18 +12,23 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
+import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
+import me.liuli.fluidity.util.move.direction
 import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S19PacketEntityStatus
 import net.minecraft.network.play.server.S27PacketExplosion
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 class Velocity : Module("Velocity", "Prevent you from knockback", ModuleCategory.COMBAT) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Simple", "Vanilla"), "Vanilla")
-    private val horizonValue = FloatValue("Horizon", 1.0f, 0.0f, 1.0f)
-    private val verticalValue = FloatValue("Vertical", 1.0f, 0.0f, 1.0f)
-    private val onlyDamageValue = BoolValue("OnlyDamage", false)
+    private val modeValue by ListValue("Mode", arrayOf("Simple", "Vanilla", "Strafe"), "Vanilla")
+    private val horizonValue by FloatValue("Horizon", 1.0f, 0.0f, 1.0f)
+    private val verticalValue by FloatValue("Vertical", 1.0f, 0.0f, 1.0f)
+    private val onlyDamageValue by BoolValue("OnlyDamage", false)
 
     private var isLastDamage = false
 
@@ -31,7 +36,7 @@ class Velocity : Module("Velocity", "Prevent you from knockback", ModuleCategory
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
 
-        if (onlyDamageValue.get()) {
+        if (onlyDamageValue) {
             if ((packet is S0BPacketAnimation && packet.animationType == 1 && packet.entityID == mc.thePlayer.entityId)
                 || (packet is S19PacketEntityStatus && packet.opCode.toInt() == 2 && packet.getEntity(mc.theWorld) == mc.thePlayer)) {
                 isLastDamage = true
@@ -49,20 +54,25 @@ class Velocity : Module("Velocity", "Prevent you from knockback", ModuleCategory
                 return
             }
 
-            if (modeValue.get() == "Vanilla") {
+            if (modeValue == "Vanilla") {
                 event.cancel()
-            } else if (modeValue.get() == "Simple") {
-                packet.motionX = (packet.motionX * horizonValue.get()).toInt()
-                packet.motionZ = (packet.motionZ * horizonValue.get()).toInt()
-                packet.motionY = (packet.motionY * verticalValue.get()).toInt()
+            } else if (modeValue == "Simple") {
+                packet.motionX = (packet.motionX * horizonValue).toInt()
+                packet.motionZ = (packet.motionZ * horizonValue).toInt()
+                packet.motionY = (packet.motionY * verticalValue).toInt()
+            } else if (modeValue == "Strafe") {
+                val yaw = Math.toRadians(mc.thePlayer.rotationYaw.toDouble())
+                displayAlert("${packet.motionZ} ${(-sin(yaw) * packet.motionX).toInt()}")
+                packet.motionX = (-sin(yaw) * abs(packet.motionX)).toInt()
+                packet.motionZ = (cos(yaw) * abs(packet.motionZ)).toInt()
             }
         } else if (packet is S27PacketExplosion) {
-            if (modeValue.get() == "Vanilla") {
+            if (modeValue == "Vanilla") {
                 event.cancel()
-            } else if (modeValue.get() == "Simple") {
-                packet.field_149152_f = packet.field_149152_f * horizonValue.get()
-                packet.field_149153_g = packet.field_149153_g * verticalValue.get()
-                packet.field_149159_h = packet.field_149159_h * horizonValue.get()
+            } else if (modeValue == "Simple") {
+                packet.field_149152_f = packet.field_149152_f * horizonValue
+                packet.field_149153_g = packet.field_149153_g * verticalValue
+                packet.field_149159_h = packet.field_149159_h * horizonValue
             }
         }
     }

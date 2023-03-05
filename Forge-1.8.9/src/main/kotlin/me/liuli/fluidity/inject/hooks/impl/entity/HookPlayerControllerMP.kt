@@ -37,7 +37,7 @@ class HookPlayerControllerMP : HookProvider("net.minecraft.client.multiplayer.Pl
     @Hook(method = "getBlockReachDistance", type = Hook.Type("ENTER"))
     fun getBlockReachDistance(param: MethodHookParam) {
         if (Reach.state) {
-            param.result = Reach.buildReachValue.get()
+            param.result = Reach.buildReachValue
         }
     }
 }

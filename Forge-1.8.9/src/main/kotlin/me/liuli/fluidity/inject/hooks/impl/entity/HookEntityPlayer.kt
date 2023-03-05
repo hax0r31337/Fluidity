@@ -21,10 +21,10 @@ class HookEntityPlayer : HookProvider("net.minecraft.entity.player.EntityPlayer"
         val thisObject = param.thisObject as EntityPlayer
 
         if (KeepSprint.state) {
-            val multiplier = 0.6f + 0.4f * KeepSprint.multiplierValue.get()
+            val multiplier = 0.6f + 0.4f * KeepSprint.multiplierValue
             thisObject.motionX = thisObject.motionX / 0.6 * multiplier
             thisObject.motionZ = thisObject.motionZ / 0.6 * multiplier
-            if (KeepSprint.noBreakSprintValue.get()) {
+            if (KeepSprint.noBreakSprintValue) {
                 thisObject.isSprinting = true
             }
         }

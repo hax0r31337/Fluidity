@@ -20,7 +20,7 @@ import kotlin.math.abs
 
 class AutoMobs : Module("AutoMobs", "Move to mobs automatically", ModuleCategory.PLAYER) {
 
-    private val yMultiplierValue = FloatValue("YMultiplier", 2f, 0f, 10f)
+    private val yMultiplierValue by FloatValue("YMultiplier", 2f, 0f, 10f)
 
     override fun onDisable() {
         Pathfinder.stateGoal = null
@@ -31,7 +31,7 @@ class AutoMobs : Module("AutoMobs", "Move to mobs automatically", ModuleCategory
     fun onUpdate(event: UpdateEvent) {
         val pos = mc.thePlayer.floorPosition
         val nearestEntity = mc.theWorld.loadedEntityList.filter { it.isTarget() }
-            .minByOrNull { distanceXZ(pos.x - it.posX, pos.z - it.posZ) + abs(pos.y - it.posY) * yMultiplierValue.get() } ?: return
+            .minByOrNull { distanceXZ(pos.x - it.posX, pos.z - it.posZ) + abs(pos.y - it.posY) * yMultiplierValue } ?: return
         if (Pathfinder.stateGoal is GoalFollow && (Pathfinder.stateGoal as GoalFollow).entity == nearestEntity) {
             return
         }

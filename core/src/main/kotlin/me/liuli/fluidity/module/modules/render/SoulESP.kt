@@ -29,12 +29,12 @@ import java.util.*
 
 class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall", ModuleCategory.RENDER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("All", "FairySoul", "Gift"), "All")
-    private val colorValue = ColorValue("Color", 0xFF55FF)
-    private val clickedColorValue = ColorValue("ClickedColor", 0x00AAAA)
-    private val boxAlphaValue = IntValue("BoxAlpha", 50, 0, 255)
-    private val outlineAlphaValue = IntValue("OutlineAlpha", 255, 0, 255)
-    private val outlineThicknessValue = FloatValue("OutlineThickness", 1f, 1f, 10f)
+    private val modeValue by ListValue("Mode", arrayOf("All", "FairySoul", "Gift"), "All")
+    private val colorValue by ColorValue("Color", 0xFF55FF)
+    private val clickedColorValue by ColorValue("ClickedColor", 0x00AAAA)
+    private val boxAlphaValue by IntValue("BoxAlpha", 50, 0, 255)
+    private val outlineAlphaValue by IntValue("OutlineAlpha", 255, 0, 255)
+    private val outlineThicknessValue by FloatValue("OutlineThickness", 1f, 1f, 10f)
 
     private val parsed = mutableMapOf<Int, String>()
     private val clicked = mutableListOf<Int>()
@@ -82,7 +82,7 @@ class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall
                         .get("url").asString.also { parsed[entity.entityId] = it }
                 }
 
-                if(when(modeValue.get()) {
+                if(when(modeValue) {
                     "All" -> false
                     "FairySoul" -> url != SKULL_FAIRY_SOUL
                     "Gift" -> url != SKULL_GIFT
@@ -103,7 +103,7 @@ class SoulESP : Module("SoulESP", "See Hypixel SkyBlock Fairy Souls through wall
                     entityBox.maxY - entity.posY + y,
                     entityBox.maxZ - entity.posZ + z + 0.2
                 )
-                drawAxisAlignedBB(axisAlignedBB, if (clicked.contains(entity.entityId)) clickedColorValue.get() else colorValue.get(), outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
+                drawAxisAlignedBB(axisAlignedBB, if (clicked.contains(entity.entityId)) clickedColorValue else colorValue, outlineThicknessValue, outlineAlphaValue, boxAlphaValue)
             }
     }
 

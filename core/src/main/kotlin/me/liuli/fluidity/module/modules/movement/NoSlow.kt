@@ -19,10 +19,10 @@ import net.minecraft.util.EnumFacing
 
 class NoSlow : Module("NoSlow", "Make you not slow down during item use", ModuleCategory.MOVEMENT) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Vanilla", "Hypixel", "Matrix", "PikaNW"), "Vanilla")
-    private val blockMultiplier = FloatValue("BlockMultiplier", 1.0F, 0.2F, 1.0F)
-    private val consumeMultiplier = FloatValue("ConsumeMultiplier", 1.0F, 0.2F, 1.0F)
-    private val bowMultiplier = FloatValue("BowMultiplier", 1.0F, 0.2F, 1.0F)
+    private val modeValue by ListValue("Mode", arrayOf("Vanilla", "Hypixel", "Matrix", "PikaNW"), "Vanilla")
+    private val blockMultiplierValue by FloatValue("BlockMultiplier", 1.0F, 0.2F, 1.0F)
+    private val consumeMultiplierValue by FloatValue("ConsumeMultiplier", 1.0F, 0.2F, 1.0F)
+    private val bowMultiplierValue by FloatValue("BowMultiplier", 1.0F, 0.2F, 1.0F)
 
     private var needNoSlow = false
     private val packetBuf = mutableListOf<Packet<*>>()
@@ -49,7 +49,7 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
             return
         }
         needNoSlow = true
-        when(modeValue.get()) {
+        when(modeValue) {
             "Hypixel" -> {
                 if (mc.thePlayer.ticksExisted % 10 == 0) {
                     if (pre) {
@@ -80,7 +80,7 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
     @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
-        if (modeValue.get() == "Matrix" && !releasingPacket) {
+        if (modeValue == "Matrix" && !releasingPacket) {
             if (needNoSlow) {
                 if (packet is C03PacketPlayer || packet is C02PacketUseEntity || packet is C0APacketAnimation) {
                     packetBuf.add(packet)
@@ -106,9 +106,9 @@ class NoSlow : Module("NoSlow", "Make you not slow down during item use", Module
         val item = mc.thePlayer.heldItem?.item
 
         event.percentage = when (item) {
-            is ItemFood, is ItemPotion, is ItemBucketMilk -> this.consumeMultiplier.get()
-            is ItemSword -> this.blockMultiplier.get()
-            is ItemBow -> this.bowMultiplier.get()
+            is ItemFood, is ItemPotion, is ItemBucketMilk -> this.consumeMultiplierValue
+            is ItemSword -> this.blockMultiplierValue
+            is ItemBow -> this.bowMultiplierValue
             else -> 0.2F
         }
     }

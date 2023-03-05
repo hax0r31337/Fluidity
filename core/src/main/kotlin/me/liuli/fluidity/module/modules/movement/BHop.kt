@@ -15,11 +15,11 @@ import me.liuli.fluidity.util.move.strafe
 
 class BHop : Module("BunnyHop", "speed up movement", ModuleCategory.MOVEMENT) {
 
-    private val speedValue = FloatValue("Speed", 0.4f, 0.1f, 3f)
+    private val speedValue by FloatValue("Speed", 0.4f, 0.1f, 3f)
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        mc.thePlayer.strafe(speedValue.get())
+        mc.thePlayer.strafe(speedValue)
         if (mc.thePlayer.onGround) {
             mc.thePlayer.jump()
         }

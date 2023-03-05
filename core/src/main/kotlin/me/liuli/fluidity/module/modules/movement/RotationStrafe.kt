@@ -17,17 +17,17 @@ import net.minecraft.util.MathHelper
 
 class RotationStrafe : Module("RotationStrafe", "Make you move \"correctly\"", ModuleCategory.MOVEMENT) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Strict", "Simple"), "Strict")
-    private val onlyOnGroundValue = BoolValue("OnlyOnGround", false)
+    private val modeValue by ListValue("Mode", arrayOf("Strict", "Simple"), "Strict")
+    private val onlyOnGroundValue by BoolValue("OnlyOnGround", false)
 
     @Listen
     fun onStrafe(event: StrafeEvent) {
-        if (onlyOnGroundValue.get() && !mc.thePlayer.onGround) return
+        if (onlyOnGroundValue && !mc.thePlayer.onGround) return
 
         if (silentRotationYaw.isNaN()) return
         val yaw = silentRotationYaw
 
-        when(modeValue.get()) {
+        when(modeValue) {
             "Strict" -> {
                 var strafe = event.strafe
                 var forward = event.forward

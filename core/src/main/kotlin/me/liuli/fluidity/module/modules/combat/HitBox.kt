@@ -11,5 +11,5 @@ import me.liuli.fluidity.module.value.FloatValue
 
 object HitBox : Module("HitBox", "Makes hitboxes of targets bigger", ModuleCategory.COMBAT) {
 
-    val sizeValue = FloatValue("Size", 0.4F, 0F, 1F)
+    val sizeValue by FloatValue("Size", 0.4F, 0F, 1F)
 }

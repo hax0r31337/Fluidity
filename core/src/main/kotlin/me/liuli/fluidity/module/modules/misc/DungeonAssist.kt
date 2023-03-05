@@ -54,12 +54,12 @@ import kotlin.math.abs
 
 object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you play Hypixel SkyBlock Dungeon", ModuleCategory.MISC) {
 
-    private val espValue = BoolValue("ESP", true)
-    private val espColorValue = ColorValue("ESPColor", Color(0xff, 0xff, 0xff, 0x55).rgb)
-    private val creeperBeamValue = BoolValue("CreeperBeam", true)
-    private val creeperBeamColorValue = ColorValue("CreeperBeamColor", Color(0x32, 0xcd, 0x32, 0x55).rgb)
-    private val higherOrLowerValue = BoolValue("HigherOrLower", true)
-    private val higherOrLowerColorValue = ColorValue("HigherOrLowerColor", Color(0xeb, 0xb0, 0x35, 0x55).rgb)
+    private val espValue by BoolValue("ESP", true)
+    private val espColorValue by ColorValue("ESPColor", Color(0xff, 0xff, 0xff, 0x55).rgb)
+    private val creeperBeamValue by BoolValue("CreeperBeam", true)
+    private val creeperBeamColorValue by ColorValue("CreeperBeamColor", Color(0x32, 0xcd, 0x32, 0x55).rgb)
+    private val higherOrLowerValue by BoolValue("HigherOrLower", true)
+    private val higherOrLowerColorValue by ColorValue("HigherOrLowerColor", Color(0xeb, 0xb0, 0x35, 0x55).rgb)
 
     private val nametags = mutableMapOf<Int, String>()
     private val threeWeirdosConditions = arrayOf("My chest doesn't have the reward. We are all telling the truth.",
@@ -145,9 +145,9 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
         var hasCreeper: EntityCreeper? = null
         var hasSilverfish: EntitySilverfish? = null
         mc.theWorld.loadedEntityList.filter { it is EntityLivingBase && it !is EntityArmorStand && it != mc.thePlayer }.forEach { entity ->
-            if (higherOrLowerValue.get() && entity is EntityBlaze) {
+            if (higherOrLowerValue && entity is EntityBlaze) {
                 hasBlaze = true
-            } else if (creeperBeamValue.get() && entity is EntityCreeper) {
+            } else if (creeperBeamValue && entity is EntityCreeper) {
                 hasCreeper = entity
             } else if (entity is EntitySilverfish && entity.getDistanceSqToEntity(mc.thePlayer) < 900) {
                 hasSilverfish = entity
@@ -488,7 +488,7 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
 
     @Listen
     fun onRender3d(event: Render3DEvent) {
-        if (espValue.get()) {
+        if (espValue) {
             nametags.forEach { (i, s) ->
                 if (!s.contains("✯")) {
                     return@forEach
@@ -508,16 +508,16 @@ object DungeonAssist : Module("DungeonAssist", "An smart assistant helps you pla
                     entityBox.maxY - entity.posY + y,
                     entityBox.maxZ - entity.posZ + z
                 )
-                drawAxisAlignedBB(axisAlignedBB, espColorValue.get(), 0f, 0, espColorValue.get() shr 24 and 255)
+                drawAxisAlignedBB(axisAlignedBB, espColorValue, 0f, 0, espColorValue shr 24 and 255)
             }
         }
         if (selectedEntity != null) {
             val axisAlignedBB = selectedEntity!!.offset(-mc.renderManager.viewerPosX, -mc.renderManager.viewerPosY, -mc.renderManager.viewerPosZ)
-            drawAxisAlignedBB(axisAlignedBB, higherOrLowerColorValue.get(), 0f, 0, higherOrLowerColorValue.get() shr 24 and 255)
+            drawAxisAlignedBB(axisAlignedBB, higherOrLowerColorValue, 0f, 0, higherOrLowerColorValue shr 24 and 255)
         }
         if (lines.isNotEmpty()) {
             GL11.glDisable(GL11.GL_TEXTURE_2D)
-            glColor(creeperBeamColorValue.get())
+            glColor(creeperBeamColorValue)
             GL11.glEnable(GL11.GL_LINE_SMOOTH)
             GL11.glLineWidth(4f)
             GL11.glBegin(GL11.GL_LINES)

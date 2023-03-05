@@ -26,11 +26,11 @@ import java.awt.Color
 
 class ChestESP : Module("ChestESP", "Allow you see chests through wall", ModuleCategory.RENDER) {
 
-    private val colorValue = ColorValue("Color", Color.BLUE.rgb)
-    private val boxAlphaValue = IntValue("BoxAlpha", 50, 0, 255)
-    private val outlineAlphaValue = IntValue("OutlineAlpha", 255, 0, 255)
-    private val outlineThicknessValue = FloatValue("OutlineThickness", 1f, 1f, 10f)
-    private val notOpenedValue = BoolValue("NotOpened", false)
+    private val colorValue by ColorValue("Color", Color.BLUE.rgb)
+    private val boxAlphaValue by IntValue("BoxAlpha", 50, 0, 255)
+    private val outlineAlphaValue by IntValue("OutlineAlpha", 255, 0, 255)
+    private val outlineThicknessValue by FloatValue("OutlineThickness", 1f, 1f, 10f)
+    private val notOpenedValue by BoolValue("NotOpened", false)
 
     private val openedChests = mutableListOf<BlockPos>()
 
@@ -47,7 +47,7 @@ class ChestESP : Module("ChestESP", "Allow you see chests through wall", ModuleC
     fun onRender3D(event: Render3DEvent) {
         mc.theWorld.loadedTileEntityList.filterIsInstance<TileEntityChest>()
             .let {
-                if (notOpenedValue.get()) {
+                if (notOpenedValue) {
                     it.filter { !openedChests.contains(it.pos) }
                 } else {
                     it
@@ -61,14 +61,14 @@ class ChestESP : Module("ChestESP", "Allow you see chests through wall", ModuleC
                     entity.pos.y + 1.0 - mc.renderManager.renderPosY,
                     entity.pos.z + 1.0 - mc.renderManager.renderPosZ
                 )
-                drawAxisAlignedBB(axisAlignedBB, colorValue.get(), outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
+                drawAxisAlignedBB(axisAlignedBB, colorValue, outlineThicknessValue, outlineAlphaValue, boxAlphaValue)
             }
     }
 
     @Listen
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
-        if (notOpenedValue.get() && packet is S24PacketBlockAction && packet.blockType is BlockChest && packet.data2 == 1) {
+        if (notOpenedValue && packet is S24PacketBlockAction && packet.blockType is BlockChest && packet.data2 == 1) {
             openedChests.add(packet.blockPosition)
         }
     }

@@ -14,11 +14,11 @@ import me.liuli.fluidity.util.mc
 
 class GameSpeed : Module("GameSpeed", "Change Minecraft tick speed", ModuleCategory.WORLD) {
 
-    private val speedValue = FloatValue("Speed", 1.5f, 0.1f, 5f)
+    private val speedValue by FloatValue("Speed", 1.5f, 0.1f, 5f)
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        mc.timer.timerSpeed = speedValue.get()
+        mc.timer.timerSpeed = speedValue
     }
 
     override fun onDisable() {

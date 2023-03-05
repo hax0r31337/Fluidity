@@ -23,8 +23,8 @@ import net.minecraft.util.ChatAllowedCharacters
 
 class ReportBot : Module("ReportBot", "report players automatically", ModuleCategory.MISC) {
 
-    private val modeValue = ListValue("Mode", arrayOf("DoMCer"), "DoMCer")
-    private val delayValue = IntValue("Delay", 5000, 1000, 10000)
+    private val modeValue by ListValue("Mode", arrayOf("DoMCer"), "DoMCer")
+    private val delayValue by IntValue("Delay", 5000, 1000, 10000)
 
     private val delayTimer = TheTimer()
     private val reportedList = mutableListOf<String>()
@@ -35,7 +35,7 @@ class ReportBot : Module("ReportBot", "report players automatically", ModuleCate
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        if (delayTimer.hasTimePassed(delayValue.get())) {
+        if (delayTimer.hasTimePassed(delayValue)) {
             mc.netHandler.playerInfoMap.forEach {
                 val name = it.gameProfile.name
                 if(name != mc.session.username) {
@@ -55,7 +55,7 @@ class ReportBot : Module("ReportBot", "report players automatically", ModuleCate
             if (!ChatAllowedCharacters.isAllowedCharacter(it)) return false
         }
 
-        if (modeValue.get() == "DoMCer") {
+        if (modeValue == "DoMCer") {
             mc.thePlayer.sendChatMessage("/report $name")
         }
         reportedList.add(name)

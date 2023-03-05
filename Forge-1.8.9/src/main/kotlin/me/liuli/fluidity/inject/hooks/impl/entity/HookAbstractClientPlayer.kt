@@ -18,7 +18,7 @@ class HookAbstractClientPlayer : HookProvider("net.minecraft.client.entity.Abstr
     @Hook(method = "getFovModifier", type = Hook.Type("ENTER"))
     fun getFovModifier(param: MethodHookParam) {
         if (NoFOV.state) {
-            var newFOV = fovValue.get()
+            var newFOV = fovValue
             val thisObject = param.thisObject as AbstractClientPlayer
 
             if (!thisObject.isUsingItem || thisObject.itemInUse.item !== Items.bow) {

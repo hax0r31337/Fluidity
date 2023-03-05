@@ -28,22 +28,22 @@ import java.awt.Color
 
 object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory", ModuleCategory.PLAYER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Auto", "Manual", "Visual"), "Visual")
-    private val stealChestValue = BoolValue("StealChest", false)
-    private val autoCloseValue = BoolValue("AutoClose", false)
-    private val autoCloseDelayValue = IntValue("AutoCloseDelay", 300, 50, 500)
-    private val clickMaxCpsValue = IntValue("ClickMaxCPS", 4, 1, 20)
-    private val clickMinCpsValue = IntValue("ClickMinCPS", 2, 1, 20)
-    val usefulColorValue = ColorValue("UsefulColor", Color.GREEN.rgb)
-    val garbageColorValue = ColorValue("GarbageColor", Color.RED.rgb)
-    private val ignoreVehiclesValue = BoolValue("IgnoreVehicles", false)
-    private val onlyPositivePotionValue = BoolValue("OnlyPositivePotion", false)
-    private val sortSwordValue = IntValue("SortSword", 0, -1, 8)
-    private val sortPickaxeValue = IntValue("SortPickaxe", 5, -1, 8)
-    private val sortAxeValue = IntValue("SortAxe", 6, -1, 8)
-    private val sortBlockValue = IntValue("SortBlock", 7, -1, 8)
-    private val sortGAppleValue = IntValue("SortGapple", 2, -1, 8)
-    private val noSortNoCloseForPlayerValue = BoolValue("NoSortNoCloseForPlayer", true)
+    private val modeValue by ListValue("Mode", arrayOf("Auto", "Manual", "Visual"), "Visual")
+    private val stealChestValue by BoolValue("StealChest", false)
+    private val autoCloseValue by BoolValue("AutoClose", false)
+    private val autoCloseDelayValue by IntValue("AutoCloseDelay", 300, 50, 500)
+    private val clickMaxCpsValue by IntValue("ClickMaxCPS", 4, 1, 20)
+    private val clickMinCpsValue by IntValue("ClickMinCPS", 2, 1, 20)
+    val usefulColorValue by ColorValue("UsefulColor", Color.GREEN.rgb)
+    val garbageColorValue by ColorValue("GarbageColor", Color.RED.rgb)
+    private val ignoreVehiclesValue by BoolValue("IgnoreVehicles", false)
+    private val onlyPositivePotionValue by BoolValue("OnlyPositivePotion", false)
+    private val sortSwordValue by IntValue("SortSword", 0, -1, 8)
+    private val sortPickaxeValue by IntValue("SortPickaxe", 5, -1, 8)
+    private val sortAxeValue by IntValue("SortAxe", 6, -1, 8)
+    private val sortBlockValue by IntValue("SortBlock", 7, -1, 8)
+    private val sortGAppleValue by IntValue("SortGapple", 2, -1, 8)
+    private val noSortNoCloseForPlayerValue by BoolValue("NoSortNoCloseForPlayer", true)
 
     val usefulItems = mutableListOf<Slot>()
     val garbageItems = mutableListOf<Slot>()
@@ -61,7 +61,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     }
     
     private fun updateClick() {
-        clickTimer.update(clickMinCpsValue.get(), clickMaxCpsValue.get())
+        clickTimer.update(clickMinCpsValue, clickMaxCpsValue)
         sorted = true
     }
 
@@ -89,7 +89,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             }
         }
 
-        val canClick = clickTimer.canClick() && modeValue.get() != "Visual"
+        val canClick = clickTimer.canClick() && modeValue != "Visual"
         if (!canClick) {
             return
         }
@@ -116,10 +116,10 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                     return
                 }
             }
-            if (autoCloseValue.get() && clickTimer.hasTimePassed(autoCloseDelayValue.get()) && (!noSortNoCloseForPlayerValue.get() || sorted)) {
+            if (autoCloseValue && clickTimer.hasTimePassed(autoCloseDelayValue) && (!noSortNoCloseForPlayerValue || sorted)) {
                 mc.thePlayer.closeScreen()
             }
-        } else if (stealChestValue.get()) {
+        } else if (stealChestValue) {
             // steal items
             usefulItems.forEach {
                 if (processSteal(it, gui, mouseX, mouseY)) {
@@ -133,7 +133,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
                     return
                 }
             }
-            if (autoCloseValue.get() && clickTimer.hasTimePassed(autoCloseDelayValue.get())) {
+            if (autoCloseValue && clickTimer.hasTimePassed(autoCloseDelayValue)) {
                 mc.thePlayer.closeScreen()
             }
         }
@@ -143,7 +143,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
         if (slot.slotNumber !in 0..(gui.inventorySlots.inventorySlots.size - 37)) {
             return false
         }
-        if (modeValue.get() == "Manual" && !gui.isMouseOverSlot(slot, mouseX, mouseY)) {
+        if (modeValue == "Manual" && !gui.isMouseOverSlot(slot, mouseX, mouseY)) {
             return false
         }
 
@@ -152,7 +152,7 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
     }
 
     private fun processClick(slot: Slot, gui: GuiContainer, lvl: ItemLevel, mouseX: Int, mouseY: Int): Boolean {
-        if (modeValue.get() == "Manual" && !gui.isMouseOverSlot(slot, mouseX, mouseY)) {
+        if (modeValue == "Manual" && !gui.isMouseOverSlot(slot, mouseX, mouseY)) {
             return false
         }
 
@@ -164,25 +164,25 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             if (item is ItemArmor && !(mc.currentScreen is GuiInventory && slot.slotNumber in 5..8)) {
                 mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, 0, 1, mc.thePlayer)
                 true
-            } else if (sortSwordValue.get() != -1 && item is ItemSword && slot.slotNumber != 36 + sortSwordValue.get()) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortSwordValue.get(), 2, mc.thePlayer)
+            } else if (sortSwordValue != -1 && item is ItemSword && slot.slotNumber != 36 + sortSwordValue) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortSwordValue, 2, mc.thePlayer)
                 true
-            } else if (sortPickaxeValue.get() != -1 && item is ItemPickaxe && slot.slotNumber != 36 + sortPickaxeValue.get()) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortPickaxeValue.get(), 2, mc.thePlayer)
+            } else if (sortPickaxeValue != -1 && item is ItemPickaxe && slot.slotNumber != 36 + sortPickaxeValue) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortPickaxeValue, 2, mc.thePlayer)
                 true
-            } else if (sortAxeValue.get() != -1 && item is ItemAxe && slot.slotNumber != 36 + sortAxeValue.get()) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortAxeValue.get(), 2, mc.thePlayer)
+            } else if (sortAxeValue != -1 && item is ItemAxe && slot.slotNumber != 36 + sortAxeValue) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortAxeValue, 2, mc.thePlayer)
                 true
             } else {
                 false
             }
         } else {
             val item = slot.stack?.item ?: return false
-            if (sortGAppleValue.get() != -1 && item is ItemAppleGold && slot.slotNumber != 36 + sortGAppleValue.get() && mc.thePlayer.inventory.getStackInSlot(sortGAppleValue.get())?.item !is ItemAppleGold) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortGAppleValue.get(), 2, mc.thePlayer)
+            if (sortGAppleValue != -1 && item is ItemAppleGold && slot.slotNumber != 36 + sortGAppleValue && mc.thePlayer.inventory.getStackInSlot(sortGAppleValue)?.item !is ItemAppleGold) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortGAppleValue, 2, mc.thePlayer)
                 true
-            } else if (sortBlockValue.get() != -1 && item is ItemBlock && slot.slotNumber != 36 + sortBlockValue.get() && mc.thePlayer.inventory.getStackInSlot(sortBlockValue.get())?.item !is ItemBlock) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortBlockValue.get(), 2, mc.thePlayer)
+            } else if (sortBlockValue != -1 && item is ItemBlock && slot.slotNumber != 36 + sortBlockValue && mc.thePlayer.inventory.getStackInSlot(sortBlockValue)?.item !is ItemBlock) {
+                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot.slotNumber, sortBlockValue, 2, mc.thePlayer)
                 true
             } else {
                 false
@@ -233,8 +233,8 @@ object InventoryHelper : Module("InventoryHelper", "Helps you sort the inventory
             else -> {
                 if (item is ItemFood || stack.unlocalizedName == "item.arrow" ||
                         (item is ItemBlock && item.isUsefulBlock()) ||
-                        item is ItemSnowball || item is ItemEgg || (item is ItemPotion && (!onlyPositivePotionValue.get() || stack.isPositivePotion())) ||
-                        item is ItemEnderPearl || item is ItemBucket || (ignoreVehiclesValue.get() && (item is ItemBoat || item is ItemMinecart))) {
+                        item is ItemSnowball || item is ItemEgg || (item is ItemPotion && (!onlyPositivePotionValue || stack.isPositivePotion())) ||
+                        item is ItemEnderPearl || item is ItemBucket || (ignoreVehiclesValue && (item is ItemBoat || item is ItemMinecart))) {
                     ItemLevel.NORMAL
                 } else {
                     ItemLevel.GARBAGE

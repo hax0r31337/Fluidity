@@ -25,25 +25,25 @@ import java.awt.Color
 
 object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCategory.RENDER) {
 
-    val onlyShowAttackableValue = BoolValue("OnlyShowAttackable", false)
-    private val colorValue = ColorValue("Color", Color.WHITE.rgb)
-    private val boxAlphaValue = IntValue("BoxAlpha", 50, 0, 255)
-    private val outlineAlphaValue = IntValue("OutlineAlpha", 255, 0, 255)
-    private val outlineThicknessValue = FloatValue("OutlineThickness", 1f, 1f, 10f)
-    val nameValue = BoolValue("Name", true)
-    private val scaleValue = FloatValue("NameScale", 2F, 1F, 4F)
-    private val nameBackgroundColorValue = ColorValue("NameBackgroundColor", Color(0, 0, 0, 150).rgb)
-    private val scaleMultiplierValue = FloatValue("NameScaleMultiplier", 4F, 1F, 10F)
+    val onlyShowAttackableValue by BoolValue("OnlyShowAttackable", false)
+    private val colorValue by ColorValue("Color", Color.WHITE.rgb)
+    private val boxAlphaValue by IntValue("BoxAlpha", 50, 0, 255)
+    private val outlineAlphaValue by IntValue("OutlineAlpha", 255, 0, 255)
+    private val outlineThicknessValue by FloatValue("OutlineThickness", 1f, 1f, 10f)
+    val nameValue by BoolValue("Name", true)
+    private val scaleValue by FloatValue("NameScale", 2F, 1F, 4F)
+    private val nameBackgroundColorValue by ColorValue("NameBackgroundColor", Color(0, 0, 0, 150).rgb)
+    private val scaleMultiplierValue by FloatValue("NameScaleMultiplier", 4F, 1F, 10F)
 
     @Listen
     fun onRender3D(event: Render3DEvent) {
-        val list = mc.theWorld.loadedEntityList.filter { it.isTarget(onlyShowAttackableValue.get()) }.toMutableList()
+        val list = mc.theWorld.loadedEntityList.filter { it.isTarget(onlyShowAttackableValue) }.toMutableList()
         if (mc.gameSettings.thirdPersonView != 0) {
             list.add(mc.thePlayer)
         }
         if(list.isEmpty()) return
 
-        val nameAlpha = nameBackgroundColorValue.get() shr 24 and 0xFF
+        val nameAlpha = nameBackgroundColorValue shr 24 and 0xFF
         val renderPlayer = mc.renderViewEntity ?: mc.thePlayer
 
         list.forEach { entity ->
@@ -59,9 +59,9 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 entityBox.maxY - entity.posY + y,
                 entityBox.maxZ - entity.posZ + z
             )
-            drawAxisAlignedBB(axisAlignedBB, if((entity as EntityLivingBase).hurtTime > 0) { 0xFF0000 } else { colorValue.get() }, outlineThicknessValue.get(), outlineAlphaValue.get(), boxAlphaValue.get())
+            drawAxisAlignedBB(axisAlignedBB, if((entity as EntityLivingBase).hurtTime > 0) { 0xFF0000 } else { colorValue }, outlineThicknessValue, outlineAlphaValue, boxAlphaValue)
 
-            if (nameValue.get()) {
+            if (nameValue) {
                 GL11.glPushMatrix()
 
                 GL11.glTranslated(x, y + entity.eyeHeight + 0.2, z)
@@ -73,7 +73,7 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 GL11.glEnable(GL11.GL_BLEND)
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 
-                val scale = ((renderPlayer.getDistanceToEntity(entity) / scaleMultiplierValue.get()).coerceAtLeast(1f) / 150F) * scaleValue.get()
+                val scale = ((renderPlayer.getDistanceToEntity(entity) / scaleMultiplierValue).coerceAtLeast(1f) / 150F) * scaleValue
                 GL11.glScalef(-scale, -scale, scale)
                 GL11.glTranslatef(0f, -mc.fontRendererObj.FONT_HEIGHT * 1.4f, 0f)
 
@@ -84,9 +84,9 @@ object ESP : Module("ESP", "Allows you see your targets through wall", ModuleCat
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
                 GL11.glEnable(GL11.GL_LINE_SMOOTH)
 
-                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * -0.3f, width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, nameBackgroundColorValue.get())
+                quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * -0.3f, width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, nameBackgroundColorValue)
                 quickDrawRect(-width, mc.fontRendererObj.FONT_HEIGHT * 1.1f, -width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.4f, entity.healthColor(nameAlpha).rgb)
-                quickDrawRect(-width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.1f, width, mc.fontRendererObj.FONT_HEIGHT * 1.4f, nameBackgroundColorValue.get())
+                quickDrawRect(-width + (width * 2 * entity.healthPercent), mc.fontRendererObj.FONT_HEIGHT * 1.1f, width, mc.fontRendererObj.FONT_HEIGHT * 1.4f, nameBackgroundColorValue)
 
                 GL11.glEnable(GL11.GL_TEXTURE_2D)
                 GL11.glDisable(GL11.GL_BLEND)

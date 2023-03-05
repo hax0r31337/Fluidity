@@ -12,9 +12,9 @@ import kotlin.math.max
 
 object Reach : Module("Reach", "Increase your hand length", ModuleCategory.COMBAT) {
 
-    val combatReachValue = FloatValue("CombatReach", 3.5f, 3f, 7f)
-    val buildReachValue = FloatValue("BuildReach", 5f, 4.5f, 7f)
+    val combatReachValue by FloatValue("CombatReach", 3.5f, 3f, 7f)
+    val buildReachValue by FloatValue("BuildReach", 5f, 4.5f, 7f)
 
     val reach: Double
-        get() = if(state) combatReachValue.get().toDouble() else 3.0
+        get() = if(state) combatReachValue.toDouble() else 3.0
 }

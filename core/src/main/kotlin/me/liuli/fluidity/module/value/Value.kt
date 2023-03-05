@@ -7,6 +7,7 @@ package me.liuli.fluidity.module.value
 
 import com.google.gson.JsonElement
 import me.liuli.fluidity.util.client.logWarn
+import kotlin.reflect.KProperty
 
 abstract class Value<T>(val name: String, protected var value: T) {
     val defaultValue = value
@@ -40,4 +41,11 @@ abstract class Value<T>(val name: String, protected var value: T) {
 
     protected open fun onChange(oldValue: T, newValue: T) {}
     protected open fun onChanged(oldValue: T, newValue: T) {}
+    operator fun getValue(obj: Any, property: KProperty<*>): T {
+        return value
+    }
+
+    operator fun setValue(obj: Any, property: KProperty<*>, valueIn: T) {
+        value = valueIn
+    }
 }

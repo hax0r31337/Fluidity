@@ -20,10 +20,10 @@ class Disabler : Module("Disabler", "Disable anticheats through exploit", Module
     private val modeList = resolveInstances("${this.javaClass.`package`.name}.disabler", DisablerMode::class.java)
         .sortedBy { it.name }
 
-    private val modeValue = ListValue("Mode", modeList.map { it.name }.toTypedArray(), modeList.first().name)
+    private val modeValue by ListValue("Mode", modeList.map { it.name }.toTypedArray(), modeList.first().name)
 
     private val mode: DisablerMode
-        get() = modeList.find { it.name == modeValue.get() }!!
+        get() = modeList.find { it.name == modeValue }!!
 
     override fun onEnable() {
         mode.onEnable()

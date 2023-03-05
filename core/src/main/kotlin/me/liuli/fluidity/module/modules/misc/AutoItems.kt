@@ -17,27 +17,27 @@ import net.minecraft.item.*
 
 class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCategory.MISC) {
 
-    private val attackValue = BoolValue("Attack", true)
-    private val attackOnlySwordValue = BoolValue("AttackOnlySword", true)
-    private val mineBlockValue = BoolValue("MineBlock", true)
-    private val placeBlockValue = BoolValue("PlaceBlock", false)
+    private val attackValue by BoolValue("Attack", true)
+    private val attackOnlySwordValue by BoolValue("AttackOnlySword", true)
+    private val mineBlockValue by BoolValue("MineBlock", true)
+    private val placeBlockValue by BoolValue("PlaceBlock", false)
 
     @Listen
     fun onAttack(event: AttackEvent) {
-        if (!attackValue.get())
+        if (!attackValue)
             return
 
         // Find best weapon in hotbar (#Kotlin Style)
         val (slot, _) = (0..8)
             .map { Pair(it, mc.thePlayer.inventory.getStackInSlot(it)) }
-            .filter { it.second != null && (it.second.item is ItemSword || (it.second.item is ItemTool && !attackOnlySwordValue.get())) }
+            .filter { it.second != null && (it.second.item is ItemSword || (it.second.item is ItemTool && !attackOnlySwordValue)) }
             .maxByOrNull { it.second.getAttackDamage() } ?: return
         swapItem(slot)
     }
 
     @Listen
     fun onClick(event: ClickBlockEvent) {
-        if (event.type == ClickBlockEvent.Type.LEFT && mineBlockValue.get()) {
+        if (event.type == ClickBlockEvent.Type.LEFT && mineBlockValue) {
             var bestSpeed = 1F
             var bestSlot = -1
 
@@ -56,7 +56,7 @@ class AutoItems : Module("AutoItems", "Automatically switch items", ModuleCatego
             if (bestSlot != -1) {
                 swapItem(bestSlot)
             }
-        } else if (event.type == ClickBlockEvent.Type.RIGHT && placeBlockValue.get()) {
+        } else if (event.type == ClickBlockEvent.Type.RIGHT && placeBlockValue) {
             val cur = mc.thePlayer.inventory.getCurrentItem()?.item
             if (cur != null && (cur is ItemBlock || cur is ItemFood || cur is ItemPotion)) {
                 return

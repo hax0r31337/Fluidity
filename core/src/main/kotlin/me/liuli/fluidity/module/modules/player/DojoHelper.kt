@@ -40,8 +40,8 @@ import kotlin.math.floor
 
 class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Swift", "Discipline", "Force", "Mastery", "Control"), "Swift")
-    private val latencyValue = IntValue("Latency", 300, 100, 1000)
+    private val modeValue by ListValue("Mode", arrayOf("Swift", "Discipline", "Force", "Mastery", "Control"), "Swift")
+    private val latencyValue by IntValue("Latency", 300, 100, 1000)
 
     private val prevPositionMap = mutableMapOf<Int, Vec3d>()
     private val currentGoodBlocks = mutableListOf<BlockPos>()
@@ -65,7 +65,7 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        when (modeValue.get()) {
+        when (modeValue) {
             "Swift" -> {
                 mc.gameSettings.keyBindSneak.pressed = false
                 if (!mc.gameSettings.keyBindJump.pressed) {
@@ -127,7 +127,7 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                 if (targets.isEmpty()) {
                     return
                 }
-                val latency = latencyValue.get() / 1000f
+                val latency = latencyValue / 1000f
                 val bestTargetPair = targets.filter { it.name.contains("§e") }.map { Pair(it, it.name.substring(4).replace(":", ".").toFloat()) }
                     .maxByOrNull {
                         if (it.second > latency) { -1.0f } else { it.second }
@@ -146,7 +146,7 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
                 val skeleton =
                     mc.theWorld.loadedEntityList.filter { it.getDistanceSqToEntity(mc.thePlayer) < 900 && it is EntitySkeleton }
                         .firstOrNull { it.inventory[4] != null } ?: return
-                val latencyMultiplier = latencyValue.get() / 100f
+                val latencyMultiplier = latencyValue / 100f
                 val prev = prevPositionMap[skeleton.entityId] ?: Vec3d(skeleton.prevPosX, skeleton.prevPosY, skeleton.prevPosZ).also {
                     displayAlert("Failed to load previous position of entity ${skeleton.entityId}")
                 }
@@ -179,7 +179,7 @@ class DojoHelper : Module("DojoHelper", "Hypixel SkyBlock", ModuleCategory.PLAYE
             state = false // disable after teleport
         }
 
-        when (modeValue.get()) {
+        when (modeValue) {
             "Swift" -> {
                 if (packet is S23PacketBlockChange) {
                     swiftDojoBlockProc(packet.blockState, packet.blockPosition)

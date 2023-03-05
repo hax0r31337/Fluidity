@@ -29,23 +29,23 @@ import kotlin.math.floor
 
 class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.COMBAT) {
 
-    private val rangeValue = FloatValue("Range", 4.5f, 1f, 10f)
-    private val minYawTurnSpeedValue = FloatValue("MinYawTurnSpeed", 10f, 1F, 180F)
-    private val maxYawTurnSpeedValue = FloatValue("MaxYawTurnSpeed", 50f, 1F, 180F)
-    private val minPitchTurnSpeedValue = FloatValue("MinPitchTurnSpeed", 10f, 1F, 180F)
-    private val maxPitchTurnSpeedValue = FloatValue("MaxPitchTurnSpeed", 50f, 1F, 180F)
-    private val backtrackTicksValue = IntValue("BackTrack", 0, 0, 10)
-    private val priorityValue = ListValue("Priority", arrayOf("Health", "Distance", "Fov", "LivingTime", "Armor", "HurtResistantTime"), "Distance")
-    private val fovValue = FloatValue("FOV", 180F, 1F, 180F)
-    private val jitterValue = FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
-    private val throughWallsValue = BoolValue("ThroughWalls", false)
-    private val onlyHoldMouseValue = BoolValue("OnlyHoldMouse", true)
-    private val silentRotationValue = BoolValue("SilentRotation", false)
-    private val aimingModeValue = ListValue("AimingMode", arrayOf("Common", "Lock", "PikaNW"), "Common")
-    private val keepRotationValue = IntValue("KeepRotation", 1000, 0, 2500)
+    private val rangeValue by FloatValue("Range", 4.5f, 1f, 10f)
+    private val minYawTurnSpeedValue by FloatValue("MinYawTurnSpeed", 10f, 1F, 180F)
+    private val maxYawTurnSpeedValue by FloatValue("MaxYawTurnSpeed", 50f, 1F, 180F)
+    private val minPitchTurnSpeedValue by FloatValue("MinPitchTurnSpeed", 10f, 1F, 180F)
+    private val maxPitchTurnSpeedValue by FloatValue("MaxPitchTurnSpeed", 50f, 1F, 180F)
+    private val backtrackTicksValue by IntValue("BackTrack", 0, 0, 10)
+    private val priorityValue by ListValue("Priority", arrayOf("Health", "Distance", "Fov", "LivingTime", "Armor", "HurtResistantTime"), "Distance")
+    private val fovValue by FloatValue("FOV", 180F, 1F, 180F)
+    private val jitterValue by FloatValue("Jitter", 0.0f, 0.0f, 5.0f)
+    private val throughWallsValue by BoolValue("ThroughWalls", false)
+    private val onlyHoldMouseValue by BoolValue("OnlyHoldMouse", true)
+    private val silentRotationValue by BoolValue("SilentRotation", false)
+    private val aimingModeValue by ListValue("AimingMode", arrayOf("Common", "Lock", "PikaNW"), "Common")
+    private val keepRotationValue by IntValue("KeepRotation", 1000, 0, 2500)
 
     private val playerRotation: Pair<Float, Float>
-        get() = if (lastAimingAt != null && !lastAimingTimer.hasTimePassed(keepRotationValue.get())) lastAimingAt!!
+        get() = if (lastAimingAt != null && !lastAimingTimer.hasTimePassed(keepRotationValue)) lastAimingAt!!
                 else Pair(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch)
 
     private var hasTarget = false
@@ -64,7 +64,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
 
     private fun getCenter(entity: EntityLivingBase): Vec3 {
         // only limit the scope of backtrack to player, that saves performance :)
-        if (entity !is EntityPlayer || backtrackTicksValue.get() == 0) return getCenter(entity.entityBoundingBox)
+        if (entity !is EntityPlayer || backtrackTicksValue == 0) return getCenter(entity.entityBoundingBox)
 
         return backtrackQueue[entity.entityId]?.peek() ?: getCenter(entity.entityBoundingBox)
     }
@@ -72,14 +72,14 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     private fun getRotation(): Pair<Float, Float>{
         hasTarget = false
 
-        if (onlyHoldMouseValue.get() && !mc.gameSettings.keyBindAttack.pressed) return playerRotation
+        if (onlyHoldMouseValue && !mc.gameSettings.keyBindAttack.pressed) return playerRotation
 
         val entity = mc.theWorld.loadedEntityList
             .filter {
-                it.isTarget(true) && (throughWallsValue.get() || mc.thePlayer.canEntityBeSeen(it)) &&
-                        mc.thePlayer.getDistanceToEntityBox(it) <= rangeValue.get() && getRotationDifference(it) <= fovValue.get()
+                it.isTarget(true) && (throughWallsValue || mc.thePlayer.canEntityBeSeen(it)) &&
+                        mc.thePlayer.getDistanceToEntityBox(it) <= rangeValue && getRotationDifference(it) <= fovValue
             }.map { it as EntityLivingBase }.let { targets ->
-                when (priorityValue.get()) {
+                when (priorityValue) {
                     "Distance" -> targets.minByOrNull { mc.thePlayer.getDistanceToEntityBox(it) } // Sort by distance
                     "Health" -> targets.minByOrNull { it.health } // Sort by health
                     "Fov" -> targets.minByOrNull { getRotationDifference(it) } // Sort by FOV
@@ -94,7 +94,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         needAimBack = true
 
         val correctAim = toRotation(getCenter(entity), true)
-        return when(aimingModeValue.get()) {
+        return when(aimingModeValue) {
             "Lock" -> correctAim
             // TODO: improve
             "Common" -> if (rayTraceEntity(Reach.reach, yaw = correctAim.first, pitch = mc.thePlayer.serverRotationPitch) { it == entity } != null) {
@@ -110,7 +110,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
                 var yaw = hurt * 60f + if (hurt != 0f) -30f + pikanwLastYaw else ((Math.random().toFloat() - 0.5f) * 3 + correctAim.first)
                 Pair(yaw, (correctAim.second + (Math.random().toFloat() - 0.5f) * 3).coerceIn(-89.9f, 89.9f))
             }
-            else -> throw IllegalArgumentException("Invalid aiming mode: ${aimingModeValue.get()}")
+            else -> throw IllegalArgumentException("Invalid aiming mode: ${aimingModeValue}")
         }.also {
             lastAimingAt = it
             lastAimingTimer.reset()
@@ -127,22 +127,22 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
         val rotationDiff = getRotationDifference(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second)
 
         var (yaw, pitch) = limitAngleChange(lastReportedYaw, lastReportedPitch, destinationRotation.first, destinationRotation.second,
-            ((rotationDiff / 180) * maxYawTurnSpeedValue.get() + (1 - rotationDiff / 180) * minYawTurnSpeedValue.get()).toFloat(),
-            ((rotationDiff / 180) * maxPitchTurnSpeedValue.get() + (1 - rotationDiff / 180) * minPitchTurnSpeedValue.get()).toFloat())
+            ((rotationDiff / 180) * maxYawTurnSpeedValue + (1 - rotationDiff / 180) * minYawTurnSpeedValue).toFloat(),
+            ((rotationDiff / 180) * maxPitchTurnSpeedValue + (1 - rotationDiff / 180) * minPitchTurnSpeedValue).toFloat())
 
         if (yaw.toInt() == mc.thePlayer.rotationYaw.toInt() && pitch.toInt() == mc.thePlayer.rotationPitch.toInt()) {
             needAimBack = false
-            if (silentRotationValue.get()) return
+            if (silentRotationValue) return
         }
 
-        if (hasTarget && jitterValue.get() != 0f) {
-            jitterRotation(jitterValue.get(), yaw, pitch).also {
+        if (hasTarget && jitterValue != 0f) {
+            jitterRotation(jitterValue, yaw, pitch).also {
                 yaw = it.first
                 pitch = it.second
             }
         }
 
-        if (silentRotationValue.get()) {
+        if (silentRotationValue) {
             setServerRotation(yaw, pitch)
         } else {
             setClientRotation(yaw, pitch)
@@ -156,7 +156,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
     }
 
     private fun updateBacktrack() {
-        val t = backtrackTicksValue.get()
+        val t = backtrackTicksValue
         if (t == 0) return
         backtrackQueue.keys.map { it }.forEach {
             if (mc.theWorld.getEntityByID(it) == null) {

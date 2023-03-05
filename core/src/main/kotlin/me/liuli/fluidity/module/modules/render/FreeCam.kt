@@ -18,7 +18,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook
 
 class FreeCam : Module("FreeCam", "Allows you to move out of your body", ModuleCategory.RENDER) {
 
-    private val speedValue = FloatValue("Speed", 0.8f, 0.1f, 2f)
+    private val speedValue by FloatValue("Speed", 0.8f, 0.1f, 2f)
 
     private var posX = 0.0
     private var posY = 0.0
@@ -56,13 +56,13 @@ class FreeCam : Module("FreeCam", "Allows you to move out of your body", ModuleC
         mc.thePlayer.noClip = true
         mc.thePlayer.fallDistance = 0f
         if (mc.gameSettings.keyBindJump.pressed) {
-            mc.thePlayer.motionY = speedValue.get().toDouble()
+            mc.thePlayer.motionY = speedValue.toDouble()
         } else if (mc.gameSettings.keyBindSneak.pressed) {
-            mc.thePlayer.motionY = -speedValue.get().toDouble()
+            mc.thePlayer.motionY = -speedValue.toDouble()
         } else {
             mc.thePlayer.motionY = 0.0
         }
-        mc.thePlayer.strafe(speedValue.get())
+        mc.thePlayer.strafe(speedValue)
     }
 
     @Listen

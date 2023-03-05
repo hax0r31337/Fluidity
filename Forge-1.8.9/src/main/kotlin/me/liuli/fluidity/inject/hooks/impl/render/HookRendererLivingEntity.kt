@@ -16,7 +16,7 @@ class HookRendererLivingEntity : HookProvider("net.minecraft.client.renderer.ent
 
     @Hook(method = "canRenderName", type = Hook.Type("ENTER"))
     fun canRenderName(param: MethodHookParam) {
-        if (ESP.state && ESP.nameValue.get() && (param.args[0] as Entity).isTarget(ESP.onlyShowAttackableValue.get()))
+        if (ESP.state && ESP.nameValue && (param.args[0] as Entity).isTarget(ESP.onlyShowAttackableValue))
             param.result = false
     }
 }

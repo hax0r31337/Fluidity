@@ -33,20 +33,20 @@ import net.minecraft.network.play.server.S13PacketDestroyEntities
 
 object Targets : Module("Targets", "Target types that can be attacked", ModuleCategory.CLIENT, canToggle = false) {
 
-    private val playerValue = BoolValue("Player", true)
-    private val playerTeamValue = BoolValue("PlayerTeam", true)
-    private val animalValue = BoolValue("Animal", false)
-    private val mobValue = BoolValue("Mob", true)
-    private val invisibleValue = BoolValue("Invisible", false)
-    private val deadValue = BoolValue("Dead", false)
+    private val playerValue by BoolValue("Player", true)
+    private val playerTeamValue by BoolValue("PlayerTeam", true)
+    private val animalValue by BoolValue("Animal", false)
+    private val mobValue by BoolValue("Mob", true)
+    private val invisibleValue by BoolValue("Invisible", false)
+    private val deadValue by BoolValue("Dead", false)
 
-    private val antibotValue = ListValue("AntiBot", arrayOf("None", "Custom", "SkyBlockDungeon"), "None")
-    private val antibotResetValue = object : BoolValue("AntiBot-Reset", false) {
+    private val antibotValue by ListValue("AntiBot", arrayOf("None", "Custom", "SkyBlockDungeon"), "None")
+    private val antibotResetValue by object : BoolValue("AntiBot-Reset", false) {
         override fun set(newValue: Boolean) {
             antibotReset()
         }
     }
-    private val antibotSpawnInCombatValue = BoolValue("AntiBot-SpawnInCombat", false)
+    private val antibotSpawnInCombatValue by BoolValue("AntiBot-SpawnInCombat", false)
 
     private val spawnList = mutableListOf<Int>()
     private val spawnInCombatList = mutableListOf<Int>()
@@ -59,7 +59,7 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
     private fun isCustomMatchedBot(entity: EntityLivingBase): Boolean {
         val id = entity.entityId
 
-        if (antibotSpawnInCombatValue.get() && spawnInCombatList.contains(id)) {
+        if (antibotSpawnInCombatValue && spawnInCombatList.contains(id)) {
             return true
         }
 
@@ -95,13 +95,13 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
     }
 
     fun Entity.isTarget(canAttackCheck: Boolean = true): Boolean {
-        if (this is EntityLivingBase && (deadValue.get() || this.isEntityAlive()) && this !== mc.thePlayer) {
-            if (invisibleValue.get() || !this.isInvisible()) {
+        if (this is EntityLivingBase && (deadValue || this.isEntityAlive()) && this !== mc.thePlayer) {
+            if (invisibleValue || !this.isInvisible()) {
                 if (this.isBot) {
                     return false
                 }
 
-                if (playerValue.get() && this is EntityPlayer) {
+                if (playerValue && this is EntityPlayer) {
                     if (canAttackCheck) {
 
                         if (this.isSpectator) {
@@ -112,7 +112,7 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
                             return false
                         }
 
-                        if (playerTeamValue.get()) {
+                        if (playerTeamValue) {
                             return !this.isTeammate
                         }
 
@@ -121,7 +121,7 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
 
                     return true
                 }
-                return mobValue.get() && this.isMob || animalValue.get() && this.isAnimal
+                return mobValue && this.isMob || animalValue && this.isAnimal
             }
         }
         return false
@@ -145,7 +145,7 @@ object Targets : Module("Targets", "Target types that can be attacked", ModuleCa
 
     val EntityLivingBase.isBot: Boolean
         get() =
-            when(antibotValue.get()) {
+            when(antibotValue) {
                 "SkyBlockDungeon" -> {
                     if (DungeonAssist.inDungeon) {
                         this is EntityBat || !DungeonAssist.getName(this.entityId).let { it.contains("✯") || it.startsWith("§6") || (it.contains("§d") && it.contains("§l")) }

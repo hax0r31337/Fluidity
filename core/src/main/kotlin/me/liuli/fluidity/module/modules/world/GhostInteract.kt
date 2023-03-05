@@ -20,8 +20,8 @@ import net.minecraft.util.BlockPos
 
 class GhostInteract : Module("GhostInteract", "Allows you interact blocks through wall", ModuleCategory.WORLD) {
 
-    private val blockValue = BlockValue("Block", 54)
-    private val radiusValue = IntValue("Radius", 4, 2, 7)
+    private val blockValue by BlockValue("Block", 54)
+    private val radiusValue by IntValue("Radius", 4, 2, 7)
 
     private var hasClick = false
 
@@ -32,8 +32,8 @@ class GhostInteract : Module("GhostInteract", "Allows you interact blocks throug
     @Listen
     fun onUpdate(event: UpdateEvent) {
         if (!hasClick && mc.gameSettings.keyBindUseItem.pressed) {
-            val radius = radiusValue.get()
-            val selectedBlock = Block.getBlockById(blockValue.get())
+            val radius = radiusValue
+            val selectedBlock = Block.getBlockById(blockValue)
             val floorPos = mc.thePlayer.floorPosition
             val eyeRay = mc.thePlayer.getEyePositionExpand(radius.toFloat())
             val pos = mc.thePlayer.positionVector

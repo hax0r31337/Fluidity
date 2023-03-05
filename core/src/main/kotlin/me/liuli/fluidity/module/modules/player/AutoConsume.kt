@@ -22,10 +22,10 @@ import net.minecraft.network.play.client.C0BPacketEntityAction
 
 class AutoConsume : Module("AutoConsume", "Automatically consume items.", ModuleCategory.PLAYER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Soup", "Head", "Wand"), "Soup")
-    private val healthValue = FloatValue("Health", 10F, 1F, 20F)
-    private val delayValue = IntValue("Delay", 1000, 0, 10000)
-    private val noConsumeHitValue = BoolValue("NoConsumeHit", false)
+    private val modeValue by ListValue("Mode", arrayOf("Soup", "Head", "Wand"), "Soup")
+    private val healthValue by FloatValue("Health", 10F, 1F, 20F)
+    private val delayValue by IntValue("Delay", 1000, 0, 10000)
+    private val noConsumeHitValue by BoolValue("NoConsumeHit", false)
 
     private var consumed = false
     private var prevSlot = -1
@@ -38,7 +38,7 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        if (!timer.hasTimePassed(delayValue.get())) {
+        if (!timer.hasTimePassed(delayValue)) {
             return
         }
 
@@ -48,7 +48,7 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
             consumed = false
             timer.reset()
         } else if (!consumed && prevSlot == -1) { // not eat
-            if (mc.thePlayer.health > healthValue.get()) {
+            if (mc.thePlayer.health > healthValue) {
                 return
             }
             val slot = searchItem()
@@ -65,7 +65,7 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
     fun onPacket(event: PacketEvent) {
         val packet = event.packet
 
-        if (noConsumeHitValue.get() && prevSlot != -1 && packet is C0BPacketEntityAction) {
+        if (noConsumeHitValue && prevSlot != -1 && packet is C0BPacketEntityAction) {
             event.cancel()
         }
     }
@@ -73,9 +73,9 @@ class AutoConsume : Module("AutoConsume", "Automatically consume items.", Module
     private fun searchItem(): Int {
         for (i in 36 until 45) {
             val stack = mc.thePlayer.inventoryContainer.getSlot(i).stack
-            if (stack != null && ((modeValue.get() == "Soup" && stack.item === Items.mushroom_stew)
-                        || (modeValue.get() == "Head" && stack.item === Items.skull
-                        || (modeValue.get() == "Wand" && stack.displayName.contains("Wand of", true))))) {
+            if (stack != null && ((modeValue == "Soup" && stack.item === Items.mushroom_stew)
+                        || (modeValue == "Head" && stack.item === Items.skull
+                        || (modeValue == "Wand" && stack.displayName.contains("Wand of", true))))) {
                 return i - 36
             }
         }

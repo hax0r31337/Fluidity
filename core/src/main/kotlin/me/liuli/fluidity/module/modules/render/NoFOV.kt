@@ -11,5 +11,5 @@ import me.liuli.fluidity.module.value.FloatValue
 
 object NoFOV : Module("NoFOV", "Disables FOV changes caused by speed effect, etc", ModuleCategory.RENDER) {
 
-    val fovValue = FloatValue("FOV", 1f, 0f, 1.5f)
+    val fovValue by FloatValue("FOV", 1f, 0f, 1.5f)
 }

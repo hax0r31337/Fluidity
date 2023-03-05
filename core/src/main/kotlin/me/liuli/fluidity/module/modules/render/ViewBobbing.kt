@@ -15,14 +15,14 @@ import me.liuli.fluidity.util.mc
 
 class ViewBobbing : Module("ViewBobbing", "Makes you custom view bobbing effect", ModuleCategory.RENDER) {
 
-    private val value = FloatValue("Value", 0.1f, 0f, 0.5f)
-    private val offgroundValue = BoolValue("OffGround", false)
+    private val value by FloatValue("Value", 0.1f, 0f, 0.5f)
+    private val offgroundValue by BoolValue("OffGround", false)
 
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
-        if (offgroundValue.get() || mc.thePlayer.onGround) {
-            mc.thePlayer.cameraYaw = value.get()
-            mc.thePlayer.prevCameraYaw = value.get()
+        if (offgroundValue || mc.thePlayer.onGround) {
+            mc.thePlayer.cameraYaw = value
+            mc.thePlayer.prevCameraYaw = value
         }
     }
 }

@@ -26,9 +26,9 @@ class HookGuiContainer : HookProvider("net.minecraft.client.gui.inventory.GuiCon
 
         var color = -1
         if (InventoryHelper.usefulItems.contains(slot)) {
-            color = InventoryHelper.usefulColorValue.get()
+            color = InventoryHelper.usefulColorValue
         } else if (InventoryHelper.garbageItems.contains(slot)) {
-            color = InventoryHelper.garbageColorValue.get()
+            color = InventoryHelper.garbageColorValue
         }
         if (color != -1) {
             GL11.glDisable(GL11.GL_TEXTURE_2D)

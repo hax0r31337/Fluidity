@@ -14,13 +14,13 @@ import java.awt.Color
 
 object Glint : Module("Glint", "Custom glint effect", ModuleCategory.RENDER) {
 
-    private val modeValue = ListValue("Mode", arrayOf("Rainbow", "Custom"), "Custom")
-    private val colorValue = ColorValue("Color", Color.RED.rgb)
+    private val modeValue by ListValue("Mode", arrayOf("Rainbow", "Custom"), "Custom")
+    private val colorValue by ColorValue("Color", Color.RED.rgb)
 
     fun getColor(): Int {
-        return when (modeValue.get()) {
+        return when (modeValue) {
             "Rainbow" -> rainbow(1).rgb
-            else -> colorValue.get()
+            else -> colorValue
         }
     }
 }

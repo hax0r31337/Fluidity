@@ -33,15 +33,15 @@ import java.awt.Color
 
 class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) {
 
-    private val blockValue = BlockValue("Block", 26)
-    private val rangeValue = FloatValue("Range", 5F, 1F, 7F)
-    private val switchValue = IntValue("SwitchDelay", 250, 0, 1000)
-    private val actionValue = ListValue("Action", arrayOf("Destroy", "Use"), "Destroy")
-    private val rotationsValue = ListValue("Rotations", arrayOf("Silent", "Direct", "None"), "Silent")
-    private val updateHandleValue = ListValue("UpdateHandle", arrayOf("NotTarget", "Breakable", "None"), "NotTarget")
-    private val swingValue = BoolValue("Swing", true)
-    private val throughWallsValue = BoolValue("ThroughWalls", false)
-    private val bypassValue = BoolValue("Bypass", false)
+    private val blockValue by BlockValue("Block", 26)
+    private val rangeValue by FloatValue("Range", 5F, 1F, 7F)
+    private val switchValue by IntValue("SwitchDelay", 250, 0, 1000)
+    private val actionValue by ListValue("Action", arrayOf("Destroy", "Use"), "Destroy")
+    private val rotationsValue by ListValue("Rotations", arrayOf("Silent", "Direct", "None"), "Silent")
+    private val updateHandleValue by ListValue("UpdateHandle", arrayOf("NotTarget", "Breakable", "None"), "NotTarget")
+    private val swingValue by BoolValue("Swing", true)
+    private val throughWallsValue by BoolValue("ThroughWalls", false)
+    private val bypassValue by BoolValue("Bypass", false)
 
     private var pos: BlockPos? = null
     private var oldPos: BlockPos? = null
@@ -57,10 +57,10 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
 
     @Listen
     fun onUpdate(event: UpdateEvent) {
-        if (pos == null || pos!!.getCenterDistance() > rangeValue.get()
-            || (updateHandleValue.get() == "NotTarget" && (pos!!.getBlock()?.let { Block.getIdFromBlock(it) } ?: -1) != blockValue.get())
-            || (updateHandleValue.get() == "Breakable" && (pos!!.getBlock()?.getBlockHardness(mc.theWorld, pos!!) ?: -1f) < 0f)) {
-            pos = find(blockValue.get())
+        if (pos == null || pos!!.getCenterDistance() > rangeValue
+            || (updateHandleValue == "NotTarget" && (pos!!.getBlock()?.let { Block.getIdFromBlock(it) } ?: -1) != blockValue)
+            || (updateHandleValue == "Breakable" && (pos!!.getBlock()?.getBlockHardness(mc.theWorld, pos!!) ?: -1f) < 0f)) {
+            pos = find(blockValue)
         }
 
         if (pos == null) {
@@ -74,21 +74,21 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
         }
         oldPos = pos
 
-        if (!switchTimer.hasTimePassed(switchValue.get())) {
+        if (!switchTimer.hasTimePassed(switchValue)) {
             return
         }
 
         val rotation = toRotation(Vec3(pos!!.x.toDouble() + 0.5, pos!!.y.toDouble() + 0.5, pos!!.z.toDouble() + 0.5), true)
-        when(rotationsValue.get()) {
+        when(rotationsValue) {
             "Silent" -> setServerRotation(rotation.first, rotation.second)
             "Direct" -> setClientRotation(rotation.first, rotation.second)
         }
 
-        when(actionValue.get()) {
+        when(actionValue) {
             "Destroy" -> {
                 var block = pos!!.getBlock() ?: return
                 var pos = pos
-                if (bypassValue.get()) {
+                if (bypassValue) {
                     val blockUp = BlockPos(pos!!.x, pos!!.y + 1, pos!!.z).getBlock()
                     if (blockUp != null && blockUp != Blocks.air) {
                         block = blockUp
@@ -103,7 +103,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
 
                     if (mc.thePlayer.capabilities.isCreativeMode ||
                         block.getPlayerRelativeBlockHardness(mc.thePlayer, mc.theWorld!!, pos!!) >= 1.0F) {
-                        if (swingValue.get())
+                        if (swingValue)
                             mc.thePlayer.swingItem()
                         mc.playerController.onPlayerDestroyBlock(pos!!, EnumFacing.DOWN)
 
@@ -113,7 +113,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
                     }
                 }
 
-                if (swingValue.get())
+                if (swingValue)
                     mc.thePlayer.swingItem()
 
                 currentDamage += block.getPlayerRelativeBlockHardness(mc.thePlayer, mc.theWorld!!, pos)
@@ -132,7 +132,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
                 if (mc.playerController.onPlayerRightClick(
                         mc.thePlayer, mc.theWorld, mc.thePlayer.heldItem, pos, EnumFacing.DOWN,
                         Vec3(pos!!.x.toDouble(), pos!!.y.toDouble(), pos!!.z.toDouble()))) {
-                    if (swingValue.get())
+                    if (swingValue)
                         mc.thePlayer.swingItem()
                     currentDamage = 0F
                     pos = null
@@ -171,7 +171,7 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
 
     private fun find(targetID: Int): BlockPos? {
         val floorPos = mc.thePlayer.floorPosition
-        val radius = rangeValue.get().toInt() + 1
+        val radius = rangeValue.toInt() + 1
 
         var nearestBlockDistance = Double.MAX_VALUE
         var nearestBlock: BlockPos? = null
@@ -185,9 +185,9 @@ class Miner : Module("Miner", "Auto mine blocks for you", ModuleCategory.WORLD) 
                     if (Block.getIdFromBlock(block) != targetID) continue
 
                     val distance = blockPos.getCenterDistance()
-                    if (distance > rangeValue.get()) continue
+                    if (distance > rangeValue) continue
                     if (nearestBlockDistance < distance) continue
-                    if (!throughWallsValue.get() && !isHitable(blockPos)) continue
+                    if (!throughWallsValue && !isHitable(blockPos)) continue
 
                     nearestBlockDistance = distance
                     nearestBlock = blockPos
