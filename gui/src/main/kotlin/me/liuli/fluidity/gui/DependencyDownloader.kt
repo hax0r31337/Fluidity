@@ -43,7 +43,7 @@ object DependencyDownloader {
     private var downloadedSize = 0
 
     init {
-        val skikoVer = "0.7.44"
+        val skikoVer = "0.7.36"
         val baseUrl = "https://ayanoyuugiri.github.io/resources/skiko/$skikoVer"
         System.mapLibraryName("skiko-$os-$arch").also {
             dependencyList.add(Dependency(it, "$baseUrl/$it", skikoVer))
