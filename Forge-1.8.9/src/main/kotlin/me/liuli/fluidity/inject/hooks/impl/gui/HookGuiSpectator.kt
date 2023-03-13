@@ -7,8 +7,8 @@ package me.liuli.fluidity.inject.hooks.impl.gui
 
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.Render2DEvent
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.yuugiri.hutil.processor.hook.MethodHookParam
 import net.minecraft.client.gui.ScaledResolution
 

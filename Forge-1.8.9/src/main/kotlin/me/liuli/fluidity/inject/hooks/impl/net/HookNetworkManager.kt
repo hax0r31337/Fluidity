@@ -7,8 +7,8 @@ package me.liuli.fluidity.inject.hooks.impl.net
 
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.PacketEvent
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.util.client.PacketUtils
 import me.liuli.fluidity.util.client.PacketUtils.getPacketType
 import me.yuugiri.hutil.processor.hook.MethodHookParam

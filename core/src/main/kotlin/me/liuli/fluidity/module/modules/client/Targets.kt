@@ -14,7 +14,6 @@ import me.liuli.fluidity.module.modules.misc.DungeonAssist
 import me.liuli.fluidity.module.special.CombatManager
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.ListValue
-import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase

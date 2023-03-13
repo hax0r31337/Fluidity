@@ -5,8 +5,8 @@
 
 package me.liuli.fluidity.inject.hooks.impl.world
 
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.module.modules.misc.BetterButton
 import me.liuli.fluidity.module.modules.world.FastMine
 import me.yuugiri.hutil.processor.hook.MethodHookParam

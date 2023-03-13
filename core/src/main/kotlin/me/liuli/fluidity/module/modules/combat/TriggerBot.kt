@@ -6,7 +6,6 @@
 package me.liuli.fluidity.module.modules.combat
 
 import me.liuli.fluidity.event.Listen
-import me.liuli.fluidity.event.PostMotionEvent
 import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
@@ -15,21 +14,13 @@ import me.liuli.fluidity.module.special.CombatManager
 import me.liuli.fluidity.module.value.BoolValue
 import me.liuli.fluidity.module.value.IntValue
 import me.liuli.fluidity.module.value.ListValue
-import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.timing.ClickTimer
 import me.liuli.fluidity.util.world.getDistanceToEntityBox
 import me.liuli.fluidity.util.world.rayTraceEntity
-import net.minecraft.client.Minecraft
-import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemSword
-import net.minecraft.network.play.client.C07PacketPlayerDigging
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.MovingObjectPosition
 
 class TriggerBot : Module("TriggerBot", "Automatically attack the target you view", ModuleCategory.COMBAT) {
 
@@ -65,7 +56,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     }
 
     @Listen
-    fun onPostMotion(event: PostMotionEvent) {
+    fun onPreMotion(event: PreMotionEvent) {
         // autoblock
         val canBlock = mc.thePlayer.heldItem?.item is ItemSword && when(autoBlockValue) {
             "Vanilla" -> mc.theWorld.loadedEntityList.any { mc.thePlayer.getDistanceToEntityBox(it) < Reach.reach && it.isTarget(true) }

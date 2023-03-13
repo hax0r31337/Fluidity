@@ -5,8 +5,8 @@
 
 package me.liuli.fluidity.inject.hooks.impl.entity
 
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.module.modules.movement.KeepSprint
 import me.liuli.fluidity.module.special.CombatManager
 import me.liuli.fluidity.util.mc

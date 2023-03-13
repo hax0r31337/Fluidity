@@ -11,10 +11,7 @@ import me.liuli.fluidity.event.KeyEvent
 import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.Listener
 import me.liuli.fluidity.util.client.displayAlert
-import me.liuli.fluidity.util.client.logError
-import me.liuli.fluidity.util.other.getObjectInstance
 import me.liuli.fluidity.util.other.resolveInstances
-import me.liuli.fluidity.util.other.resolvePackage
 import org.lwjgl.input.Keyboard
 
 object ModuleManager : Listener {

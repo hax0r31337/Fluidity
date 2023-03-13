@@ -8,8 +8,8 @@ package me.liuli.fluidity.inject.hooks.impl.entity
 import me.liuli.fluidity.Fluidity
 import me.liuli.fluidity.event.AttackEvent
 import me.liuli.fluidity.event.ClickBlockEvent
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.module.modules.combat.Reach
 import me.yuugiri.hutil.processor.hook.MethodHookParam
 import net.minecraft.entity.Entity

@@ -6,11 +6,11 @@
 package me.liuli.fluidity.inject;
 
 import me.liuli.fluidity.Fluidity;
-import me.liuli.fluidity.module.modules.combat.Reach;
 import me.liuli.fluidity.util.client.ClientUtilsKt;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.EnumWorldBlockLayer;
 
 /**
  * values() will cause performance issues, so we store them in a static array.

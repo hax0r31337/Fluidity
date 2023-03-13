@@ -8,7 +8,6 @@ package me.liuli.fluidity.module.modules.combat
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.module.value.FloatValue
-import kotlin.math.max
 
 object Reach : Module("Reach", "Increase your hand length", ModuleCategory.COMBAT) {
 

@@ -5,19 +5,15 @@
 
 package me.liuli.fluidity.inject
 
-import me.yuugiri.hutil.HookUtility
-import me.yuugiri.hutil.obfuscation.SeargeObfuscationMap
-import me.yuugiri.hutil.processor.hook.MethodHookProcessor
 import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.processor.MethodNodeProcessor
 import me.liuli.fluidity.inject.processor.OptimizeProcessor
 import me.liuli.fluidity.util.other.resolveInstances
+import me.yuugiri.hutil.HookUtility
+import me.yuugiri.hutil.obfuscation.SeargeObfuscationMap
 import me.yuugiri.hutil.processor.AccessProcessor
+import me.yuugiri.hutil.processor.hook.MethodHookProcessor
 import net.minecraft.launchwrapper.IClassTransformer
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.tree.ClassNode
-import java.io.File
 import java.util.zip.GZIPInputStream
 
 class HookUtilityCompatTransformer : IClassTransformer {

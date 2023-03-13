@@ -5,8 +5,8 @@
 
 package me.liuli.fluidity.inject.hooks.impl.net
 
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.module.modules.misc.NoRotateSet
 import me.liuli.fluidity.util.mc
 import me.yuugiri.hutil.processor.hook.MethodHookParam
@@ -14,7 +14,6 @@ import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.play.client.C03PacketPlayer.C06PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
 import net.minecraft.network.play.server.S08PacketPlayerPosLook.EnumFlags
-import net.minecraft.network.play.server.S40PacketDisconnect
 import net.minecraft.util.ChatComponentText
 
 class HookNetHandlerPlayClient : HookProvider("net.minecraft.client.network.NetHandlerPlayClient") {

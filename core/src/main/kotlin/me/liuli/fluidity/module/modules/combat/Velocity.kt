@@ -14,7 +14,6 @@ import me.liuli.fluidity.module.value.FloatValue
 import me.liuli.fluidity.module.value.ListValue
 import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
-import me.liuli.fluidity.util.move.direction
 import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.network.play.server.S12PacketEntityVelocity
 import net.minecraft.network.play.server.S19PacketEntityStatus

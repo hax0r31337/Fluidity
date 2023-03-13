@@ -9,7 +9,6 @@ import com.google.gson.JsonParser
 import io.netty.buffer.Unpooled
 import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PacketEvent
-import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.util.client.displayAlert

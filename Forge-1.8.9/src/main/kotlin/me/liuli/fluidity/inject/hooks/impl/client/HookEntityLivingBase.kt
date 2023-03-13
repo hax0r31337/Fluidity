@@ -5,8 +5,8 @@
 
 package me.liuli.fluidity.inject.hooks.impl.client
 
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.lastReportedPitch
 import me.liuli.fluidity.util.move.lastReportedYaw

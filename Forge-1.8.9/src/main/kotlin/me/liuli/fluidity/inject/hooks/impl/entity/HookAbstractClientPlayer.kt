@@ -5,8 +5,8 @@
 
 package me.liuli.fluidity.inject.hooks.impl.entity
 
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.module.modules.render.NoFOV
 import me.liuli.fluidity.module.modules.render.NoFOV.fovValue
 import me.yuugiri.hutil.processor.hook.MethodHookParam

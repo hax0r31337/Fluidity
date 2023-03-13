@@ -8,7 +8,6 @@ package me.liuli.fluidity.util.move
 import me.liuli.fluidity.util.mc
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3

@@ -5,7 +5,9 @@
 
 package me.liuli.fluidity.module.modules.misc.disabler
 
-import me.liuli.fluidity.event.*
+import me.liuli.fluidity.event.PacketEvent
+import me.liuli.fluidity.event.UpdateEvent
+import me.liuli.fluidity.event.WorldEvent
 
 abstract class DisablerMode(val name: String) {
 

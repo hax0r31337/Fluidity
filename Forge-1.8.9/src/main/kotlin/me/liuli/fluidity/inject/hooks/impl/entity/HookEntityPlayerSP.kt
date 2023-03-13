@@ -6,7 +6,10 @@
 package me.liuli.fluidity.inject.hooks.impl.entity
 
 import me.liuli.fluidity.Fluidity
-import me.liuli.fluidity.event.*
+import me.liuli.fluidity.event.PostMotionEvent
+import me.liuli.fluidity.event.PreMotionEvent
+import me.liuli.fluidity.event.SlowDownEvent
+import me.liuli.fluidity.event.UpdateEvent
 import me.liuli.fluidity.inject.hooks.Hook
 import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.MethodProcess
@@ -17,11 +20,7 @@ import me.yuugiri.hutil.processor.hook.MethodHookParam
 import me.yuugiri.hutil.util.forEach
 import net.minecraft.client.entity.EntityPlayerSP
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.FieldInsnNode
-import org.objectweb.asm.tree.InsnNode
-import org.objectweb.asm.tree.LdcInsnNode
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.MethodNode
+import org.objectweb.asm.tree.*
 
 object HookEntityPlayerSP : HookProvider("net.minecraft.client.entity.EntityPlayerSP") {
 

@@ -5,8 +5,8 @@
 
 package me.liuli.fluidity.inject.hooks.impl.gui
 
-import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.inject.hooks.Hook
+import me.liuli.fluidity.inject.hooks.HookProvider
 import me.liuli.fluidity.module.modules.player.InventoryHelper
 import me.liuli.fluidity.util.render.glColor
 import me.liuli.fluidity.util.render.quickDrawRect

@@ -12,8 +12,7 @@ import me.liuli.fluidity.module.ModuleCategory
 import me.liuli.fluidity.util.mc
 import net.minecraft.client.gui.GuiDownloadTerrain
 import net.minecraft.network.Packet
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 
 class Blink : Module("Blink", "Suspend packet send and make server thought you were lag", ModuleCategory.MISC) {
 
