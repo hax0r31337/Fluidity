@@ -10,7 +10,6 @@ import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
-import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.setServerRotation
 import me.liuli.fluidity.util.move.toRotation
@@ -23,7 +22,6 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
 import java.awt.Color
-import kotlin.math.abs
 
 
 class Scaffold : Module("Scaffold", "place blocks automatically", ModuleCategory.WORLD) {
@@ -95,10 +93,6 @@ class Scaffold : Module("Scaffold", "place blocks automatically", ModuleCategory
                 }
                 blockNear.clear()
             }
-        }
-
-        if (possibilities.isEmpty()) {
-            displayAlert("no possibility found")
         }
 
         return possibilities
