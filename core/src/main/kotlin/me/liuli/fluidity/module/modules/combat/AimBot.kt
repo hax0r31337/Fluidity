@@ -104,7 +104,7 @@ class AimBot : Module("AimBot", "Helps you aim on your targets", ModuleCategory.
                 if (hurt == 0f) {
                     pikanwLastYaw = correctAim.first
                 }
-                var yaw = hurt * 60f + if (hurt != 0f) -30f + pikanwLastYaw else ((Math.random().toFloat() - 0.5f) * 3 + correctAim.first)
+                val yaw = hurt * 60f + if (hurt != 0f) -30f + pikanwLastYaw else ((Math.random().toFloat() - 0.5f) * 3 + correctAim.first)
                 Pair(yaw, (correctAim.second + (Math.random().toFloat() - 0.5f) * 3).coerceIn(-89.9f, 89.9f))
             }
             else -> throw IllegalArgumentException("Invalid aiming mode: ${aimingModeValue}")

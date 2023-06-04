@@ -9,6 +9,7 @@ import me.liuli.fluidity.event.Listen
 import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.module.modules.client.Targets
 import me.liuli.fluidity.module.modules.client.Targets.isTarget
 import me.liuli.fluidity.module.special.CombatManager
 import me.liuli.fluidity.module.value.BoolValue
@@ -28,7 +29,6 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
     private val maxCpsValue by IntValue("MaxCPS", 12, 1, 20)
     private val swingItemValue by BoolValue("SwingItem", true)
     private val rayCastValue by BoolValue("RayCast", false)
-    private val throughWallsValue by BoolValue("ThroughWalls", false)
     private val noBlockAttacksValue by ListValue("NoBlockAttacks", arrayOf("Always", "Tick", "None"), "None")
     private val autoBlockValue by ListValue("AutoBlock", arrayOf("Vanilla", "Hurt", "None"), "None")
     private val autoBlockPacketValue by ListValue("AutoBlockPacket", arrayOf("Vanilla", "Packet"), "Vanilla")
@@ -86,7 +86,7 @@ class TriggerBot : Module("TriggerBot", "Automatically attack the target you vie
 
         if (clickTimer.canClick()) {
             val target = rayTraceTarget()
-            if (target != null) {
+            if (target != null && target.isTarget()) {
                 // attack
                 if (swingItemValue) {
                     mc.thePlayer.swingItem()

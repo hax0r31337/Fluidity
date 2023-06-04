@@ -43,18 +43,20 @@ object HookEntityPlayerSP : HookProvider("net.minecraft.client.entity.EntityPlay
 
     @MethodProcess(method = "onUpdateWalkingPlayer")
     fun getMouseOver(obfuscationMap: AbstractObfuscationMap?, method: MethodNode) {
-        var hasHooked = 0
         val entityClassName = AbstractObfuscationMap.classObfuscationRecordReverse(obfuscationMap, "net/minecraft/entity/Entity").obfuscatedName
+        val ops = mutableListOf<Pair<FieldInsnNode, String>>()
         method.instructions.forEach {
             if (it !is FieldInsnNode) return@forEach
             val obf = AbstractObfuscationMap.fieldObfuscationRecord(obfuscationMap, entityClassName, it.name) // TODO: use reverse obfmap check
             if (obf.name != "rotationYaw" && obf.name != "rotationPitch") return@forEach
-            method.instructions.insertBefore(it, InsnNode(Opcodes.POP)) // pop "this" on stack
-            method.instructions.insertBefore(it, MethodInsnNode(Opcodes.INVOKESTATIC, RotationUtils::class.java.asmName, obf.name, "()F", false))
-            method.instructions.remove(it)
-            hasHooked++
+            ops.add(it to obf.name)
         }
-        if (hasHooked < 2) throw UnknownError("unable to found hook point for net.minecraft.client.entity.EntityPlayerSP.onUpdateWalkingPlayer()V")
+        if (ops.isEmpty()) throw UnknownError("unable to found hook point for net.minecraft.client.entity.EntityPlayerSP.onUpdateWalkingPlayer()V")
+        ops.forEach {
+            method.instructions.insertBefore(it.first, InsnNode(Opcodes.POP)) // pop "this" on stack
+            method.instructions.insertBefore(it.first, MethodInsnNode(Opcodes.INVOKESTATIC, RotationUtils::class.java.asmName, it.second, "()F", false))
+            method.instructions.remove(it.first)
+        }
     }
 
     @Hook(method = "onLivingUpdate", type = Hook.Type("ENTER"))
