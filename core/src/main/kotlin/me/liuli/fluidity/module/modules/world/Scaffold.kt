@@ -10,17 +10,20 @@ import me.liuli.fluidity.event.PreMotionEvent
 import me.liuli.fluidity.event.Render3DEvent
 import me.liuli.fluidity.module.Module
 import me.liuli.fluidity.module.ModuleCategory
+import me.liuli.fluidity.util.client.displayAlert
 import me.liuli.fluidity.util.mc
 import me.liuli.fluidity.util.move.setServerRotation
 import me.liuli.fluidity.util.move.toRotation
 import me.liuli.fluidity.util.render.drawAxisAlignedBB
 import net.minecraft.block.BlockAir
+import net.minecraft.item.ItemBlock
 import net.minecraft.network.play.client.C0APacketAnimation
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
 import java.awt.Color
+import kotlin.math.abs
 
 
 class Scaffold : Module("Scaffold", "place blocks automatically", ModuleCategory.WORLD) {
@@ -32,6 +35,7 @@ class Scaffold : Module("Scaffold", "place blocks automatically", ModuleCategory
     @Listen
     fun onPreMotion(event: PreMotionEvent) {
         render = null
+        if (mc.thePlayer.heldItem?.item !is ItemBlock) return
         val possibilities = searchBlocks(mc.thePlayer.posX, mc.thePlayer.posY,
             mc.thePlayer.posZ, 1)
         val block = possibilities.firstOrNull() ?: return
@@ -60,13 +64,25 @@ class Scaffold : Module("Scaffold", "place blocks automatically", ModuleCategory
         val rangeSq = 4.5 * 4.5
         val blockNear = mutableListOf<EnumFacing>()
         val bb = mc.thePlayer.entityBoundingBox.offset(0.0, -1.0, 0.0)
+        val standbb = bb.expand(-0.3, 0.0, -0.3)
+        val isMoveHorizontal = (mc.thePlayer.posY - mc.thePlayer.prevPosY) < 0.05
 
         for (x in -range..range) {
             for (z in -range..range) {
                 val pos = BlockPos(offsetX + x, offsetY - 0.625, offsetZ + z)
                 val block = mc.theWorld.getBlockState(pos)?.block ?: continue
-                if (block !is BlockAir) continue
-                else if (pos.distanceSq(offsetX, offsetY + 1.62, offsetZ) > rangeSq) continue
+                val posbb = AxisAlignedBB(pos, pos.add(1, 1, 1))
+                if (block !is BlockAir) {
+                    if (isMoveHorizontal && standbb.intersectsWith(posbb)) {
+                        return emptyList()
+                    } else {
+                        continue
+                    }
+                } else if (pos.distanceSq(offsetX, offsetY + 1.62, offsetZ) > rangeSq) {
+                    continue
+                } else if (!bb.intersectsWith(posbb)) {
+                    continue
+                }
                 EnumFacing.values().forEach {
                     val offset = pos.offset(it)
                     if (mc.theWorld.getBlockState(offset)?.block !is BlockAir/*
@@ -74,11 +90,15 @@ class Scaffold : Module("Scaffold", "place blocks automatically", ModuleCategory
                         blockNear.add(it)
                     }
                 }
-                if (blockNear.size != 6 && blockNear.isNotEmpty() && bb.intersectsWith(AxisAlignedBB(pos, pos.add(1, 1, 1)))) {
+                if (blockNear.size != 6 && blockNear.isNotEmpty()) {
                     possibilities.add(pos)
                 }
                 blockNear.clear()
             }
+        }
+
+        if (possibilities.isEmpty()) {
+            displayAlert("no possibility found")
         }
 
         return possibilities
